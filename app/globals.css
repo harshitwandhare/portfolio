@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Tokens.
+
+   Chosen deliberately against the 2026 generated-site signature: no Inter, no
+   blue/indigo/violet, no default Tailwind scale. The single accent is a warm
+   orange — Nagpur is India's Orange City, which puts the one saturated colour
+   on the site outside the 200–290° hue band that every template lives in.
+
+   Light is designed, not inverted. Both modes are checked to WCAG AA.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, 'SF Mono', monospace;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+
+  /* A strict modular scale — four sizes for the whole site. */
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.5;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+  --text-lede: 1.375rem;
+  --text-lede--line-height: 1.45;
+  --text-display: clamp(2.25rem, 6vw, 4.5rem);
+  --text-display--line-height: 1.02;
+}
+
+:root {
+  --bg: #faf9f7;
+  --bg-sunk: #f2f0ec;
+  --fg: #16130f;
+  --fg-muted: #6b635a;
+  --fg-faint: #726858;
+  --line: #e2ded6;
+  --line-strong: #cec8bd;
+  --accent: #a3480a;
+  --accent-soft: #f5e6d6;
+  --dot: #cec8bd;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0a0a0a;
+  --bg-sunk: #121110;
+  --fg: #ebe7e1;
+  --fg-muted: #8f877d;
+  --fg-faint: #847b70;
+  --line: #232120;
+  --line-strong: #35322f;
+  --accent: #f2a25c;
+  --accent-soft: #2a1c10;
+  --dot: #35322f;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0a0a0a;
+    --bg-sunk: #121110;
+    --fg: #ebe7e1;
+    --fg-muted: #8f877d;
+    --fg-faint: #847b70;
+    --line: #232120;
+    --line-strong: #35322f;
+    --accent: #f2a25c;
+    --accent-soft: #2a1c10;
+    --dot: #35322f;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-sunk: var(--bg-sunk);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-faint: var(--fg-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-dot: var(--dot);
+}
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Metadata voice: indices, dates, metrics, stack labels. */
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Same voice, but for a sentence rather than a label — uppercasing a whole
+   paragraph is unreadable. */
+.mono-note {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  letter-spacing: 0.01em;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.25em;
+}
+
+/* The toggle's label follows the same attribute the theme itself follows, so
+   there is nothing to keep in sync. Light showing → offer dark, and vice versa. */
+.theme-toggle__to-light {
+  display: none;
+}
+.theme-toggle__to-dark {
+  display: inline;
+}
+:root[data-theme='dark'] .theme-toggle__to-dark {
+  display: none;
+}
+:root[data-theme='dark'] .theme-toggle__to-light {
+  display: inline;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-toggle__to-dark {
+    display: none;
+  }
+  :root:not([data-theme='light']) .theme-toggle__to-light {
+    display: inline;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* The stroke draws itself. Honoured fully by the reduced-motion rule below —
+   the finished figure is shown immediately rather than the motion being
+   merely shortened. */
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--len);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.stroke-draw {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  animation: draw 4.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .stroke-draw {
+    stroke-dashoffset: 0;
+  }
+}
