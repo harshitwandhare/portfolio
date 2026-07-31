@@ -99,21 +99,21 @@ a reader can go and check.
 
 CI fails on any of these, and they run on every pull request.
 
-| Gate           | Bar                                                                 |
-| -------------- | ------------------------------------------------------------------- |
-| Format         | Prettier, checked not fixed                                         |
-| Lint           | ESLint, zero warnings                                               |
-| Types          | `tsc --strict`, `noUncheckedIndexedAccess`, zero `any`              |
-| Unit           | Vitest — **100% line and function coverage** on `lib/`              |
-| E2E            | Playwright × Chromium, Firefox, WebKit, mobile                      |
-| Accessibility  | `@axe-core/playwright` — zero critical or serious violations        |
-| Console        | Zero errors _and_ zero warnings in production                       |
-| No-JS          | Core content must render with scripting disabled                    |
-| Reduced motion | The finished figure must show immediately, not animate faster       |
-| Overflow       | No horizontal scroll at 375 / 768 / 1280 / 1920                     |
-| Links          | Every external URL must resolve under 400                           |
-| Bundle         | First-load JS measured in a real browser, per route                 |
-| Lighthouse     | Performance ≥ 95 · Accessibility 100 · Best Practices 100           |
+| Gate           | Bar                                                           |
+| -------------- | ------------------------------------------------------------- |
+| Format         | Prettier, checked not fixed                                   |
+| Lint           | ESLint, zero warnings                                         |
+| Types          | `tsc --strict`, `noUncheckedIndexedAccess`, zero `any`        |
+| Unit           | Vitest — **100% line and function coverage** on `lib/`        |
+| E2E            | Playwright × Chromium, Firefox, WebKit, mobile                |
+| Accessibility  | `@axe-core/playwright` — zero critical or serious violations  |
+| Console        | Zero errors _and_ zero warnings in production                 |
+| No-JS          | Core content must render with scripting disabled              |
+| Reduced motion | The finished figure must show immediately, not animate faster |
+| Overflow       | No horizontal scroll at 375 / 768 / 1280 / 1920               |
+| Links          | Every external URL must resolve under 400                     |
+| Bundle         | First-load JS measured in a real browser, per route           |
+| Lighthouse     | Performance ≥ 95 · Accessibility 100 · Best Practices 100     |
 
 Measured locally against the production build, all three routes:
 
@@ -129,8 +129,6 @@ Measured locally against the production build, all three routes:
 these are concept previews and carry `robots: noindex`. Every other SEO check
 passes. The assertion is relaxed for exactly that one audit rather than for the
 category, so the rest still gates.
-
-
 
 **First-load JS is budgeted at 160 KB, not the 100 KB originally targeted.** A route
 with no client components at all still costs ~146 KB gzipped, because that is React

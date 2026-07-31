@@ -4,3 +4,4 @@ out
 package-lock.json
 data/*.json
 public
+next-env.d.ts
