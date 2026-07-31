@@ -1,0 +1,18 @@
+node_modules
+.next
+out
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+
+# test + audit artefacts
+test-results/
+playwright-report/
+playwright/.cache/
+coverage/
+.lighthouseci/
+
+# editor
+.claude/
+.vscode/
