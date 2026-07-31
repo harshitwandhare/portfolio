@@ -55,7 +55,10 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # The site is a work sample; a bloated bundle is a visible defect.
+      # The site is a work sample; a bloated bundle is a visible defect. The
+      # budget is measured by loading the built site in a real browser, so this
+      # job needs one.
+      - run: npx playwright install --with-deps chromium
       - name: Check first-load JS budget
         run: node scripts/check-bundle-budget.mjs
 
@@ -89,7 +92,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm i -g @lhci/cli@0.15.x
-      - run: lhci autorun
+      # @lhci/cli is a devDependency, so the pinned local copy is used rather
+      # than whatever a global install resolves to that day.
+      - run: npx lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
