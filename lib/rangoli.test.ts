@@ -1,0 +1,109 @@
+import { describe, expect, it } from 'vitest'
+import { generateRangoli, type Arc } from './rangoli'
+
+/**
+ * The figure on the page is only worth anything if the constraint actually
+ * holds. These tests assert the three properties the drawing claims: it is one
+ * closed curve, it covers the whole lattice, and it never touches a dot.
+ */
+
+const GRIDS = [
+  { rows: 3, cols: 3 },
+  { rows: 4, cols: 6 },
+  { rows: 6, cols: 6 },
+  { rows: 6, cols: 9 },
+  { rows: 8, cols: 12 },
+  { rows: 13, cols: 27 },
+] as const
+
+const SEEDS = [1, 2, 3, 7, 23, 42, 99, 1234]
+
+/** Arcs per cell (2) plus one link for each pair of perimeter midpoints. */
+function expectedArcs(rows: number, cols: number): number {
+  return rows * cols * 2 + (2 * rows + 2 * cols) / 2
+}
+
+const key = (p: readonly [number, number]) => `${p[0].toFixed(4)},${p[1].toFixed(4)}`
+
+describe('generateRangoli', () => {
+  it.each(GRIDS)('collapses to a single closed stroke on a $rows×$cols lattice', (grid) => {
+    for (const seed of SEEDS) {
+      const r = generateRangoli({ ...grid, seed, size: 40 })
+
+      // Every arc in the tiling is used exactly once, so the walk covered the
+      // whole lattice rather than getting stuck in one small loop.
+      expect(r.length).toBe(expectedArcs(grid.rows, grid.cols))
+
+      // The path is explicitly closed.
+      expect(r.path.endsWith('Z')).toBe(true)
+      expect(r.path.startsWith('M ')).toBe(true)
+    }
+  })
+
+  it.each(GRIDS)('joins end to end with no breaks on a $rows×$cols lattice', (grid) => {
+    for (const seed of SEEDS) {
+      const { stroke } = generateRangoli({ ...grid, seed, size: 40 })
+
+      // Each arc must begin exactly where the previous one ended.
+      for (let i = 1; i < stroke.length; i++) {
+        expect(key(stroke[i]!.from)).toBe(key(stroke[i - 1]!.to))
+      }
+      // And the last must return to the first — a closed loop, not a path.
+      expect(key(stroke.at(-1)!.to)).toBe(key(stroke[0]!.from))
+    }
+  })
+
+  it('visits every midpoint exactly once, so the curve never self-intersects', () => {
+    for (const seed of SEEDS) {
+      const { stroke } = generateRangoli({ rows: 6, cols: 9, seed, size: 40 })
+      const visited = stroke.map((a: Arc) => key(a.from))
+      expect(new Set(visited).size).toBe(visited.length)
+    }
+  })
+
+  it('never draws through a dot — every arc keeps its radius from the dot it circles', () => {
+    const size = 40
+    const r = generateRangoli({ rows: 6, cols: 6, seed: 23, size })
+    const dots = new Set(r.dots.map(key))
+
+    for (const arc of r.stroke) {
+      // Arc endpoints are edge midpoints, never lattice points.
+      expect(dots.has(key(arc.from))).toBe(false)
+      expect(dots.has(key(arc.to))).toBe(false)
+
+      // A curved arc sits exactly one radius from the dot it goes around.
+      if (arc.around !== arc.from) {
+        const d = Math.hypot(arc.from[0] - arc.around[0], arc.from[1] - arc.around[1])
+        expect(d).toBeCloseTo(size / 2, 6)
+      }
+    }
+  })
+
+  it('needs exactly one flip per loop it has to splice', () => {
+    for (const seed of SEEDS) {
+      const r = generateRangoli({ rows: 8, cols: 12, seed, size: 40 })
+      expect(r.flips).toBe(r.loopsBefore - 1)
+    }
+  })
+
+  it('is deterministic — the same seed gives the same figure', () => {
+    const a = generateRangoli({ rows: 6, cols: 9, seed: 42, size: 40 })
+    const b = generateRangoli({ rows: 6, cols: 9, seed: 42, size: 40 })
+    expect(a.path).toBe(b.path)
+    expect(a.flips).toBe(b.flips)
+  })
+
+  it('gives different figures for different seeds', () => {
+    const a = generateRangoli({ rows: 6, cols: 9, seed: 1, size: 40 })
+    const b = generateRangoli({ rows: 6, cols: 9, seed: 2, size: 40 })
+    expect(a.path).not.toBe(b.path)
+  })
+
+  it('lays out a full dot lattice with the expected geometry', () => {
+    const r = generateRangoli({ rows: 4, cols: 6, seed: 1, size: 40, pad: 20 })
+    expect(r.dots).toHaveLength((4 + 1) * (6 + 1))
+    expect(r.dots[0]).toEqual([20, 20])
+    expect(r.width).toBe(6 * 40 + 40)
+    expect(r.height).toBe(4 * 40 + 40)
+  })
+})
