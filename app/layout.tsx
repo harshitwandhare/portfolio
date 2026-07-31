@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Instrument_Sans, JetBrains_Mono, Newsreader } from 'next/font/google'
+import { SITE_URL } from '@/next.config'
 import './globals.css'
 import { ThemeToggle } from './theme-toggle'
 
@@ -22,8 +23,15 @@ const newsreader = Newsreader({
 })
 
 export const metadata: Metadata = {
+  // Resolves relative Open Graph and canonical URLs against the real domain
+  // rather than the deployment host, so a shared link never points at a
+  // *.vercel.app address.
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: '/' },
   title: 'Harshit Wandhare — concept lab',
-  description: 'Three directions for a personal engineering portfolio.',
+  description: 'Two directions for a personal engineering portfolio.',
+  // Stays until a direction is chosen. Until then this domain serves competing
+  // designs, which is not what should be indexed as his portfolio.
   robots: { index: false, follow: false },
 }
 
