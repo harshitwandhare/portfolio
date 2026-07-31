@@ -3,6 +3,10 @@
 Personal engineering site for **Harshit Wandhare**. Built to survive a recruiter's
 twenty-second skim and an engineer's twenty-minute one.
 
+**Live:** <https://portfolio-harshit-wandhare-s-projects.vercel.app>
+· [One Stroke](https://portfolio-harshit-wandhare-s-projects.vercel.app/lab/a)
+· [Reconstruction](https://portfolio-harshit-wandhare-s-projects.vercel.app/lab/c)
+
 [![CI](https://github.com/harshitwandhare/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/harshitwandhare/portfolio/actions/workflows/ci.yml)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.2%20LTS-000)](https://nextjs.org)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6)](https://www.typescriptlang.org)
