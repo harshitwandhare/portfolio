@@ -10,7 +10,19 @@ import nextTypescript from 'eslint-config-next/typescript'
  * the version, because detection uses the pre-10 rule context API.
  */
 const config = [
-  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'out/**'] },
+  {
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'next-env.d.ts',
+      'out/**',
+      // Generated reports and artefacts — not source.
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
+      '.lighthouseci/**',
+    ],
+  },
   ...coreWebVitals,
   ...nextTypescript,
   {
