@@ -37,9 +37,6 @@ export function RangoliFigure({
   const r = generateRangoli(options)
   const size = options.size ?? 40
 
-  // Rough path length for the draw animation. Each arc is a quarter circle of
-  // radius size/2, so its length is (π/2)(size/2); boundary chords are shorter.
-  const approxLength = Math.ceil(r.length * ((Math.PI / 2) * (size / 2)))
   const maxWeight = weights?.length ? Math.max(...weights, 1) : 1
   const origin = r.stroke[0]?.from
 
@@ -69,20 +66,21 @@ export function RangoliFigure({
             />
           )
         })}
+      {/* pathLength re-scales the path to 1 unit, so the dash pattern is exact
+          without anyone having to know how long the curve really is. Estimating
+          it — quarter-arcs plus straight boundary chords — under-counted, and a
+          dasharray shorter than the path leaves a gap that reads, wrongly, as
+          the figure being open. */}
       <path
         d={r.path}
+        pathLength={1}
         fill="none"
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
         className="stroke-draw"
-        style={
-          {
-            '--len': approxLength,
-            animationDuration: `${duration}s`,
-          } as React.CSSProperties
-        }
+        style={{ animationDuration: `${duration}s` }}
       />
       {showOrigin && origin && (
         <circle cx={origin[0]} cy={origin[1]} r={strokeWidth * 2.6} fill="var(--accent)" />

@@ -150,6 +150,29 @@ a {
   }
 }
 
+/* Theme-paired images (a logo drawn for dark vs light). Same mechanism as the
+   toggle label: the attribute is the single source of truth. */
+.only-light {
+  display: block;
+}
+.only-dark {
+  display: none;
+}
+:root[data-theme='dark'] .only-light {
+  display: none;
+}
+:root[data-theme='dark'] .only-dark {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .only-light {
+    display: none;
+  }
+  :root:not([data-theme='light']) .only-dark {
+    display: block;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -164,9 +187,11 @@ a {
 /* The stroke draws itself. Honoured fully by the reduced-motion rule below —
    the finished figure is shown immediately rather than the motion being
    merely shortened. */
+/* The figure draws itself. Lengths are in pathLength units — the <path> sets
+   pathLength="1", so 1 is the whole curve no matter its real size. */
 @keyframes draw {
   from {
-    stroke-dashoffset: var(--len);
+    stroke-dashoffset: 1;
   }
   to {
     stroke-dashoffset: 0;
@@ -174,8 +199,8 @@ a {
 }
 
 .stroke-draw {
-  stroke-dasharray: var(--len);
-  stroke-dashoffset: var(--len);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
   animation: draw 4.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
