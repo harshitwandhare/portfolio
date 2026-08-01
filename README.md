@@ -67,6 +67,7 @@ npm run dev
 ```
 app/
   page.tsx              the site
+  resume/               the résumé, as a document that prints to PDF
   layout.tsx            fonts, theme bootstrap, skip link
   globals.css           design tokens — both themes, contrast-checked
   rangoli-figure.tsx    server-rendered SVG figure
@@ -114,36 +115,41 @@ a reader can go and check.
 
 CI fails on any of these, and they run on every pull request.
 
-| Gate           | Bar                                                           |
-| -------------- | ------------------------------------------------------------- |
-| Format         | Prettier, checked not fixed                                   |
-| Lint           | ESLint, zero warnings                                         |
-| Types          | `tsc --strict`, `noUncheckedIndexedAccess`, zero `any`        |
-| Unit           | Vitest — **100% line and function coverage** on `lib/`        |
-| E2E            | Playwright × Chromium, Firefox, WebKit, mobile                |
-| Accessibility  | `@axe-core/playwright` — zero critical or serious violations  |
-| Console        | Zero errors _and_ zero warnings in production                 |
-| No-JS          | Core content must render with scripting disabled              |
-| Reduced motion | The finished figure must show immediately, not animate faster |
-| Overflow       | No horizontal scroll at 375 / 768 / 1280 / 1920               |
-| Links          | Every external URL must resolve under 400                     |
-| Bundle         | First-load JS, gzipped, from a clean install — under 160 KB   |
-| Lighthouse     | Performance ≥ 95 · Accessibility 100 · Best Practices 100     |
+| Gate           | Bar                                                                 |
+| -------------- | ------------------------------------------------------------------- |
+| Format         | Prettier, checked not fixed                                         |
+| Lint           | ESLint, zero warnings                                               |
+| Types          | `tsc --strict`, `noUncheckedIndexedAccess`, zero `any`              |
+| Unit           | Vitest — **100% line and function coverage** on `lib/`              |
+| E2E            | Playwright × Chromium, Firefox, WebKit, mobile                      |
+| Accessibility  | `@axe-core/playwright` — zero critical or serious violations        |
+| Console        | Zero errors _and_ zero warnings in production                       |
+| No-JS          | Core content must render with scripting disabled                    |
+| Reduced motion | The finished figure must show immediately, not animate faster       |
+| Overflow       | No horizontal scroll at 375 / 768 / 1280 / 1920                     |
+| Links          | Every external URL must resolve under 400                           |
+| Bundle         | First-load JS, gzipped, from a clean install — under 160 KB         |
+| Lighthouse     | Performance ≥ 95 · Accessibility 100 · Best Practices 100 · SEO 100 |
 
 Measured locally against the production build:
 
 ```
-perf 100 | a11y 100 | best-practices 100 | seo 63
+perf 100 | a11y 100 | best-practices 100 | seo 100
 first-load JS 146 KB gzipped of a 160 KB budget
 ```
 
-### Three numbers worth being honest about
+### The résumé is a page, not a file
 
-**SEO scores 63, and that is on purpose — for now.** The only failing audit is
-`is-crawlable`, because the site still carries `robots: noindex` while its content
-is being finished. Every other SEO check passes. The assertion is relaxed for that
-one audit rather than for the category, so the rest still gates. Removing the
-noindex takes it to 100.
+`/resume` renders from the same constants the homepage does, so the two cannot
+disagree — which is the failure mode a separately-maintained PDF always eventually
+hits. Printing it produces the PDF, so the copy a recruiter takes is never a stale
+upload someone forgot to replace.
+
+It also carries **no phone number**. That belongs on the copy sent to a named
+recipient, not on a page a crawler can read. Tests assert both: that the two
+surfaces agree, and that no phone-shaped string reaches either.
+
+### Two numbers worth being honest about
 
 **The bundle number took four attempts to measure, and three of them were
 confidently wrong.** Kept here because the failure mode is the interesting part:
@@ -155,7 +161,12 @@ confidently wrong.** Kept here because the failure mode is the interesting part:
    local `node_modules` grown by repeated `npm install` runs rather than from
    the lockfile. It reported **69 KB** and I believed it, because it was the
    answer I wanted.
-4. Same method after a clean `npm ci` — **146 KB**, matching CI exactly.
+4. Same method after a clean `npm ci` — **146 KB**, matching CI exactly, and
+   later confirmed against the deployed site itself: Vercel serves **145.9 KB**.
+
+A local `node_modules` grown by repeated installs still reports ~70 KB, so the
+script now says so out loud rather than letting the smaller number look like
+progress.
 
 The real figure is ~146 KB, and almost all of it is React 19 plus the Next App
 Router runtime; this site's own components are a few kilobytes of it. Going

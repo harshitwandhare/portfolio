@@ -28,7 +28,15 @@ import { chromium } from 'playwright'
 
 const BUDGET_KB = 160
 const PORT = 3123
-const ROUTES = ['/']
+const ROUTES = ['/', '/resume']
+
+/**
+ * A local build that has been rebuilt many times over an evolving node_modules
+ * chunks differently from a clean install, and reports roughly half the real
+ * figure. CI and Vercel both build from the lockfile and agree with each other;
+ * a local run below this is measuring something a visitor never receives.
+ */
+const SUSPICIOUSLY_SMALL_KB = 100
 
 const server = spawn('npx', ['next', 'start', '--port', String(PORT)], {
   stdio: 'ignore',
@@ -108,6 +116,15 @@ try {
       ? `worst route is ${(worst - BUDGET_KB).toFixed(1)} KB over`
       : `worst route has ${(BUDGET_KB - worst).toFixed(1)} KB of headroom`,
   )
+
+  if (worst < SUSPICIOUSLY_SMALL_KB && !process.env.CI) {
+    console.log(
+      `\nnote: ${worst.toFixed(1)} KB is well under what CI and production report (~146 KB).\n` +
+        '      A node_modules grown by repeated installs chunks differently from the\n' +
+        '      lockfile. Run `npm ci` before trusting a local figure — the gate in CI\n' +
+        '      is the one that matches what a visitor downloads.',
+    )
+  }
 } finally {
   shutdown()
 }
