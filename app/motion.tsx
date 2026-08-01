@@ -129,7 +129,15 @@ export function CountUp({
   }, [value, duration])
 
   return (
-    <span ref={ref} className={className}>
+    <span
+      ref={ref}
+      className={className}
+      // The animation counts up from 0, which is narrower than the final
+      // figure. Reserving the final width keeps the strip from reflowing as
+      // four counters run at once. `ch` is sized to the digit here because the
+      // surrounding type is tabular.
+      style={{ display: 'inline-block', minWidth: `${value.length}ch` }}
+    >
       {value}
     </span>
   )

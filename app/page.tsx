@@ -84,7 +84,11 @@ export default function Home() {
 
           {/* The figure is the algorithm, and it is playable. The server renders
               the finished stroke so it is never blank without JavaScript. */}
-          <figure className="lg:justify-self-end lg:max-w-[560px]">
+          {/* Width comes from the column, not from the content. With
+              `justify-self-end` the figure sized to its widest child, so the
+              caption changing from "separate loops" to "unbroken stroke"
+              resized the SVG by 12% mid-animation. */}
+          <figure className="w-full lg:ml-auto lg:max-w-[560px]">
             <noscript>
               <div className="text-fg">
                 <RangoliFigure {...HERO} strokeWidth={2.4} duration={0} showOrigin />
@@ -403,9 +407,20 @@ export default function Home() {
               {education.map((e) => (
                 <Reveal key={e.school}>
                   <article className="grid gap-3 sm:grid-cols-[160px_1fr] sm:gap-10">
-                    <p className="mono text-fg-muted">
-                      <time dateTime={e.from}>{e.from}</time> — <time dateTime={e.to}>{e.to}</time>
-                    </p>
+                    <div>
+                      <img
+                        src={e.logo.src}
+                        alt={e.logo.alt}
+                        width={e.logo.width}
+                        height={e.logo.height}
+                        className="mb-4 object-contain"
+                        style={{ height: e.logo.height / 2, width: 'auto' }}
+                      />
+                      <p className="mono text-fg-muted">
+                        <time dateTime={e.from}>{e.from}</time> —{' '}
+                        <time dateTime={e.to}>{e.to}</time>
+                      </p>
+                    </div>
                     <div>
                       <h3 className="text-xl font-semibold tracking-[-0.01em]">{e.school}</h3>
                       <p className="mt-1.5 text-fg-muted">{e.detail}</p>
@@ -417,14 +432,21 @@ export default function Home() {
             </div>
 
             <Reveal delay={100}>
-              <figure className="lg:sticky lg:top-24">
-                <img
-                  src={identity.portrait}
-                  alt="Harshit Wandhare"
-                  width={800}
-                  height={1000}
-                  className="w-full border border-line object-cover"
-                />
+              {/* Not sticky. A pinned portrait beside a short list stutters more
+                  than it flatters, and the aspect ratio is declared so the frame
+                  holds its space before the image arrives. */}
+              <figure>
+                <picture>
+                  <source srcSet="/portrait.webp" type="image/webp" />
+                  <img
+                    src={identity.portrait}
+                    alt="Harshit Wandhare"
+                    width={800}
+                    height={1000}
+                    className="w-full border border-line object-cover"
+                    style={{ aspectRatio: '4 / 5' }}
+                  />
+                </picture>
                 <figcaption className="mono mt-3 text-fg-faint">Richardson, TX</figcaption>
               </figure>
             </Reveal>

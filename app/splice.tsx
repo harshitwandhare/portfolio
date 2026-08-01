@@ -125,24 +125,28 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
         )}
       </svg>
 
-      <div className="mt-7 flex flex-wrap items-baseline gap-x-6 gap-y-3">
+      {/* Every value here changes as the splice runs, and each one used to
+          resize its own box — the counter from two digits to one, the label
+          from "separate loops" to "unbroken stroke", the note from two lines to
+          one. With the hero grid centred, that reflow moved the whole column.
+          Each slot now reserves its widest state, so nothing shifts. */}
+      <div className="mt-7 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-4">
         <p className="flex items-baseline gap-2.5">
           <span
             data-loop-count
-            className="tabular text-3xl font-medium tabular-nums"
+            className="tabular inline-block min-w-[1.4ch] text-right text-3xl font-medium tabular-nums"
             style={{ color: done ? 'var(--accent)' : 'var(--fg)' }}
           >
             {stage.loopCount}
           </span>
-          <span className="mono text-fg-muted">{done ? 'unbroken stroke' : 'separate loops'}</span>
+          <span className="mono inline-block min-w-[8.5rem] text-fg-muted">
+            {done ? 'unbroken stroke' : 'separate loops'}
+          </span>
         </p>
 
-        <p className="mono text-fg-faint">
-          {stage.flips} {stage.flips === 1 ? 'flip' : 'flips'} ·{' '}
-          {stage.loops.reduce((n, l) => n + l.arcs.length, 0)} arcs
-        </p>
-
-        <span className="ml-auto flex gap-2">
+        {/* Wraps below the counter on a phone rather than pushing past the
+            viewport edge. */}
+        <span className="flex gap-2">
           <button
             type="button"
             onClick={play}
@@ -171,10 +175,14 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
         }}
       />
 
-      <p className="mono-note mt-4 text-fg-faint">
-        {done
-          ? 'one stroke · around every dot, never through one, never crossing, closed'
-          : 'each flip rewires two arcs inside one cell, joining two loops into one'}
+      <p className="mono-note mt-4 flex min-h-[3.4rem] items-start text-fg-faint">
+        <span>
+          {stage.flips} {stage.flips === 1 ? 'flip' : 'flips'} ·{' '}
+          {stage.loops.reduce((n, l) => n + l.arcs.length, 0)} arcs ·{' '}
+          {done
+            ? 'around every dot, never through one, never crossing, closed'
+            : 'each flip joins two loops into one'}
+        </span>
       </p>
     </div>
   )
