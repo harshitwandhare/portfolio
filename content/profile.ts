@@ -38,6 +38,20 @@ export const identity = {
   // recipient rather than crawled — so it lives there and nowhere in here.
 } as const
 
+/**
+ * The one-paragraph summary at the top of the résumé sheet.
+ *
+ * Mirrors the LaTeX résumé so the two read as one document, with the star count
+ * stated as a floor rather than a moving figure — the résumé's "2,100+" was
+ * already above the real number by the time it was printed.
+ */
+export const summary =
+  'Software engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
+  'Science student at UT Dallas. Solo-owned the highest-traffic module of a 30-engineer program ' +
+  'at Reliance Jio (top annual performance rating), then served as the sole engineer at a ' +
+  '3-person company, building an open-source platform now past 2,000 GitHub stars. Seeking a ' +
+  'Summer 2027 software engineering or AI/ML internship.'
+
 export const hero = {
   line: 'I build production systems end to end — and have shipped them alone.',
   sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering function at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track.',
@@ -254,10 +268,28 @@ export const projects: readonly Project[] = [
   },
 ]
 
+/**
+ * The résumé download.
+ *
+ * Deliberately `null` for now. The current PDF carries a US phone number, and a
+ * PDF linked from a public page is harvested the same way a page is — which
+ * would undo the decision made in `identity` above for the sake of one file.
+ *
+ * To publish it: remove the phone from the header in the résumé source,
+ * recompile, save as `public/resume.pdf`, and set this to
+ * `{ file: '/resume.pdf', updated: 'YYYY-MM' }`. Nothing else needs changing —
+ * the contact section renders the link only when this is set, and a test
+ * asserts the published file carries no phone number.
+ */
+export const resume: { readonly file: string; readonly updated: string } | null = null
+
 export interface Paper {
   readonly title: string
   readonly venue: string
+  /** Hosted here, not merely cited. A downloadable paper persuades; a citation does not. */
   readonly file: string
+  readonly pages: number
+  readonly sizeMb: string
   readonly points: readonly string[]
 }
 
@@ -266,6 +298,8 @@ export const research: readonly Paper[] = [
     title: 'Integrating YOLOv5 and CNN for Number Plate Recognition in Automated Parking Systems',
     venue: 'First author · Vidyalankar Institute of Technology · 2023 · unpublished manuscript',
     file: '/papers/number-plate-recognition.pdf',
+    pages: 8,
+    sizeMb: '1.1',
     points: [
       'YOLOv5 detector at 95.45% mAP, 88.7% precision, 96.4% recall — 100 epochs on a 433-image custom dataset.',
       'Custom CNN over 36 character classes at 89.66% accuracy — 80 epochs, 6,659-image dataset.',
@@ -278,6 +312,8 @@ export const research: readonly Paper[] = [
       'A Comprehensive Survey of Methodologies in Social Media Analytics for Disaster Management',
     venue: 'First author · Vidyalankar Institute of Technology · unpublished manuscript',
     file: '/papers/social-media-disaster-management.pdf',
+    pages: 5,
+    sizeMb: '0.25',
     points: [
       'Systematic review of seven papers spanning CyberGIS frameworks, text mining, QGIS spatial analysis, YOLO/VGG-16 image classification, CNN visual sentiment analysis and NLP tweet classification.',
     ],

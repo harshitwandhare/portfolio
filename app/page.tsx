@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- the logos and portrait are small
    static assets with fixed dimensions; next/image would add client JavaScript
    and a layout wrapper for no benefit at this size. */
+import Link from 'next/link'
 import contributions from '@/data/contributions.json'
 import {
   education,
@@ -11,6 +12,7 @@ import {
   metrics,
   projects,
   research,
+  resume,
   skills,
 } from '@/content/profile'
 import { CountUp, Reveal, ScrollProgress } from './motion'
@@ -339,7 +341,13 @@ export default function Home() {
                 <Reveal key={paper.title}>
                   <article className="max-w-4xl">
                     <h3 className="text-xl font-semibold leading-snug tracking-[-0.01em]">
-                      {paper.title}
+                      {/* The paper itself, not a citation of it. */}
+                      <a
+                        href={paper.file}
+                        className="underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-accent"
+                      >
+                        {paper.title}
+                      </a>
                     </h3>
                     <p className="mono mt-2.5 text-fg-faint">{paper.venue}</p>
                     <ul className="mt-5 space-y-3">
@@ -353,6 +361,18 @@ export default function Home() {
                         </li>
                       ))}
                     </ul>
+                    <p className="mono mt-5">
+                      <a
+                        className="text-accent underline underline-offset-4"
+                        href={paper.file}
+                        download
+                      >
+                        read the paper
+                      </a>
+                      <span className="ml-3 text-fg-faint">
+                        pdf · {paper.pages} pages · {paper.sizeMb} MB
+                      </span>
+                    </p>
                   </article>
                 </Reveal>
               ))}
@@ -466,6 +486,19 @@ export default function Home() {
                     {identity.email}
                   </a>
                 </li>
+                <li>
+                  <Link className="text-accent underline underline-offset-4" href="/resume">
+                    résumé
+                  </Link>
+                </li>
+                {resume && (
+                  <li>
+                    <a className="text-accent underline underline-offset-4" href={resume.file}>
+                      résumé
+                    </a>
+                    <span className="ml-2 text-fg-faint">pdf · {resume.updated}</span>
+                  </li>
+                )}
                 <li>
                   <a className="text-accent underline underline-offset-4" href={identity.github}>
                     github
