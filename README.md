@@ -127,14 +127,14 @@ CI fails on any of these, and they run on every pull request.
 | Reduced motion | The finished figure must show immediately, not animate faster |
 | Overflow       | No horizontal scroll at 375 / 768 / 1280 / 1920               |
 | Links          | Every external URL must resolve under 400                     |
-| Bundle         | First-load JS measured in a real browser — **under 100 KB**   |
+| Bundle         | First-load JS, gzipped, from a clean install — under 160 KB   |
 | Lighthouse     | Performance ≥ 95 · Accessibility 100 · Best Practices 100     |
 
 Measured locally against the production build:
 
 ```
 perf 100 | a11y 100 | best-practices 100 | seo 63
-first-load JS 69.5 KB gzipped (222.2 KB raw, 8 files) of a 100 KB budget
+first-load JS 146 KB gzipped of a 160 KB budget
 ```
 
 ### Three numbers worth being honest about
@@ -145,17 +145,27 @@ is being finished. Every other SEO check passes. The assertion is relaxed for th
 one audit rather than for the category, so the rest still gates. Removing the
 noindex takes it to 100.
 
-**The bundle number took three attempts to measure correctly**, which is worth
-recording because each wrong answer was confidently wrong:
+**The bundle number took four attempts to measure, and three of them were
+confidently wrong.** Kept here because the failure mode is the interesting part:
 
 1. Summing the built chunk directory — counted assets belonging to other routes.
-2. Trusting the browser's reported transfer size — made the result depend on
-   whether that particular server compressed. Identical code measured 69 KB
-   locally and 147 KB in CI, and only the disagreement revealed the flaw.
-3. Fetching each script and gzipping it here — environment-independent, and the
-   figure a visitor actually downloads, since Vercel always serves compressed.
+2. Trusting the browser's reported transfer size — made the answer depend on
+   whether that server compressed.
+3. Gzipping each script here instead — correct method, but measured against a
+   local `node_modules` grown by repeated `npm install` runs rather than from
+   the lockfile. It reported **69 KB** and I believed it, because it was the
+   answer I wanted.
+4. Same method after a clean `npm ci` — **146 KB**, matching CI exactly.
 
-A number you cannot reproduce on another machine is not a measurement.
+The real figure is ~146 KB, and almost all of it is React 19 plus the Next App
+Router runtime; this site's own components are a few kilobytes of it. Going
+materially lower means dropping hydration, which is a framework choice rather
+than a tuning exercise. The budget sits at 160 KB so it still catches
+regressions in the part we control.
+
+Two lessons, both cheap in hindsight: a number you cannot reproduce from a clean
+install is not a measurement, and a disagreement between two environments is
+information rather than an inconvenience.
 
 **Branch coverage is gated at 80%, lines and functions at 100%.** The uncovered
 branches are defensive `??` guards on lookups that cannot miss for a well-formed

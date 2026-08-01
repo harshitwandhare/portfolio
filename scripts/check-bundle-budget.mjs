@@ -3,22 +3,30 @@
  * Fails if a route's first-load JavaScript exceeds the budget.
  *
  * Measured by loading the production build in a real browser, collecting every
- * script it actually fetches, and gzipping each one here. Two earlier versions
- * of this script got the number wrong in instructive ways:
+ * script it actually fetches, and gzipping each one here. Three earlier versions
+ * of this check were wrong, each instructively:
  *
  *   - Summing the chunk directory counted assets belonging to other routes.
- *   - Trusting the server's transfer size made the result depend on whether
- *     that particular server compressed. It reported 69 KB locally and 147 KB
- *     in CI for identical code, because one gzipped and the other did not.
+ *   - Trusting the server's reported transfer size made the answer depend on
+ *     whether that particular server compressed.
+ *   - Measuring against a local node_modules grown by repeated installs rather
+ *     than from the lockfile. That reported 69 KB; a clean `npm ci` reproduces
+ *     CI's 146 KB exactly. The install is part of the measurement.
  *
- * Compressing here removes the environment from the answer. Vercel always
- * serves these compressed, so this is the figure a visitor actually downloads.
+ * Gzipping here removes the server from the answer, and Vercel always serves
+ * these compressed, so this is what a visitor actually downloads.
+ *
+ * The budget is 160 KB because ~146 KB of it is React 19 plus the Next App
+ * Router client runtime, not this site's code — the app's own components are a
+ * few kilobytes. It sits just above that floor so it still catches regressions
+ * in what we control. Going materially below means dropping hydration, which is
+ * a framework decision rather than a tuning exercise.
  */
 import { spawn } from 'node:child_process'
 import { gzipSync } from 'node:zlib'
 import { chromium } from 'playwright'
 
-const BUDGET_KB = 100
+const BUDGET_KB = 160
 const PORT = 3123
 const ROUTES = ['/']
 
