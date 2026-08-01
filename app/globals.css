@@ -219,6 +219,63 @@ a {
   animation: rise 0.2s ease-out both;
 }
 
+/* ── print ─────────────────────────────────────────────────────────────────
+   Printing /resume is the download. The sheet is already a single-column
+   document, so this strips the page around it and lets the browser paginate —
+   which keeps the PDF in step with the site instead of being a file that has
+   to be regenerated and re-uploaded whenever a fact changes. */
+@media print {
+  @page {
+    size: letter;
+    margin: 12mm 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .no-print,
+  .theme-toggle {
+    display: none !important;
+  }
+
+  /* Undo the stage: no tilt, no shadow, no max-width, no dark surround. */
+  .print-sheet {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .print-sheet > article {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  main {
+    background: #fff !important;
+    min-height: 0 !important;
+  }
+
+  main > div {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: #000 !important;
+  }
+
+  /* Keep an entry from being split across a page break. */
+  article,
+  section {
+    break-inside: avoid;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
