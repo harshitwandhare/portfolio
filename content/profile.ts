@@ -25,6 +25,8 @@ export const identity = {
   githubWork: 'https://github.com/harshit-yc',
   linkedin: 'https://linkedin.com/in/harshit-wandhare-a088201aa',
   status: 'Open to Summer 2027 SWE and AI/ML internships',
+  // Replace this file with a real headshot — see public/portrait.README.
+  portrait: '/portrait.jpg',
   // Phone deliberately absent until a US number exists. An Indian number on a
   // US-facing site reads as "not actually here".
 } as const
@@ -69,6 +71,8 @@ export interface Role {
   readonly from: string
   readonly to: string
   readonly badge?: string
+  /** Company mark, shown small beside the role. */
+  readonly logo?: { src: string; alt: string }
   readonly points: readonly Fact[]
 }
 
@@ -79,6 +83,7 @@ export const experience: readonly Role[] = [
     where: 'Germany · Remote',
     from: '2025-09',
     to: '2026-07',
+    logo: { src: '/logos/yosemite.png', alt: 'Yosemite Crew' },
     points: [
       {
         text: 'Sole engineer-owner of an open-source veterinary practice-management system at a three-person company — architecture, web platform, mobile app, integrations, CI and release.',
@@ -120,6 +125,7 @@ export const experience: readonly Role[] = [
     from: '2023-10',
     to: '2025-09',
     badge: 'A* annual rating — the firm’s highest performance category',
+    logo: { src: '/logos/jio.svg', alt: 'Reliance Jio' },
     points: [
       {
         text: 'Rated A*, the highest performance category, awarded to a limited number of engineers.',
@@ -162,6 +168,8 @@ export interface Project {
   readonly live?: string
   readonly docs?: string
   readonly private?: boolean
+  /** Project mark. `srcLight` is used in light mode where the two differ. */
+  readonly logo?: { src: string; srcLight?: string; alt: string }
   readonly points: readonly Fact[]
 }
 
@@ -172,6 +180,7 @@ export const projects: readonly Project[] = [
     stack: ['Python', 'FastAPI', 'asyncio', 'LangGraph', 'Next.js', 'SQLite'],
     repo: 'https://github.com/harshitwandhare/atlas-ra',
     live: 'https://atlas-ra.vercel.app',
+    logo: { src: '/logos/atlas-dark.svg', srcLight: '/logos/atlas-light.svg', alt: '' },
     points: [
       {
         text: 'An orchestrator routes goals to specialist agent teams and a Critic verifies every result before it counts as done.',
@@ -202,6 +211,7 @@ export const projects: readonly Project[] = [
     repo: 'https://github.com/harshitwandhare/job-sentinel',
     live: 'https://job-sentinel.vercel.app',
     docs: 'https://harshitwandhare.github.io/job-sentinel/',
+    logo: { src: '/logos/job-sentinel.png', alt: '' },
     points: [
       {
         text: 'Aggregates postings across sources, scores role fit with a local or bring-your-own-key LLM, and tracks the full application pipeline.',
