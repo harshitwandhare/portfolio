@@ -134,7 +134,7 @@ Measured locally against the production build:
 
 ```
 perf 100 | a11y 100 | best-practices 100 | seo 63
-first-load JS 69.5 KB of a 100 KB budget
+first-load JS 69.5 KB gzipped (222.2 KB raw, 8 files) of a 100 KB budget
 ```
 
 ### Three numbers worth being honest about
@@ -145,12 +145,17 @@ is being finished. Every other SEO check passes. The assertion is relaxed for th
 one audit rather than for the category, so the rest still gates. Removing the
 noindex takes it to 100.
 
-**First-load JS is 69.5 KB, and an earlier draft of this file claimed the floor
-was 146 KB.** That was wrong, and the reason is worth writing down: the site then
-had internal links to two other routes, and Next prefetches a linked route's
-chunks on sight, so the measurement was counting three pages of JavaScript rather
-than one. The lesson is that a bundle number measured without understanding what
-the browser was actually asked to fetch is not a measurement.
+**The bundle number took three attempts to measure correctly**, which is worth
+recording because each wrong answer was confidently wrong:
+
+1. Summing the built chunk directory — counted assets belonging to other routes.
+2. Trusting the browser's reported transfer size — made the result depend on
+   whether that particular server compressed. Identical code measured 69 KB
+   locally and 147 KB in CI, and only the disagreement revealed the flaw.
+3. Fetching each script and gzipping it here — environment-independent, and the
+   figure a visitor actually downloads, since Vercel always serves compressed.
+
+A number you cannot reproduce on another machine is not a measurement.
 
 **Branch coverage is gated at 80%, lines and functions at 100%.** The uncovered
 branches are defensive `??` guards on lookups that cannot miss for a well-formed
