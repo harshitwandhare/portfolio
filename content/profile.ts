@@ -22,7 +22,10 @@ export const identity = {
   email: 'dal314006@utdallas.edu',
   altEmail: 'harshitwandhare45@gmail.com',
   github: 'https://github.com/harshitwandhare',
-  githubWork: 'https://github.com/harshit-yc',
+  // The `harshit-yc` work account was deleted and github.com/harshit-yc now
+  // 404s, so it is not linked anywhere. The commits it made are still in the
+  // Yosemite-Crew history, and the founder's letter covers the same ground
+  // without depending on a profile that no longer exists.
   linkedin: 'https://linkedin.com/in/harshit-wandhare-a088201aa',
   status: 'Open to Summer 2027 SWE and AI/ML internships',
   // Replace this file with a real headshot — see public/portrait.README.
@@ -54,11 +57,15 @@ export interface Metric {
 
 export const metrics: readonly Metric[] = [
   {
-    value: '1,268',
-    label: 'commits, #1 of 15',
+    // Was 1,268 and "#1 of 15". Both moved when the `harshit-yc` work account
+    // was deleted: GitHub re-attributes a deleted account's commits, and the
+    // contributor count is 29 once anonymous attribution is included. 1,214 is
+    // the figure the API returns today, and it is still the largest share of
+    // any contributor — 982 is next.
+    value: '1,214',
+    label: 'commits — most on the project',
     source: 'confirmed',
-    live: true,
-    note: 'His own commits on Yosemite-Crew — more than any other contributor.',
+    note: 'Verifiable via the contributors API with anon=1; the account itself is gone.',
   },
   // The only star count anywhere on the site. Job Sentinel and ATLAS are young
   // repos with none, and leading a panel with a zero would draw the eye
@@ -337,6 +344,7 @@ export const education = [
     from: '2026-08',
     to: '2028-05',
     note: 'Jonsson School Dean’s Graduate Scholarship',
+    logo: { src: '/logos/utd.png', alt: '', width: 48, height: 48 },
   },
   {
     school: 'Vidyalankar Institute of Technology, University of Mumbai',
@@ -344,6 +352,7 @@ export const education = [
     from: '2019-08',
     to: '2023-05',
     note: 'CGPA 9.53 / 10.0',
+    logo: { src: '/logos/vit.png', alt: '', width: 96, height: 27 },
   },
 ] as const
 
