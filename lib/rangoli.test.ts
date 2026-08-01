@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateRangoli, type Arc } from './rangoli'
+import { generateRangoli, generateStages, type Arc } from './rangoli'
 
 /**
  * The figure on the page is only worth anything if the constraint actually
@@ -97,6 +97,42 @@ describe('generateRangoli', () => {
     const a = generateRangoli({ rows: 6, cols: 9, seed: 1, size: 40 })
     const b = generateRangoli({ rows: 6, cols: 9, seed: 2, size: 40 })
     expect(a.path).not.toBe(b.path)
+  })
+
+  it('records a stage per flip, ending on one loop', () => {
+    for (const seed of SEEDS) {
+      const r = generateRangoli({ rows: 6, cols: 9, seed, size: 40 })
+      const { stages } = generateStages({ rows: 6, cols: 9, seed, size: 40 })
+
+      // The working must match the answer.
+      expect(stages).toHaveLength(r.flips + 1)
+      expect(stages[0]!.loopCount).toBe(r.loopsBefore)
+      expect(stages.at(-1)!.loopCount).toBe(1)
+      expect(stages.at(-1)!.loops).toHaveLength(1)
+      expect(stages.at(-1)!.loops[0]!.arcs).toHaveLength(r.length)
+    }
+  })
+
+  it('never lets the loop count rise as it splices', () => {
+    for (const seed of SEEDS) {
+      const { stages } = generateStages({ rows: 8, cols: 12, seed, size: 40 })
+      for (let i = 1; i < stages.length; i++) {
+        expect(stages[i]!.loopCount).toBeLessThan(stages[i - 1]!.loopCount)
+      }
+    }
+  })
+
+  it('conserves every arc at every stage — splicing rewires, it never deletes', () => {
+    const rows = 6
+    const cols = 9
+    const total = expectedArcs(rows, cols)
+    for (const seed of SEEDS) {
+      const { stages } = generateStages({ rows, cols, seed, size: 40 })
+      for (const stage of stages) {
+        const arcs = stage.loops.reduce((n, l) => n + l.arcs.length, 0)
+        expect(arcs).toBe(total)
+      }
+    }
   })
 
   it('lays out a full dot lattice with the expected geometry', () => {

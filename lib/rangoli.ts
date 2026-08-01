@@ -46,6 +46,23 @@ export interface Arc {
   sweep: 0 | 1
 }
 
+/** One closed loop of the tiling, as an ordered ring of arcs. */
+export interface Loop {
+  readonly arcs: readonly Arc[]
+  readonly path: string
+}
+
+/**
+ * One stage of the splice. The first stage is the raw tiling with all its
+ * separate loops; the last is the single stroke.
+ */
+export interface Stage {
+  readonly loops: readonly Loop[]
+  readonly loopCount: number
+  /** Flips applied to reach this stage. */
+  readonly flips: number
+}
+
 export interface Rangoli {
   /** Every dot in the lattice, in row-major order. */
   dots: ReadonlyArray<readonly [number, number]>
@@ -221,6 +238,74 @@ function sweepFor(
   return cross > 0 ? 1 : 0
 }
 
+/* ── walking the graph into drawable arcs ────────────────────────────────── */
+
+/** Build the arc joining two adjacent midpoints. */
+function makeArc(a: NodeId, b: NodeId, size: number, pad: number): Arc {
+  const from = nodePoint(a, size, pad)
+  const to = nodePoint(b, size, pad)
+  // Arcs inside a cell join a horizontal edge midpoint to a vertical one. A
+  // pair of like-kind nodes is a boundary link, drawn as a straight chord.
+  const sameKind = a[0] === b[0]
+  const around = sameKind ? from : sharedCorner(a, b, size, pad)
+  return { from, to, around, sweep: sameKind ? 0 : sweepFor(from, to, around) }
+}
+
+/** SVG path data for an ordered ring of arcs. */
+export function arcsToPath(arcs: readonly Arc[], size: number): string {
+  if (!arcs.length) return ''
+  const r = size / 2
+  const head = `M ${arcs[0]!.from[0]} ${arcs[0]!.from[1]}`
+  const body = arcs
+    .map((arc) =>
+      arc.around === arc.from
+        ? `L ${arc.to[0]} ${arc.to[1]}`
+        : `A ${r} ${r} 0 0 ${arc.sweep} ${arc.to[0]} ${arc.to[1]}`,
+    )
+    .join(' ')
+  return `${head} ${body} Z`
+}
+
+/** Follow the ring that starts at `start`, emitting arcs in order. */
+function walkRing(
+  adj: Map<NodeId, NodeId[]>,
+  start: NodeId,
+  size: number,
+  pad: number,
+  seen?: Set<NodeId>,
+): Arc[] {
+  const arcs: Arc[] = []
+  let current = start
+  let previous: NodeId | null = null
+
+  for (let step = 0; step <= adj.size; step++) {
+    seen?.add(current)
+    const neighbours = adj.get(current)
+    if (!neighbours) break
+    const next = neighbours.find((n) => n !== previous) ?? neighbours[0]
+    if (next === undefined) break
+
+    arcs.push(makeArc(current, next, size, pad))
+    previous = current
+    current = next
+    if (current === start) break
+  }
+  return arcs
+}
+
+/** Every closed loop currently present, each as its own ordered ring. */
+function collectLoops(adj: Map<NodeId, NodeId[]>, size: number, pad: number): Loop[] {
+  const seen = new Set<NodeId>()
+  const loops: Loop[] = []
+  for (const start of adj.keys()) {
+    if (seen.has(start)) continue
+    const arcs = walkRing(adj, start, size, pad, seen)
+    if (arcs.length) loops.push({ arcs, path: arcsToPath(arcs, size) })
+  }
+  // Largest first, so colour assignment stays stable as loops merge.
+  return loops.sort((a, b) => b.arcs.length - a.arcs.length)
+}
+
 /* ── the generator ───────────────────────────────────────────────────────── */
 
 export interface RangoliOptions {
@@ -296,58 +381,108 @@ export function generateRangoli({
 
   // Walk the finished curve into an ordered ring of arcs.
   const startNode = adj.keys().next().value
-  const stroke: Arc[] = []
-  if (startNode !== undefined) {
-    let current: NodeId = startNode
-    let previous: NodeId | null = null
-    const radius = size / 2
+  const stroke = startNode === undefined ? [] : walkRing(adj, startNode, size, pad)
 
-    for (let step = 0; step < adj.size + 1; step++) {
-      const neighbours = adj.get(current)
-      if (!neighbours) break
-      const next = neighbours.find((n) => n !== previous) ?? neighbours[0]
-      if (next === undefined) break
-
-      const from = nodePoint(current, size, pad)
-      const to = nodePoint(next, size, pad)
-      const sameKind = current[0] === next[0]
-      // Arcs within a cell join a horizontal edge to a vertical one. A pair of
-      // like-kind nodes is a boundary link, drawn as a straight chord.
-      const around = sameKind ? from : sharedCorner(current, next, size, pad)
-      stroke.push({ from, to, around, sweep: sameKind ? 0 : sweepFor(from, to, around) })
-
-      previous = current
-      current = next
-      if (current === startNode) break
-    }
-    void radius
+  return {
+    dots: latticeDots(rows, cols, size, pad),
+    stroke,
+    path: arcsToPath(stroke, size),
+    loopsBefore,
+    flips,
+    length: stroke.length,
+    width: cols * size + pad * 2,
+    height: rows * size + pad * 2,
   }
+}
 
-  const radius = size / 2
-  const path = stroke.length
-    ? `M ${stroke[0]!.from[0]} ${stroke[0]!.from[1]} ` +
-      stroke
-        .map((arc) =>
-          arc.around === arc.from
-            ? `L ${arc.to[0]} ${arc.to[1]}`
-            : `A ${radius} ${radius} 0 0 ${arc.sweep} ${arc.to[0]} ${arc.to[1]}`,
-        )
-        .join(' ') +
-      ' Z'
-    : ''
-
+/** Every dot in the lattice, row-major. */
+function latticeDots(
+  rows: number,
+  cols: number,
+  size: number,
+  pad: number,
+): Array<readonly [number, number]> {
   const dots: Array<readonly [number, number]> = []
   for (let r = 0; r <= rows; r++) {
     for (let c = 0; c <= cols; c++) dots.push([pad + c * size, pad + r * size])
   }
+  return dots
+}
+
+export interface Stages {
+  readonly dots: ReadonlyArray<readonly [number, number]>
+  /** Index 0 is the raw tiling; the last entry is the single stroke. */
+  readonly stages: readonly Stage[]
+  readonly width: number
+  readonly height: number
+}
+
+/**
+ * The same construction, but recording the figure after every splice.
+ *
+ * `generateRangoli` only needs the answer. This returns the working — the raw
+ * tiling with all its separate loops, then each one absorbed, down to the
+ * single stroke. It exists so the page can show the algorithm running rather
+ * than assert that it did.
+ */
+export function generateStages({
+  rows,
+  cols,
+  size = 40,
+  seed = 1,
+  pad = 20,
+}: RangoliOptions): Stages {
+  const rand = mulberry32(seed)
+  const tiles: Tile[][] = Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => (rand() < 0.5 ? 0 : 1) as Tile),
+  )
+
+  const ring = perimeterNodes(rows, cols)
+  const boundaryPairs: Array<readonly [NodeId, NodeId]> = []
+  for (let i = 0; i < ring.length; i += 2) {
+    const a = ring[i]
+    const b = ring[(i + 1) % ring.length]
+    if (a && b) boundaryPairs.push([a, b])
+  }
+
+  let adj = buildAdjacency(tiles, rows, cols, boundaryPairs)
+  let loopOf = traceLoops(adj)
+  let loopCount = new Set(loopOf.values()).size
+
+  const stages: Stage[] = [{ loops: collectLoops(adj, size, pad), loopCount, flips: 0 }]
+
+  let flips = 0
+  let guard = rows * cols * 4
+
+  while (loopCount > 1 && guard-- > 0) {
+    let flipped = false
+    for (let r = 0; r < rows && !flipped; r++) {
+      for (let c = 0; c < cols && !flipped; c++) {
+        const row = tiles[r]
+        if (!row) continue
+        const tile = row[c]
+        if (tile === undefined) continue
+        const [p, q] = tilePairs(r, c, tile)
+        const lp = loopOf.get(p[0])
+        const lq = loopOf.get(q[0])
+        if (lp === undefined || lq === undefined || lp === lq) continue
+
+        row[c] = (tile === 0 ? 1 : 0) as Tile
+        flips++
+        flipped = true
+      }
+    }
+    if (!flipped) break
+
+    adj = buildAdjacency(tiles, rows, cols, boundaryPairs)
+    loopOf = traceLoops(adj)
+    loopCount = new Set(loopOf.values()).size
+    stages.push({ loops: collectLoops(adj, size, pad), loopCount, flips })
+  }
 
   return {
-    dots,
-    stroke,
-    path,
-    loopsBefore,
-    flips,
-    length: stroke.length,
+    dots: latticeDots(rows, cols, size, pad),
+    stages,
     width: cols * size + pad * 2,
     height: rows * size + pad * 2,
   }
