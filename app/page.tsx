@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- the logos and portrait are small
+   static assets with fixed dimensions; next/image would add client JavaScript
+   and a layout wrapper for no benefit at this size. */
 import contributions from '@/data/contributions.json'
 import {
   education,
@@ -11,18 +14,15 @@ import {
   skills,
 } from '@/content/profile'
 import { CountUp, Reveal, ScrollProgress } from './motion'
-import { RangoliFigure, rangoliStats } from './rangoli-figure'
-import { Splice } from './splice'
+import { RangoliFigure } from './rangoli-figure'
+import { SpliceFigure } from './splice'
 
 /**
- * Deliberately coarse. At six cells across, each arc is large enough that the
- * eye can follow the line all the way round — which is the entire point. A
- * denser grid turns the same algorithm into wallpaper.
+ * The hero figure. Deliberately coarse: at six cells across each arc is large
+ * enough that the eye can follow the line all the way round, which is the whole
+ * point. A denser grid turns the same algorithm into wallpaper.
  */
 const HERO = { rows: 6, cols: 6, size: 74, seed: 23, pad: 40 }
-
-/** The figure the splice animation steps through. */
-const SPLICE = { rows: 7, cols: 11, size: 60, seed: 5, pad: 34 }
 
 /**
  * The contribution lattice.
@@ -51,7 +51,6 @@ function latticeWeights(): number[] {
 const totalContributions = contributions.totals['harshit-yc'] + contributions.totals.harshitwandhare
 
 export default function Home() {
-  const stats = rangoliStats(HERO)
   const weights = latticeWeights()
   const active = weights.filter((w) => w > 0).length
   const busiest = Math.max(...contributions.days.map((d) => d.c))
@@ -61,12 +60,12 @@ export default function Home() {
       <ScrollProgress />
       <main id="main" className="bg-bg text-fg">
         {/* ── hero ───────────────────────────────────────────────────────── */}
-        <section className="mx-auto grid min-h-[94vh] max-w-7xl grid-cols-1 items-center gap-14 px-6 py-24 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-10">
+        <section className="mx-auto grid min-h-[92vh] max-w-7xl grid-cols-1 items-center gap-16 px-6 py-24 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-10">
           <div>
             <p className="mono text-fg-faint">{identity.location}</p>
             {/* Two blocks rather than a <br>, so the accessible name stays
                 "Harshit Wandhare" and not "HarshitWandhare". */}
-            <h1 className="mt-7 text-[length:var(--text-display)] font-semibold leading-[0.98] tracking-[-0.035em]">
+            <h1 className="mt-7 text-[length:var(--text-display)] font-semibold leading-[0.96] tracking-[-0.035em]">
               <span className="block">Harshit</span> <span className="block">Wandhare</span>
             </h1>
             <p className="mt-9 max-w-xl text-[length:var(--text-lede)] leading-[1.4]">
@@ -83,20 +82,15 @@ export default function Home() {
             </p>
           </div>
 
-          <figure className="lg:justify-self-end">
-            <div className="text-fg">
-              <RangoliFigure
-                {...HERO}
-                className="h-auto w-full max-w-[560px]"
-                duration={7}
-                strokeWidth={2.4}
-                showOrigin
-              />
-            </div>
-            <figcaption className="mono-note mt-7 max-w-[560px] text-fg-faint">
-              <span className="text-accent">●</span> one stroke · {stats.dots} dots ·{' '}
-              {stats.loopsBefore} loops spliced into {stats.arcs} arcs · never crosses, never lifts
-            </figcaption>
+          {/* The figure is the algorithm, and it is playable. The server renders
+              the finished stroke so it is never blank without JavaScript. */}
+          <figure className="lg:justify-self-end lg:max-w-[560px]">
+            <noscript>
+              <div className="text-fg">
+                <RangoliFigure {...HERO} strokeWidth={2.4} duration={0} showOrigin />
+              </div>
+            </noscript>
+            <SpliceFigure {...HERO} />
           </figure>
         </section>
 
@@ -116,33 +110,33 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── the algorithm, running ─────────────────────────────────────── */}
+        {/* ── the rule ───────────────────────────────────────────────────── */}
         <section aria-labelledby="rule-heading" className="border-b border-line">
-          <div className="mx-auto max-w-7xl px-6 pb-4 pt-24 lg:px-10">
-            <p className="mono text-fg-faint">01 — The rule</p>
-            <h2
-              id="rule-heading"
-              className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.025em] md:text-5xl"
-            >
-              It is not a drawing. It is a constraint being satisfied.
-            </h2>
-            <div className="mt-8 grid max-w-5xl gap-7 text-fg-muted md:grid-cols-2 md:gap-12">
-              <p>
-                Lay a grid of equidistant dots. Draw a line that goes{' '}
-                <em className="not-italic text-fg">around</em> every dot, never through one, never
-                crossing itself, and closing where it began. That rule is old — it is how the
-                dot-grid rangoli of Maharashtra is drawn, on doorsteps, at dawn, from memory.
-              </p>
-              <p>
-                It is also a solvable problem, and a raw tiling does not solve it. It comes out as a
-                dozen separate loops. Each tile you flip rewires two arcs and joins two loops into
-                one. Keep going and there is a single stroke left.
-              </p>
-            </div>
+          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+            <Reveal>
+              <p className="mono text-fg-faint">01 — The rule</p>
+              <h2
+                id="rule-heading"
+                className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.025em] md:text-5xl"
+              >
+                It is not a drawing. It is a constraint being satisfied.
+              </h2>
+              <div className="mt-9 grid max-w-5xl gap-8 text-fg-muted md:grid-cols-2 md:gap-14">
+                <p>
+                  Lay a grid of equidistant dots. Draw a line that goes{' '}
+                  <em className="not-italic text-fg">around</em> every dot, never through one, never
+                  crossing itself, and closing where it began. That rule is old — it is how the
+                  dot-grid rangoli of Maharashtra is drawn, on doorsteps, at dawn, from memory.
+                </p>
+                <p>
+                  It is also a solvable problem, and a raw tiling does not solve it — it comes out
+                  as a dozen separate loops. Flipping one tile rewires two arcs and joins two of
+                  those loops into one. The figure above plays that through to the single stroke;
+                  press <span className="text-fg">new figure</span> and it solves a fresh one.
+                </p>
+              </div>
+            </Reveal>
           </div>
-
-          {/* The working, scrubbed by scroll. */}
-          <Splice {...SPLICE} />
         </section>
 
         {/* ── the lattice ────────────────────────────────────────────────── */}
@@ -161,20 +155,19 @@ export default function Home() {
                 <span className="tabular text-fg">{totalContributions.toLocaleString()}</span>{' '}
                 contributions across{' '}
                 <span className="tabular text-fg">{active.toLocaleString()}</span> active days. The
-                line weaves around all of them without lifting once.
+                same rule applies: the line weaves around all of them and closes.
               </p>
             </Reveal>
 
             <Reveal delay={120}>
-              {/* The figure is wider than a phone, so it scrolls — which means it
-                  must be reachable and scrollable by keyboard, not just by touch. */}
+              {/* Wider than a phone, so it scrolls — which means it has to be
+                  reachable and scrollable by keyboard, not only by touch. */}
               <div
                 role="group"
                 aria-label="Contribution lattice — scroll horizontally to see the full year"
                 tabIndex={0}
                 className="mt-12 overflow-x-auto border border-line bg-bg p-8"
               >
-                {/* The line recedes and the data leads. */}
                 <div className="min-w-[760px] text-fg-faint">
                   <RangoliFigure
                     {...LATTICE}
@@ -206,6 +199,15 @@ export default function Home() {
                 <Reveal key={role.org}>
                   <article className="grid gap-6 lg:grid-cols-[220px_1fr] lg:gap-14">
                     <div>
+                      {role.logo && (
+                        <img
+                          src={role.logo.src}
+                          alt={role.logo.alt}
+                          width={40}
+                          height={40}
+                          className="mb-4 h-10 w-10 object-contain"
+                        />
+                      )}
                       <p className="mono text-fg-muted">
                         <time dateTime={role.from}>{role.from}</time> —{' '}
                         <time dateTime={role.to}>{role.to}</time>
@@ -257,8 +259,37 @@ export default function Home() {
               {projects.map((p, i) => (
                 <Reveal key={p.name} delay={i * 90} className="bg-bg">
                   <article className="flex h-full flex-col p-8">
-                    <h3 className="text-2xl font-semibold tracking-[-0.015em]">{p.name}</h3>
-                    <p className="mt-2 text-fg-muted">{p.blurb}</p>
+                    <div className="flex h-10 items-center gap-3">
+                      {p.logo &&
+                        (p.logo.srcLight ? (
+                          <>
+                            <img
+                              src={p.logo.src}
+                              alt={p.logo.alt}
+                              width={32}
+                              height={32}
+                              className="only-dark h-8 w-8 object-contain"
+                            />
+                            <img
+                              src={p.logo.srcLight}
+                              alt={p.logo.alt}
+                              width={32}
+                              height={32}
+                              className="only-light h-8 w-8 object-contain"
+                            />
+                          </>
+                        ) : (
+                          <img
+                            src={p.logo.src}
+                            alt={p.logo.alt}
+                            width={32}
+                            height={32}
+                            className="h-8 w-8 object-contain"
+                          />
+                        ))}
+                      <h3 className="text-2xl font-semibold tracking-[-0.015em]">{p.name}</h3>
+                    </div>
+                    <p className="mt-3 text-fg-muted">{p.blurb}</p>
                     <ul className="mt-6 flex-1 space-y-3">
                       {p.points.map((pt) => (
                         <li key={pt.text} className="text-fg-muted">
@@ -333,7 +364,7 @@ export default function Home() {
               Technical skills
             </h2>
             {/* Reveal carries the grid classes itself so the DOM stays
-                dl > div > dt/dd. An extra wrapper div would orphan the terms. */}
+                dl > div > dt/dd. An extra wrapper would orphan the terms. */}
             <dl className="mt-14 space-y-8">
               {skills.map((group, i) => (
                 <Reveal
@@ -357,7 +388,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── education + contact ────────────────────────────────────────── */}
+        {/* ── education, portrait and contact ────────────────────────────── */}
         <section
           aria-labelledby="contact-heading"
           className="mx-auto max-w-7xl px-6 py-24 lg:px-10"
@@ -366,21 +397,37 @@ export default function Home() {
           <h2 id="contact-heading" className="sr-only">
             Education and contact
           </h2>
-          <div className="mt-12 space-y-10">
-            {education.map((e) => (
-              <Reveal key={e.school}>
-                <article className="grid gap-3 lg:grid-cols-[220px_1fr] lg:gap-14">
-                  <p className="mono text-fg-muted">
-                    <time dateTime={e.from}>{e.from}</time> — <time dateTime={e.to}>{e.to}</time>
-                  </p>
-                  <div>
-                    <h3 className="text-xl font-semibold tracking-[-0.01em]">{e.school}</h3>
-                    <p className="mt-1.5 text-fg-muted">{e.detail}</p>
-                    <p className="mono mt-2 text-fg-faint">{e.note}</p>
-                  </div>
-                </article>
-              </Reveal>
-            ))}
+
+          <div className="mt-12 grid gap-16 lg:grid-cols-[1fr_320px] lg:gap-20">
+            <div className="space-y-10">
+              {education.map((e) => (
+                <Reveal key={e.school}>
+                  <article className="grid gap-3 sm:grid-cols-[160px_1fr] sm:gap-10">
+                    <p className="mono text-fg-muted">
+                      <time dateTime={e.from}>{e.from}</time> — <time dateTime={e.to}>{e.to}</time>
+                    </p>
+                    <div>
+                      <h3 className="text-xl font-semibold tracking-[-0.01em]">{e.school}</h3>
+                      <p className="mt-1.5 text-fg-muted">{e.detail}</p>
+                      <p className="mono mt-2 text-fg-faint">{e.note}</p>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+
+            <Reveal delay={100}>
+              <figure className="lg:sticky lg:top-24">
+                <img
+                  src={identity.portrait}
+                  alt="Harshit Wandhare"
+                  width={800}
+                  height={1000}
+                  className="w-full border border-line object-cover"
+                />
+                <figcaption className="mono mt-3 text-fg-faint">Richardson, TX</figcaption>
+              </figure>
+            </Reveal>
           </div>
 
           <Reveal>
@@ -417,9 +464,7 @@ export default function Home() {
         <div className="mono mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-2 px-6 py-10 text-fg-faint lg:px-10">
           <span>{identity.name}</span>
           <span>Richardson, TX</span>
-          <span className="ml-auto">
-            the figure is a tipkyanchi rangoli, computed at build time
-          </span>
+          <span className="ml-auto">the figure is a tipkyanchi rangoli, solved in the browser</span>
         </div>
       </footer>
     </>

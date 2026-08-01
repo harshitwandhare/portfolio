@@ -1,20 +1,23 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { generateStages } from '@/lib/rangoli'
 
 /**
- * The algorithm, running.
+ * The hero figure, and the algorithm behind it.
  *
  * A raw tiling is not one line — it is a dozen separate closed loops. Each tile
- * flip splices two of them together. Scrolling steps through that: the largest
- * loop is drawn in the accent and every other loop stays grey, so the accent
- * visibly spreads across the lattice as loops are absorbed, until the whole
- * figure is a single stroke.
+ * flip splices two of them together. This plays that through: the longest loop
+ * is drawn in the accent and the rest stay grey, so the accent visibly spreads
+ * across the lattice as loops are absorbed, ending on a single unbroken stroke.
  *
- * The server renders the finished figure. This only takes over once JavaScript
- * is available, and it holds the finished figure under reduced motion, so the
- * answer is never withheld — only the working is progressive.
+ * It runs once on load and can be replayed or reseeded. It is not tied to
+ * scroll — the figure is the first thing on the page, and a reader should not
+ * have to scroll past their own introduction to see it resolve.
+ *
+ * Progressive throughout: the server renders the finished stroke, so the answer
+ * is there without JavaScript, and reduced motion holds the finished stroke
+ * rather than playing faster.
  */
 
 interface Props {
@@ -23,154 +26,156 @@ interface Props {
   size: number
   pad: number
   seed: number
+  /** Milliseconds each splice step is held. */
+  step?: number
 }
 
-export function Splice({ rows, cols, size, pad, seed }: Props) {
-  const trackRef = useRef<HTMLDivElement | null>(null)
-  // Starts at the raw tiling. It must not start unrendered: the scroll handler
-  // measures the track element, so gating the render on a scroll reading would
-  // mean the track never mounts and the section never appears.
-  const [index, setIndex] = useState(0)
+export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props) {
   const [currentSeed, setCurrentSeed] = useState(seed)
+  const [index, setIndex] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  const timer = useRef<number | null>(null)
 
-  // Derived from the seed, so it belongs in a memo rather than in state set by
-  // an effect. The generator is deterministic and small, so regenerating is one
-  // function call rather than a round trip.
   const model = useMemo(
     () => generateStages({ rows, cols, size, pad, seed: currentSeed }),
     [rows, cols, size, pad, currentSeed],
   )
+  const last = model.stages.length - 1
 
-  useEffect(() => {
-    const last = model.stages.length - 1
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const stop = useCallback(() => {
+    if (timer.current !== null) {
+      window.clearInterval(timer.current)
+      timer.current = null
+    }
+    setPlaying(false)
+  }, [])
 
-    let frame = 0
-    const onScroll = () => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        // Reduced motion gets the finished figure and never the working — the
-        // answer is shown at once rather than the animation merely running fast.
-        if (reduced) {
-          setIndex(last)
-          return
+  const play = useCallback(() => {
+    stop()
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIndex(last)
+      return
+    }
+    setIndex(0)
+    setPlaying(true)
+    timer.current = window.setInterval(() => {
+      setIndex((i) => {
+        if (i >= last) {
+          stop()
+          return last
         }
-        const track = trackRef.current
-        if (!track) return
-        const rect = track.getBoundingClientRect()
-        const scrollable = rect.height - window.innerHeight
-        if (scrollable <= 0) {
-          setIndex(last)
-          return
-        }
-        const progress = Math.min(Math.max(-rect.top / scrollable, 0), 1)
-        setIndex(Math.round(progress * last))
+        return i + 1
       })
-    }
+    }, step)
+  }, [last, step, stop])
 
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+  // Play once when the figure first appears, and again whenever it is reseeded.
+  useEffect(() => {
+    const id = window.setTimeout(play, 450)
     return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      window.clearTimeout(id)
+      stop()
     }
-  }, [model])
+  }, [play, stop])
 
-  const stage = model.stages[Math.min(index, model.stages.length - 1)]
+  const stage = model.stages[Math.min(index, last)]
   if (!stage) return null
 
   const done = stage.loopCount === 1
-  const total = model.stages.length - 1
 
   return (
-    <div ref={trackRef} data-splice-track className="relative h-[340vh]">
-      <div className="sticky top-0 flex h-screen flex-col justify-center">
-        <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_320px] lg:gap-16">
-            <svg
-              viewBox={`0 0 ${model.width} ${model.height}`}
-              className="h-auto w-full"
-              role="img"
-              aria-label={`The tiling at stage ${index + 1} of ${total + 1}: ${stage.loopCount} ${
-                stage.loopCount === 1 ? 'loop' : 'separate loops'
-              }.`}
-            >
-              {model.dots.map((d, i) => (
-                <circle key={i} cx={d[0]} cy={d[1]} r={size * 0.042} fill="var(--dot)" />
-              ))}
+    <div data-splice className="w-full">
+      <svg
+        viewBox={`0 0 ${model.width} ${model.height}`}
+        className="h-auto w-full"
+        role="img"
+        aria-label={
+          done
+            ? 'A lattice of dots with a single unbroken line drawn around every one of them.'
+            : `The tiling part-way through: ${stage.loopCount} separate loops remaining.`
+        }
+      >
+        {model.dots.map((d, i) => (
+          <circle key={i} cx={d[0]} cy={d[1]} r={size * 0.04} fill="var(--dot)" />
+        ))}
 
-              {/* Grey loops first so the accent one always draws on top. */}
-              {stage.loops.map((loop, i) => (
-                <path
-                  key={`${index}-${i}`}
-                  d={loop.path}
-                  fill="none"
-                  stroke={i === 0 ? 'var(--accent)' : 'var(--fg-faint)'}
-                  strokeWidth={i === 0 ? size * 0.055 : size * 0.03}
-                  strokeLinecap="round"
-                  opacity={i === 0 ? 1 : 0.55}
-                  style={{ transition: 'stroke 260ms ease, stroke-width 260ms ease' }}
-                />
-              ))}
-            </svg>
+        {/* Grey loops first so the accent one always draws on top. */}
+        {stage.loops.map((loop, i) => (
+          <path
+            key={`${index}-${i}`}
+            d={loop.path}
+            fill="none"
+            stroke={i === 0 ? 'var(--accent)' : 'var(--fg-faint)'}
+            strokeWidth={i === 0 ? size * 0.05 : size * 0.028}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={i === 0 ? 1 : 0.5}
+            style={{ transition: 'stroke-width 220ms ease, opacity 220ms ease' }}
+          />
+        ))}
 
-            <div>
-              <p className="mono text-fg-faint">the algorithm, running</p>
+        {/* The bindu — the origin dot a rangoli is started from. */}
+        {done && stage.loops[0]?.arcs[0] && (
+          <circle
+            cx={stage.loops[0].arcs[0].from[0]}
+            cy={stage.loops[0].arcs[0].from[1]}
+            r={size * 0.075}
+            fill="var(--accent)"
+          />
+        )}
+      </svg>
 
-              <p className="mt-5 flex items-baseline gap-3">
-                <span
-                  data-loop-count
-                  className="tabular text-6xl font-medium tracking-tight tabular-nums"
-                  style={{ color: done ? 'var(--accent)' : 'var(--fg)' }}
-                >
-                  {stage.loopCount}
-                </span>
-                <span className="mono text-fg-muted">
-                  {stage.loopCount === 1 ? 'stroke' : 'separate loops'}
-                </span>
-              </p>
+      <div className="mt-7 flex flex-wrap items-baseline gap-x-6 gap-y-3">
+        <p className="flex items-baseline gap-2.5">
+          <span
+            data-loop-count
+            className="tabular text-3xl font-medium tabular-nums"
+            style={{ color: done ? 'var(--accent)' : 'var(--fg)' }}
+          >
+            {stage.loopCount}
+          </span>
+          <span className="mono text-fg-muted">{done ? 'unbroken stroke' : 'separate loops'}</span>
+        </p>
 
-              <div
-                className="mt-6 h-px w-full bg-line"
-                role="presentation"
-                aria-hidden
-                style={{
-                  backgroundImage: `linear-gradient(to right, var(--accent) ${
-                    (index / Math.max(total, 1)) * 100
-                  }%, var(--line) 0)`,
-                }}
-              />
+        <p className="mono text-fg-faint">
+          {stage.flips} {stage.flips === 1 ? 'flip' : 'flips'} ·{' '}
+          {stage.loops.reduce((n, l) => n + l.arcs.length, 0)} arcs
+        </p>
 
-              <dl className="mono mt-6 grid grid-cols-2 gap-y-4 text-fg-muted">
-                <dt className="text-fg-faint">flips applied</dt>
-                <dd className="tabular text-right text-fg">{stage.flips}</dd>
-                <dt className="text-fg-faint">arcs in play</dt>
-                <dd className="tabular text-right text-fg">
-                  {stage.loops.reduce((n, l) => n + l.arcs.length, 0)}
-                </dd>
-                <dt className="text-fg-faint">longest loop</dt>
-                <dd className="tabular text-right text-fg">{stage.loops[0]?.arcs.length ?? 0}</dd>
-              </dl>
-
-              <p className="mono-note mt-6 text-fg-faint">
-                {done
-                  ? 'one stroke. it goes around every dot and closes where it began.'
-                  : 'each flip rewires two arcs inside one cell, joining two loops into one.'}
-              </p>
-
-              <button
-                type="button"
-                onClick={() => setCurrentSeed((s) => s + 1)}
-                className="mono mt-7 border border-line px-3 py-1.5 text-fg-muted transition-colors hover:border-accent hover:text-accent"
-              >
-                new figure
-              </button>
-            </div>
-          </div>
-        </div>
+        <span className="ml-auto flex gap-2">
+          <button
+            type="button"
+            onClick={play}
+            disabled={playing}
+            className="mono border border-line px-3 py-1.5 text-fg-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-40"
+          >
+            replay
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrentSeed((s) => s + 1)}
+            className="mono border border-line px-3 py-1.5 text-fg-muted transition-colors hover:border-accent hover:text-accent"
+          >
+            new figure
+          </button>
+        </span>
       </div>
+
+      <div
+        aria-hidden
+        className="mt-4 h-px w-full"
+        style={{
+          backgroundImage: `linear-gradient(to right, var(--accent) ${
+            (index / Math.max(last, 1)) * 100
+          }%, var(--line) 0)`,
+        }}
+      />
+
+      <p className="mono-note mt-4 text-fg-faint">
+        {done
+          ? 'one stroke · around every dot, never through one, never crossing, closed'
+          : 'each flip rewires two arcs inside one cell, joining two loops into one'}
+      </p>
     </div>
   )
 }
