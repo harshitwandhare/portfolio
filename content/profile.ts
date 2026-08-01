@@ -27,8 +27,12 @@ export const identity = {
   status: 'Open to Summer 2027 SWE and AI/ML internships',
   // Replace this file with a real headshot — see public/portrait.README.
   portrait: '/portrait.jpg',
-  // Phone deliberately absent until a US number exists. An Indian number on a
-  // US-facing site reads as "not actually here".
+  // No phone number, deliberately, and not merely because one was missing.
+  //
+  // A number on a public page is harvested within days, and in this repo it
+  // would also sit in git history forever. Recruiters open with email in any
+  // case. The number belongs on the résumé PDF, which is sent to a named
+  // recipient rather than crawled — so it lives there and nowhere in here.
 } as const
 
 export const hero = {

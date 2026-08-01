@@ -41,9 +41,26 @@ test.describe('/', () => {
     expect(yosemite).toBeLessThan(jio)
   })
 
-  test('omits a phone number until a US one exists', async ({ page }) => {
-    const body = await page.locator('main').innerText()
-    expect(body).not.toMatch(/\+91/)
+  test('publishes no phone number at all', async ({ page }) => {
+    // Deliberate, not an oversight: a number on a public page gets harvested,
+    // and recruiters open with email regardless. It belongs on the résumé PDF,
+    // which is sent rather than crawled. Written as a shape rather than a
+    // literal so the number itself never enters this repository.
+    const text = await page.locator('body').innerText()
+    const html = await page.content()
+
+    // Examples use the 555 range, which is reserved for fiction — the real
+    // number must not appear even in a comment.
+    const shapes = [
+      /\+\d{1,3}[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/, // +1 (555) 010-0100
+      /\(\d{3}\)\s?\d{3}[\s.-]?\d{4}/, // (555) 010-0100
+      /\b\d{3}[\s.-]\d{3}[\s.-]\d{4}\b/, // 555-010-0100
+      /\btel:/i, // a tel: link anywhere in the markup
+    ]
+    for (const shape of shapes) {
+      expect(text, `phone-shaped text matched ${shape}`).not.toMatch(shape)
+      expect(html, `phone-shaped markup matched ${shape}`).not.toMatch(shape)
+    }
   })
 
   test('excludes the withdrawn tooling claims', async ({ page }) => {
