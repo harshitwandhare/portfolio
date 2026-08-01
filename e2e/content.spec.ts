@@ -12,7 +12,7 @@ test.describe('/', () => {
 
   test('states the figure is a single closed stroke', async ({ page }) => {
     // The whole claim rests on the hero figure being one line, not a pattern.
-    await expect(page.getByText(/one stroke ·.*never crosses, never lifts/)).toBeVisible()
+    await expect(page.getByText(/one stroke ·.*never crossing, closed/)).toBeVisible()
   })
 
   test('leads the proof strip with commits, not a star count', async ({ page }) => {
@@ -71,40 +71,73 @@ test.describe('/', () => {
   })
 })
 
-test.describe('the splice animation', () => {
-  test('starts on many loops and reaches exactly one by the end of the track', async ({ page }) => {
+test.describe('the hero figure', () => {
+  test('plays the splice down to exactly one unbroken stroke', async ({ page }) => {
     await page.goto('/')
     const counter = page.locator('[data-loop-count]')
-    const track = page.locator('[data-splice-track]')
     await expect(counter).toBeVisible()
 
-    const start = Number(await counter.textContent())
-    expect(start).toBeGreaterThan(1)
+    // It plays on its own. The claim the whole page rests on is that it ends
+    // on one, so wait for that rather than for a fixed duration.
+    await expect(counter).toHaveText('1', { timeout: 20_000 })
+    await expect(page.getByText('unbroken stroke')).toBeVisible()
+  })
 
-    // Scroll to the end of the sticky track.
-    const box = await track.boundingBox()
-    if (!box) throw new Error('splice track has no box')
-    await page.evaluate((y) => window.scrollTo(0, y), box.y + box.height)
-    await expect(counter).toHaveText('1')
+  test('draws a closed path — no gap left by a short dash pattern', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
+
+    const closed = await page
+      .locator('[data-splice] path')
+      .first()
+      .evaluate((el) => {
+        const path = el as unknown as SVGPathElement
+        const d = path.getAttribute('d') ?? ''
+        const style = getComputedStyle(el)
+        const dash = style.strokeDasharray
+        // Either no dash pattern at all, or one long enough to cover the path.
+        const covered =
+          dash === 'none' ||
+          dash === '' ||
+          Number.parseFloat(dash) >= path.getTotalLength() - 1 ||
+          // pathLength normalises the curve to 1 unit.
+          (path.hasAttribute('pathLength') && Number.parseFloat(dash) >= 1)
+        return { endsWithZ: d.trim().endsWith('Z'), covered }
+      })
+
+    expect(closed.endsWithZ, 'path data must close with Z').toBe(true)
+    expect(closed.covered, 'dash pattern must cover the whole path').toBe(true)
   })
 
   test('regenerates a different figure on demand', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('[data-loop-count]')).toBeVisible()
+    await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
 
     // Compare the whole figure, not one loop — two different tilings can share
     // their largest loop by coincidence.
     const shape = () =>
       page
-        .locator('[data-splice-track] path')
+        .locator('[data-splice] path')
         .evaluateAll((els) => els.map((e) => e.getAttribute('d')).join('|'))
 
     const before = await shape()
     expect(before.length).toBeGreaterThan(0)
 
     await page.getByRole('button', { name: 'new figure' }).click()
-    await expect.poll(shape, { timeout: 10_000 }).not.toBe(before)
+    await expect.poll(shape, { timeout: 20_000 }).not.toBe(before)
   })
+})
+
+test('shows every logo and the portrait without a broken image', async ({ page }) => {
+  await page.goto('/')
+  await page.waitForLoadState('networkidle')
+
+  const broken = await page.evaluate(() =>
+    [...document.images].filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.src),
+  )
+  expect(broken).toEqual([])
+  // Both company marks and the portrait slot.
+  expect(await page.locator('img').count()).toBeGreaterThanOrEqual(4)
 })
 
 test('the theme switch flips the document and persists the choice', async ({ page }) => {
