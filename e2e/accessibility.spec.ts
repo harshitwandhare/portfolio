@@ -1,12 +1,28 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-const PAGES = ['/', '/lab/a', '/lab/c'] as const
+const PAGES = ['/'] as const
 
 for (const path of PAGES) {
   test.describe(`${path}`, () => {
     test('has no critical or serious accessibility violations', async ({ page }) => {
       await page.goto(path)
+
+      // Scroll the whole page first and let it settle. Reveal fades content in
+      // from opacity 0, and axe computes effective colour through opacity — so
+      // auditing mid-fade reports contrast failures against a colour that only
+      // exists for a few hundred milliseconds. The settled page is what a
+      // reader actually sees, and it is what must pass.
+      await page.evaluate(async () => {
+        const step = window.innerHeight * 0.8
+        for (let y = 0; y < document.body.scrollHeight; y += step) {
+          window.scrollTo(0, y)
+          await new Promise((r) => setTimeout(r, 120))
+        }
+        window.scrollTo(0, 0)
+      })
+      await page.waitForTimeout(900)
+
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze()
@@ -82,7 +98,7 @@ for (const path of PAGES) {
 test('renders its content with JavaScript disabled', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false })
   const page = await context.newPage()
-  await page.goto('/lab/a')
+  await page.goto('/')
 
   // The centrepiece is server-rendered SVG, so the figure and every fact
   // survive without scripting.
@@ -96,7 +112,7 @@ test('renders its content with JavaScript disabled', async ({ browser }) => {
 test('honours prefers-reduced-motion by showing the finished figure', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' })
   const page = await context.newPage()
-  await page.goto('/lab/a')
+  await page.goto('/')
 
   // The stroke must be fully drawn immediately rather than merely animating fast.
   const offset = await page

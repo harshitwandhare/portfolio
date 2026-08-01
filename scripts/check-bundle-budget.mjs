@@ -14,21 +14,20 @@ import { spawn } from 'node:child_process'
 import { chromium } from 'playwright'
 
 /**
- * 160 KB, not the 100 KB the brief asked for.
+ * 100 KB — the figure the brief asked for, and currently met with room to spare.
  *
- * Measured honestly: a page with no client components at all still loads ~146 KB
- * gzipped, because that is React 19 plus the Next App Router runtime. The floor
- * is the framework, not this site's code — `/` and `/lab/a` come in within
- * 0.1 KB of each other despite one being far heavier in content.
+ * An earlier draft measured 146 KB and concluded the floor was the framework.
+ * That was wrong, and worth recording: the site then had internal <Link>s to
+ * two other routes, and Next prefetches a linked route's chunks on sight. The
+ * measurement was counting three pages' JavaScript, not one. With the extra
+ * routes gone the real figure is well under half of it.
  *
- * The budget is set just above that floor so it catches our own regressions,
- * which is what a budget is for. Genuinely getting under 100 KB means dropping
- * hydration entirely — an Astro-style zero-JS build — which is a framework
- * decision, not a tuning exercise.
+ * The centrepiece is server-rendered SVG, which is why this stays small. If it
+ * starts creeping, something moved to the client that did not need to.
  */
-const BUDGET_KB = 160
+const BUDGET_KB = 100
 const PORT = 3123
-const ROUTES = ['/', '/lab/a', '/lab/c']
+const ROUTES = ['/']
 
 const server = spawn('npx', ['next', 'start', '--port', String(PORT)], {
   stdio: 'ignore',
