@@ -12,14 +12,31 @@ test.describe('/', () => {
 
   test('states the figure is a single closed stroke', async ({ page }) => {
     // The whole claim rests on the hero figure being one line, not a pattern.
-    await expect(page.getByText(/one stroke ·.*never crossing, closed/)).toBeVisible()
+    await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
+    await expect(page.getByText(/never through one, never crossing, closed/)).toBeVisible()
+  })
+
+  test('is indexable and describes itself for a search result', async ({ page }) => {
+    await expect(page).toHaveTitle(/Harshit Wandhare/)
+
+    const robots = await page.locator('meta[name="robots"]').getAttribute('content')
+    expect(robots ?? '', 'the site must not ship noindex').not.toMatch(/noindex/)
+
+    const description = await page.locator('meta[name="description"]').getAttribute('content')
+    expect(description ?? '').toContain('Reliance Jio')
+
+    // Structured data, so a result renders as a person rather than a page.
+    const ld = await page.locator('script[type="application/ld+json"]').textContent()
+    const parsed = JSON.parse(ld ?? '{}')
+    expect(parsed['@type']).toBe('Person')
+    expect(parsed.name).toBe('Harshit Wandhare')
   })
 
   test('leads the proof strip with commits, not a star count', async ({ page }) => {
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits, #1 of 15')).toBeVisible()
+    await expect(strip.getByText('commits — most on the project')).toBeVisible()
     // CountUp animates from zero, so wait for it to settle on the real figure.
-    await expect(strip.getByText('1,268')).toBeVisible()
+    await expect(strip.getByText('1,214')).toBeVisible()
   })
 
   test('never shows a zero in the proof strip', async ({ page }) => {
@@ -27,7 +44,7 @@ test.describe('/', () => {
     // weakest fact on the page in the largest type. Scoped to the strip — the
     // splice panel legitimately starts at zero flips applied.
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits, #1 of 15')).toBeVisible()
+    await expect(strip.getByText('commits — most on the project')).toBeVisible()
     for (const value of await strip.locator('.tabular').allTextContents()) {
       expect(value.trim()).not.toBe('0')
     }
@@ -81,7 +98,17 @@ test.describe('/', () => {
       .evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).href))
     expect(hrefs.length).toBeGreaterThan(0)
 
-    for (const href of [...new Set(hrefs)]) {
+    // Structured-data URLs are checked too. A dead link in `sameAs` is just as
+    // broken as one in the markup and nobody sees it until a crawler does —
+    // which is how a deleted account's profile URL survived here for a while.
+    const ld = JSON.parse(
+      (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
+    )
+    const ldUrls: string[] = [...(ld.sameAs ?? []), ld.url, ld.image].filter(
+      (u: unknown): u is string => typeof u === 'string' && u.startsWith('http'),
+    )
+
+    for (const href of [...new Set([...hrefs, ...ldUrls])]) {
       const res = await request.get(href, { maxRedirects: 5 })
       expect(res.status(), `${href} returned ${res.status()}`).toBeLessThan(400)
     }
@@ -124,6 +151,42 @@ test.describe('the hero figure', () => {
 
     expect(closed.endsWithZ, 'path data must close with Z').toBe(true)
     expect(closed.covered, 'dash pattern must cover the whole path').toBe(true)
+  })
+
+  test('never resizes while it plays, replays or reseeds', async ({ page }) => {
+    await page.goto('/')
+    const svg = page.locator('[data-splice] svg')
+    await expect(svg).toBeVisible()
+
+    const box = async () => {
+      const b = await svg.boundingBox()
+      if (!b) throw new Error('figure has no box')
+      return `${Math.round(b.width)}x${Math.round(b.height)}`
+    }
+
+    // Sampled across the whole animation. The figure used to size to its own
+    // caption, so the label changing from "separate loops" to "unbroken
+    // stroke" resized the SVG by 12% part-way through.
+    const first = await box()
+    const seen = new Set([first])
+    for (let i = 0; i < 12; i++) {
+      await page.waitForTimeout(220)
+      seen.add(await box())
+    }
+
+    await page.getByRole('button', { name: 'replay' }).click()
+    for (let i = 0; i < 6; i++) {
+      await page.waitForTimeout(220)
+      seen.add(await box())
+    }
+
+    await page.getByRole('button', { name: 'new figure' }).click()
+    for (let i = 0; i < 6; i++) {
+      await page.waitForTimeout(220)
+      seen.add(await box())
+    }
+
+    expect([...seen], 'the figure must hold one size throughout').toEqual([first])
   })
 
   test('regenerates a different figure on demand', async ({ page }) => {
