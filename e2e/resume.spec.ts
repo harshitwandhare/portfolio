@@ -102,11 +102,15 @@ test.describe('/resume', () => {
   })
 })
 
-test('the homepage links to the résumé', async ({ page }) => {
+test('the résumé is reachable from the header, without scrolling', async ({ page }) => {
   await page.goto('/')
-  const link = page.getByRole('link', { name: 'résumé', exact: true })
-  await expect(link).toBeVisible()
-  await link.click()
+
+  // The header is the one that matters: it is on screen before any scrolling,
+  // and opening the résumé is the likeliest first useful action a recruiter
+  // takes. The contact section carries the same link further down.
+  const header = page.getByRole('link', { name: 'résumé', exact: true }).first()
+  await expect(header).toBeInViewport()
+  await header.click()
   await expect(page).toHaveURL(/\/resume$/)
 })
 

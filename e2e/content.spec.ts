@@ -109,8 +109,18 @@ test.describe('/', () => {
     )
 
     for (const href of [...new Set([...hrefs, ...ldUrls])]) {
-      const res = await request.get(href, { maxRedirects: 5 })
-      expect(res.status(), `${href} returned ${res.status()}`).toBeLessThan(400)
+      let status: number
+      try {
+        status = (await request.get(href, { maxRedirects: 5, timeout: 20_000 })).status()
+      } catch (err) {
+        throw new Error(`${href} did not respond: ${String(err).split('\n')[0]}`)
+      }
+
+      // 999 is LinkedIn's response to anything that is not a browser. It is a
+      // bot block, not a broken link — real visitors get the page. Everything
+      // else must be a genuine success.
+      if (status === 999 && new URL(href).hostname.endsWith('linkedin.com')) continue
+      expect(status, `${href} returned ${status}`).toBeLessThan(400)
     }
   })
 })
