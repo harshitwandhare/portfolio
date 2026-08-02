@@ -8,7 +8,7 @@ import { generateRangoli } from '@/lib/rangoli'
  * preview is the real thing rather than a screenshot that drifts out of date.
  */
 
-export const alt = 'Harshit Wandhare — Software Engineer'
+export const alt = 'Harshit Wandhare, Software Engineer'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -63,7 +63,7 @@ export default function OpenGraphImage() {
           <span>Wandhare</span>
         </div>
         <div style={{ fontSize: 30, color: FG, marginTop: 34, lineHeight: 1.35 }}>
-          I build production systems end to end — and have shipped them alone.
+          I build production systems end to end, and have shipped them alone.
         </div>
         <div style={{ fontSize: 21, color: MUTED, marginTop: 30, display: 'flex', gap: 26 }}>
           <span>1,214 commits, #1 of 29</span>

@@ -24,9 +24,9 @@ const newsreader = Newsreader({
   display: 'swap',
 })
 
-const TITLE = 'Harshit Wandhare — Software Engineer'
+const TITLE = 'Harshit Wandhare, Software Engineer'
 const DESCRIPTION =
-  'Software engineer. Three years shipping production web, mobile and backend at scale — ' +
+  'Software engineer. Three years shipping production web, mobile and backend at scale: ' +
   'enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering ' +
   'function at a three-person startup in Germany. MS Computer Science at UT Dallas.'
 

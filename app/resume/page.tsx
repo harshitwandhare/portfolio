@@ -5,12 +5,12 @@ import { ResumeSheet } from './resume-sheet'
 import { Stage } from './stage'
 
 export const metadata: Metadata = {
-  title: 'Résumé — Harshit Wandhare',
+  title: 'Résumé, Harshit Wandhare',
   description: summary,
   alternates: { canonical: '/resume' },
   openGraph: {
     type: 'profile',
-    title: 'Résumé — Harshit Wandhare',
+    title: 'Résumé, Harshit Wandhare',
     description: summary,
     url: '/resume',
   },
@@ -31,8 +31,8 @@ export default function ResumePage() {
             <h1 className="mt-8 text-4xl font-semibold tracking-[-0.03em] md:text-5xl">Résumé</h1>
             <p className="mt-5 max-w-2xl text-fg-muted">
               The same content as the site, laid out as a document. It is rendered from one source,
-              so this page and the homepage cannot disagree — and printing it produces the PDF,
-              which means the copy you take is never a stale file someone forgot to re-upload.
+              so this page and the homepage cannot disagree, and printing it produces the PDF, which
+              means the copy you take is never a stale file someone forgot to re-upload.
             </p>
             <p className="mono-note mt-4 max-w-2xl text-fg-faint">
               no phone number here by design. it is on the copy sent to an application, not on a

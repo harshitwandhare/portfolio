@@ -57,7 +57,7 @@ export function Stage({ children }: { children: ReactNode }) {
 
   async function share() {
     const url = 'https://harshitwandhare.com/resume'
-    const data = { title: 'Harshit Wandhare — Résumé', url }
+    const data = { title: 'Harshit Wandhare, Résumé', url }
     try {
       if (navigator.share) {
         await navigator.share(data)
@@ -89,7 +89,7 @@ export function Stage({ children }: { children: ReactNode }) {
           {copied ? 'link copied' : 'share'}
         </button>
         <p className="mono-note text-fg-faint">
-          printing produces the pdf — so the copy you take is always the current one
+          printing produces the pdf, so the copy you take is always the current one
         </p>
       </div>
 

@@ -155,7 +155,7 @@ export function ResumeSheet() {
               key={e.school}
               left={e.school}
               leftSub={e.detail}
-              right={`${fmt(e.from)} — ${fmt(e.to)}`}
+              right={`${fmt(e.from)} to ${fmt(e.to)}`}
               rightSub={e.note}
             />
           ))}
@@ -167,7 +167,7 @@ export function ResumeSheet() {
               key={role.org}
               left={role.title}
               leftSub={role.org}
-              right={`${fmt(role.from)} — ${fmt(role.to)}`}
+              right={`${fmt(role.from)} to ${fmt(role.to)}`}
               rightSub={role.where}
               bullets={role.points.slice(0, LIMITS.experience[i] ?? 4).map((p) => p.text)}
             />

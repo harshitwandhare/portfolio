@@ -53,7 +53,7 @@ export const summary =
   'Summer 2027 software engineering or AI/ML internship.'
 
 export const hero = {
-  line: 'I build production systems end to end — and have shipped them alone.',
+  line: 'I build production systems end to end, and have shipped them alone.',
   sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering function at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track.',
 } as const
 
@@ -77,7 +77,7 @@ export const metrics: readonly Metric[] = [
     // the figure the API returns today, and it is still the largest share of
     // any contributor — 982 is next.
     value: '1,214',
-    label: 'commits — most on the project',
+    label: 'commits, most on the project',
     source: 'confirmed',
     note: 'Verifiable via the contributors API with anon=1; the account itself is gone.',
   },
@@ -114,7 +114,7 @@ export const experience: readonly Role[] = [
     href: 'https://www.linkedin.com/company/yosemitecrew/',
     points: [
       {
-        text: 'Sole engineer-owner of an open-source veterinary practice-management system at a three-person company — architecture, web platform, mobile app, integrations, CI and release.',
+        text: 'Sole engineer-owner of an open-source veterinary practice-management system at a three-person company: architecture, web platform, mobile app, integrations, CI and release.',
         source: 'document',
         evidence: '/docs/lor-founder.pdf',
       },
@@ -123,7 +123,7 @@ export const experience: readonly Role[] = [
         source: 'confirmed',
       },
       {
-        text: 'Owned the React Native app end to end including the release process — builds, store review, and shipping to both the App Store and Google Play.',
+        text: 'Owned the React Native app end to end including the release process: builds, store review, and shipping to both the App Store and Google Play.',
         source: 'document',
         evidence: '/docs/lor-founder.pdf',
       },
@@ -133,11 +133,11 @@ export const experience: readonly Role[] = [
         source: 'self',
       },
       {
-        text: 'Built the auth stack on AWS Cognito and Amplify Gen 2 — custom Lambda OTP triggers, WebAuthn passkeys, TOTP MFA, OAuth across Google/Apple/Facebook — then led its migration to SuperTokens.',
+        text: 'Built the auth stack on AWS Cognito and Amplify Gen 2 (custom Lambda OTP triggers, WebAuthn passkeys, TOTP MFA, OAuth across Google/Apple/Facebook), then led its migration to SuperTokens.',
         source: 'self',
       },
       {
-        text: 'Owned cloud infrastructure (Lambda, S3, CloudFront, Redis) and authored the GitHub Actions estate — CodeQL, Gitleaks, SonarCloud gates, Playwright E2E — across three codebases in a Turborepo/pnpm monorepo.',
+        text: 'Owned cloud infrastructure (Lambda, S3, CloudFront, Redis) and authored the GitHub Actions estate, from CodeQL and Gitleaks to SonarCloud gates and Playwright E2E, across three codebases in a Turborepo/pnpm monorepo.',
         source: 'self',
       },
       {
@@ -152,7 +152,7 @@ export const experience: readonly Role[] = [
     where: 'Navi Mumbai, India',
     from: '2023-10',
     to: '2025-09',
-    badge: 'A* annual rating — the firm’s highest performance category',
+    badge: 'A* annual rating, the firm’s highest performance category',
     logo: { src: '/logos/jio.svg', alt: 'Reliance Jio' },
     href: 'https://www.linkedin.com/company/jioplatforms/',
     points: [
@@ -170,7 +170,7 @@ export const experience: readonly Role[] = [
         source: 'self',
       },
       {
-        text: 'Designed the SDK layer for secure WebView-to-native message passing between React Native shells and embedded Angular/Next.js apps — adopted as the standard integration layer across products.',
+        text: 'Designed the SDK layer for secure WebView-to-native message passing between React Native shells and embedded Angular/Next.js apps, adopted as the standard integration layer across products.',
         source: 'document',
         evidence: '/docs/lor-jio.pdf',
       },
@@ -223,7 +223,7 @@ export const projects: readonly Project[] = [
         text: 'Ships a clip-to-track browser extension, a Typer CLI, a Next.js UI and a FastAPI backend.',
         source: 'self',
       },
-      { text: 'Local-first by design — no user data leaves the machine.', source: 'self' },
+      { text: 'Local-first by design: no user data leaves the machine.', source: 'self' },
       {
         // 507 collected by pytest today. Written as a floor: the old "~450"
         // counted test functions and missed every parametrised case.
@@ -245,11 +245,11 @@ export const projects: readonly Project[] = [
         source: 'confirmed',
       },
       {
-        text: 'Three memory tiers — an episodic SQLite ledger, a semantic store, and versioned skill playbooks.',
+        text: 'Three memory tiers: an episodic SQLite ledger, a semantic store, and versioned skill playbooks.',
         source: 'confirmed',
       },
       {
-        text: 'Three interchangeable runtimes — Claude Agent SDK, LangGraph, and local Ollama — behind one typed protocol.',
+        text: 'Three interchangeable runtimes (Claude Agent SDK, LangGraph, and local Ollama) behind one typed protocol.',
         source: 'confirmed',
       },
       {
@@ -270,7 +270,7 @@ export const projects: readonly Project[] = [
     private: true,
     points: [
       {
-        text: 'Generates and publishes short-form video autonomously — LLM-driven scripting, automated media processing, scheduled publishing.',
+        text: 'Generates and publishes short-form video autonomously: LLM-driven scripting, automated media processing, scheduled publishing.',
         source: 'self',
       },
     ],
@@ -310,10 +310,10 @@ export const research: readonly Paper[] = [
     pages: 8,
     sizeMb: '1.1',
     points: [
-      'YOLOv5 detector at 95.45% mAP, 88.7% precision, 96.4% recall — 100 epochs on a 433-image custom dataset.',
-      'Custom CNN over 36 character classes at 89.66% accuracy — 80 epochs, 6,659-image dataset.',
+      'YOLOv5 detector at 95.45% mAP, 88.7% precision, 96.4% recall, over 100 epochs on a 433-image custom dataset.',
+      'Custom CNN over 36 character classes at 89.66% accuracy, over 80 epochs on a 6,659-image dataset.',
       'OpenCV preprocessing: cropping, grayscale, Hough-transform deskew, contour-based character segmentation.',
-      'Trained locally on an Nvidia RTX 2060 (6GB) — 100 epochs in 0.849 hours.',
+      'Trained locally on an Nvidia RTX 2060 (6GB): 100 epochs in 0.849 hours.',
     ],
   },
   {
@@ -385,7 +385,7 @@ export const learning = ['Rust'] as const
 export const education = [
   {
     school: 'The University of Texas at Dallas',
-    detail: 'M.S. Computer Science — Intelligent Systems track',
+    detail: 'M.S. Computer Science, Intelligent Systems track',
     from: '2026-08',
     to: '2028-05',
     note: 'Jonsson School Dean’s Graduate Scholarship',
@@ -420,7 +420,7 @@ export const story = [
     lat: 21.15,
     lon: 79.09,
     title: 'A balloon, and an idea borrowed from Google',
-    body: 'Eighth standard. Google had just announced Project Loon — balloons in the stratosphere carrying internet to places cables would never reach. I built my own version at school. The local papers ran it. I have been chasing the same feeling ever since: take an idea that is too big for you, and build the small version anyway.',
+    body: 'Eighth standard. Google had just announced Project Loon: balloons in the stratosphere carrying internet to places cables would never reach. I built my own version at school. The local papers ran it. I have been chasing the same feeling ever since: take an idea that is too big for you, and build the small version anyway.',
   },
   {
     year: '2019',
@@ -428,7 +428,7 @@ export const story = [
     lat: 19.08,
     lon: 72.88,
     title: 'Engineering, and the first real system',
-    body: 'Vidyalankar, Computer Engineering, 9.53. The final-year project was Parkify — YOLOv5 to find the number plate, a CNN to read it, OpenCV to clean up everything in between. I led the technical side: model selection, training, evaluation, and the integration that turned three separate pieces into one system that worked.',
+    body: 'Vidyalankar, Computer Engineering, 9.53. The final-year project was Parkify. YOLOv5 to find the number plate, a CNN to read it, OpenCV to clean up everything in between. I led the technical side: model selection, training, evaluation, and the integration that turned three separate pieces into one system that worked.',
   },
   {
     year: '2023',
