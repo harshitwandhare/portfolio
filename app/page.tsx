@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import contributions from '@/data/contributions.json'
 import {
   education,
   experience,
@@ -24,51 +23,19 @@ import { SpliceFigure } from './splice'
  */
 const HERO = { rows: 6, cols: 6, size: 74, seed: 13, pad: 40 }
 
-/**
- * The contribution lattice.
- *
- * A year laid out the GitHub way — 53 weeks across, 7 days down — makes a band
- * so thin that the arcs collapse into texture and the commit-weighted dots stop
- * reading at all. Reshaping the same 365 days into a squarer block keeps every
- * day and makes both the data and the line legible.
- */
-const LATTICE = { rows: 13, cols: 27, size: 34, seed: 3, pad: 18 }
-
-/** One weight per lattice dot, in the same row-major order the figure draws. */
-function latticeWeights(): number[] {
-  const days = contributions.days
-  const out: number[] = []
-  let day = 0
-  for (let r = 0; r <= LATTICE.rows; r++) {
-    for (let c = 0; c <= LATTICE.cols; c++) {
-      out.push(days[day]?.c ?? 0)
-      day++
-    }
-  }
-  return out
-}
-
-const totalContributions = contributions.totals['harshit-yc'] + contributions.totals.harshitwandhare
-
 const LINK = 'text-accent underline underline-offset-4'
 const TITLE_LINK =
   'underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-accent'
 
 export default function Home() {
-  const weights = latticeWeights()
-  const active = weights.filter((w) => w > 0).length
-  const busiest = Math.max(...contributions.days.map((d) => d.c))
-
   return (
     <>
       <ScrollProgress />
       <main id="main" className="bg-bg text-fg">
         {/* ── hero ───────────────────────────────────────────────────────────
             Sized against the small viewport height minus the sticky header, so
-            the whole hero is on screen at load. It used to run past the fold on
-            a laptop, which meant the first thing a reader did was scroll to
-            find the point. `svh` rather than `vh` so mobile browser chrome does
-            not push it under. */}
+            the whole hero is on screen at load. `svh` rather than `vh` so mobile
+            browser chrome does not push it under. */}
         <section className="mx-auto grid min-h-[calc(100svh-3.5rem)] max-w-7xl grid-cols-1 items-center gap-10 px-6 py-8 lg:grid-cols-[1fr_1fr] lg:gap-14 lg:px-10 lg:py-10">
           <div>
             <p className="mono text-fg-faint">{identity.location}</p>
@@ -92,12 +59,8 @@ export default function Home() {
           </div>
 
           {/* The figure is the algorithm, and it is playable. Width comes from
-              the column, not the content — with `justify-self-end` it sized to
-              its widest child, so the caption changing from "separate loops" to
-              "unbroken stroke" resized the SVG by 12% mid-animation. */}
-          {/* The figure is square, so capping its width caps its height. Tying
-              that cap to the viewport keeps the whole hero on a 720px-tall
-              laptop, where a fixed 520px figure alone overflowed the fold. */}
+              the column, not the content, and the square shape means capping
+              width caps height, which is what keeps the hero on one screen. */}
           <figure className="w-full lg:ml-auto" style={{ maxWidth: 'min(100%, 520px, 44svh)' }}>
             <noscript>
               <div className="text-fg">
@@ -124,87 +87,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── the rule ───────────────────────────────────────────────────── */}
-        <section aria-labelledby="rule-heading" className="border-b border-line">
-          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <Reveal>
-              <p className="mono text-fg-faint">01 — The rule</p>
-              <h2
-                id="rule-heading"
-                className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.025em] md:text-5xl"
-              >
-                It is not a drawing. It is a constraint being satisfied.
-              </h2>
-              <div className="mt-9 grid max-w-5xl gap-8 text-fg-muted md:grid-cols-2 md:gap-14">
-                <p>
-                  Lay a grid of equidistant dots. Draw a line that goes{' '}
-                  <em className="not-italic text-fg">around</em> every dot, never through one, never
-                  crossing itself, and closing where it began. That rule is old — it is how the
-                  dot-grid rangoli of Maharashtra is drawn, on doorsteps, at dawn, from memory.
-                </p>
-                <p>
-                  It is also a solvable problem, and a raw tiling does not solve it — it comes out
-                  as a dozen separate loops. Flipping one tile rewires two arcs and joins two of
-                  those loops into one. The figure above plays that through to the single stroke;
-                  press <span className="text-fg">new figure</span> and it solves a fresh one.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ── the lattice ────────────────────────────────────────────────── */}
-        <section aria-labelledby="lattice-heading" className="border-b border-line bg-bg-sunk">
-          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <Reveal>
-              <p className="mono text-fg-faint">02 — The lattice</p>
-              <h2
-                id="lattice-heading"
-                className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.025em] md:text-5xl"
-              >
-                One line, drawn around a year of work.
-              </h2>
-              <p className="mt-6 max-w-2xl text-fg-muted">
-                Every dot below is a real day, sized by the commits pushed that day —{' '}
-                <span className="tabular text-fg">{totalContributions.toLocaleString()}</span>{' '}
-                contributions across{' '}
-                <span className="tabular text-fg">{active.toLocaleString()}</span> active days. The
-                same rule applies: the line weaves around all of them and closes.
-              </p>
-            </Reveal>
-
-            <Reveal delay={120}>
-              {/* Wider than a phone, so it scrolls — which means it has to be
-                  reachable and scrollable by keyboard, not only by touch. */}
-              <div
-                role="group"
-                aria-label="Contribution lattice — scroll horizontally to see the full year"
-                tabIndex={0}
-                className="mt-12 overflow-x-auto border border-line bg-bg p-8"
-              >
-                <div className="min-w-[760px] text-fg-faint">
-                  <RangoliFigure
-                    {...LATTICE}
-                    weights={weights}
-                    className="h-auto w-full"
-                    duration={9}
-                    strokeWidth={1.1}
-                  />
-                </div>
-              </div>
-              <p className="mono-note mt-5 text-fg-faint">
-                busiest single day <span className="tabular text-fg">{busiest}</span> commits · the
-                lattice holds <span className="tabular text-fg">{contributions.days.length}</span>{' '}
-                days
-              </p>
-            </Reveal>
-          </div>
-        </section>
-
         {/* ── experience ─────────────────────────────────────────────────── */}
         <section aria-labelledby="experience-heading" className="border-b border-line">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">03 — Experience</p>
+            <p className="mono text-fg-faint">01 - Experience</p>
             <h2 id="experience-heading" className="sr-only">
               Experience
             </h2>
@@ -231,7 +117,7 @@ export default function Home() {
                           />
                         ))}
                       <p className="mono text-fg-muted">
-                        <time dateTime={role.from}>{role.from}</time> —{' '}
+                        <time dateTime={role.from}>{role.from}</time> to{' '}
                         <time dateTime={role.to}>{role.to}</time>
                       </p>
                       <p className="mono mt-1.5 text-fg-faint">{role.where}</p>
@@ -284,7 +170,7 @@ export default function Home() {
         {/* ── projects ───────────────────────────────────────────────────── */}
         <section aria-labelledby="work-heading" className="border-b border-line bg-bg-sunk">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">04 — Selected work</p>
+            <p className="mono text-fg-faint">02 - Selected work</p>
             <h2 id="work-heading" className="sr-only">
               Selected work
             </h2>
@@ -340,7 +226,7 @@ export default function Home() {
         {/* ── research ───────────────────────────────────────────────────── */}
         <section aria-labelledby="research-heading" className="border-b border-line">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">05 — Research</p>
+            <p className="mono text-fg-faint">03 - Research</p>
             <h2 id="research-heading" className="sr-only">
               Research
             </h2>
@@ -385,7 +271,7 @@ export default function Home() {
         {/* ── skills ─────────────────────────────────────────────────────── */}
         <section aria-labelledby="skills-heading" className="border-b border-line bg-bg-sunk">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">06 — Stack</p>
+            <p className="mono text-fg-faint">04 - Stack</p>
             <h2 id="skills-heading" className="sr-only">
               Technical skills
             </h2>
@@ -419,7 +305,7 @@ export default function Home() {
           aria-labelledby="contact-heading"
           className="mx-auto max-w-7xl px-6 py-24 lg:px-10"
         >
-          <p className="mono text-fg-faint">07 — Education</p>
+          <p className="mono text-fg-faint">05 - Education</p>
           <h2 id="contact-heading" className="sr-only">
             Education and contact
           </h2>
@@ -438,7 +324,7 @@ export default function Home() {
                         className="mb-4"
                       />
                       <p className="mono text-fg-muted">
-                        <time dateTime={e.from}>{e.from}</time> —{' '}
+                        <time dateTime={e.from}>{e.from}</time> to{' '}
                         <time dateTime={e.to}>{e.to}</time>
                       </p>
                     </div>
