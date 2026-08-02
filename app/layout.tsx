@@ -3,7 +3,8 @@ import { Instrument_Sans, JetBrains_Mono, Newsreader } from 'next/font/google'
 import { identity } from '@/content/profile'
 import { SITE_URL } from '@/next.config'
 import './globals.css'
-import { ThemeToggle } from './theme-toggle'
+import { Cursor } from './cursor'
+import { SiteHeader } from './site-header'
 
 const instrument = Instrument_Sans({
   subsets: ['latin'],
@@ -96,7 +97,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <ThemeToggle />
+        <Cursor />
+        <SiteHeader />
         {/* Each page supplies its own <main> and <footer> so the footer is a
             sibling of main rather than nested inside it. */}
         {children}

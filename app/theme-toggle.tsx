@@ -35,7 +35,7 @@ export function ThemeToggle() {
       // means the visible text is unreliable as an accessible name — a screen
       // reader would read "darklight". The label is stated explicitly instead.
       aria-label="Switch colour theme"
-      className="mono theme-toggle fixed right-4 top-4 z-40 border border-line px-3 py-1.5 text-fg-muted transition-colors hover:border-line-strong hover:text-fg"
+      className="mono theme-toggle border border-line px-2.5 py-1 text-fg-muted transition-colors hover:border-accent hover:text-accent"
     >
       <span aria-hidden className="theme-toggle__to-dark">
         dark
