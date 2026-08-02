@@ -1,6 +1,3 @@
-/* eslint-disable @next/next/no-img-element -- the logos and portrait are small
-   static assets with fixed dimensions; next/image would add client JavaScript
-   and a layout wrapper for no benefit at this size. */
 import Link from 'next/link'
 import contributions from '@/data/contributions.json'
 import {
@@ -12,9 +9,10 @@ import {
   metrics,
   projects,
   research,
-  resume,
   skills,
 } from '@/content/profile'
+import { ExternalLink } from './external-link'
+import { Logo } from './logo'
 import { CountUp, Reveal, ScrollProgress } from './motion'
 import { RangoliFigure } from './rangoli-figure'
 import { SpliceFigure } from './splice'
@@ -24,7 +22,7 @@ import { SpliceFigure } from './splice'
  * enough that the eye can follow the line all the way round, which is the whole
  * point. A denser grid turns the same algorithm into wallpaper.
  */
-const HERO = { rows: 6, cols: 6, size: 74, seed: 23, pad: 40 }
+const HERO = { rows: 6, cols: 6, size: 74, seed: 13, pad: 40 }
 
 /**
  * The contribution lattice.
@@ -52,6 +50,10 @@ function latticeWeights(): number[] {
 
 const totalContributions = contributions.totals['harshit-yc'] + contributions.totals.harshitwandhare
 
+const LINK = 'text-accent underline underline-offset-4'
+const TITLE_LINK =
+  'underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-accent'
+
 export default function Home() {
   const weights = latticeWeights()
   const active = weights.filter((w) => w > 0).length
@@ -61,21 +63,26 @@ export default function Home() {
     <>
       <ScrollProgress />
       <main id="main" className="bg-bg text-fg">
-        {/* ── hero ───────────────────────────────────────────────────────── */}
-        <section className="mx-auto grid min-h-[92vh] max-w-7xl grid-cols-1 items-center gap-16 px-6 py-24 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-10">
+        {/* ── hero ───────────────────────────────────────────────────────────
+            Sized against the small viewport height minus the sticky header, so
+            the whole hero is on screen at load. It used to run past the fold on
+            a laptop, which meant the first thing a reader did was scroll to
+            find the point. `svh` rather than `vh` so mobile browser chrome does
+            not push it under. */}
+        <section className="mx-auto grid min-h-[calc(100svh-3.5rem)] max-w-7xl grid-cols-1 items-center gap-10 px-6 py-8 lg:grid-cols-[1fr_1fr] lg:gap-14 lg:px-10 lg:py-10">
           <div>
             <p className="mono text-fg-faint">{identity.location}</p>
             {/* Two blocks rather than a <br>, so the accessible name stays
                 "Harshit Wandhare" and not "HarshitWandhare". */}
-            <h1 className="mt-7 text-[length:var(--text-display)] font-semibold leading-[0.96] tracking-[-0.035em]">
+            <h1 className="mt-5 text-[length:var(--text-display)] font-semibold leading-[0.96] tracking-[-0.035em]">
               <span className="block">Harshit</span> <span className="block">Wandhare</span>
             </h1>
-            <p className="mt-9 max-w-xl text-[length:var(--text-lede)] leading-[1.4]">
+            <p className="mt-7 max-w-xl text-[length:var(--text-lede)] leading-[1.4]">
               {hero.line}
             </p>
-            <p className="mt-6 max-w-lg text-fg-muted">{hero.sub}</p>
+            <p className="mt-5 max-w-lg text-fg-muted">{hero.sub}</p>
 
-            <p className="mono mt-10 flex items-center gap-2.5 text-fg-muted">
+            <p className="mono mt-7 flex items-center gap-2.5 text-fg-muted">
               <span
                 aria-hidden
                 className="inline-block h-1.5 w-1.5 rounded-full bg-accent align-middle"
@@ -84,13 +91,14 @@ export default function Home() {
             </p>
           </div>
 
-          {/* The figure is the algorithm, and it is playable. The server renders
-              the finished stroke so it is never blank without JavaScript. */}
-          {/* Width comes from the column, not from the content. With
-              `justify-self-end` the figure sized to its widest child, so the
-              caption changing from "separate loops" to "unbroken stroke"
-              resized the SVG by 12% mid-animation. */}
-          <figure className="w-full lg:ml-auto lg:max-w-[560px]">
+          {/* The figure is the algorithm, and it is playable. Width comes from
+              the column, not the content — with `justify-self-end` it sized to
+              its widest child, so the caption changing from "separate loops" to
+              "unbroken stroke" resized the SVG by 12% mid-animation. */}
+          {/* The figure is square, so capping its width caps its height. Tying
+              that cap to the viewport keeps the whole hero on a 720px-tall
+              laptop, where a fixed 520px figure alone overflowed the fold. */}
+          <figure className="w-full lg:ml-auto" style={{ maxWidth: 'min(100%, 520px, 44svh)' }}>
             <noscript>
               <div className="text-fg">
                 <RangoliFigure {...HERO} strokeWidth={2.4} duration={0} showOrigin />
@@ -205,15 +213,23 @@ export default function Home() {
                 <Reveal key={role.org}>
                   <article className="grid gap-6 lg:grid-cols-[220px_1fr] lg:gap-14">
                     <div>
-                      {role.logo && (
-                        <img
-                          src={role.logo.src}
-                          alt={role.logo.alt}
-                          width={40}
-                          height={40}
-                          className="mb-4 h-10 w-10 object-contain"
-                        />
-                      )}
+                      {role.logo &&
+                        (role.href ? (
+                          <ExternalLink
+                            href={role.href}
+                            aria-label={role.logo.alt}
+                            className="mb-4 inline-block"
+                          >
+                            <Logo src={role.logo.src} alt={role.logo.alt} height={44} />
+                          </ExternalLink>
+                        ) : (
+                          <Logo
+                            src={role.logo.src}
+                            alt={role.logo.alt}
+                            height={44}
+                            className="mb-4"
+                          />
+                        ))}
                       <p className="mono text-fg-muted">
                         <time dateTime={role.from}>{role.from}</time> —{' '}
                         <time dateTime={role.to}>{role.to}</time>
@@ -222,7 +238,18 @@ export default function Home() {
                     </div>
                     <div className="border-l border-line pl-7 lg:pl-10">
                       <h3 className="text-2xl font-semibold tracking-[-0.015em]">{role.title}</h3>
-                      <p className="mt-1.5 text-fg-muted">{role.org}</p>
+                      <p className="mt-1.5 text-fg-muted">
+                        {role.href ? (
+                          <ExternalLink
+                            href={role.href}
+                            className="underline decoration-line-strong decoration-1 underline-offset-[5px] transition-colors hover:text-fg hover:decoration-accent"
+                          >
+                            {role.org}
+                          </ExternalLink>
+                        ) : (
+                          role.org
+                        )}
+                      </p>
                       {role.badge && (
                         <p className="mono mt-4 inline-block border border-accent/40 bg-accent-soft px-2.5 py-1 text-accent">
                           {role.badge}
@@ -266,33 +293,14 @@ export default function Home() {
                 <Reveal key={p.name} delay={i * 90} className="bg-bg">
                   <article className="flex h-full flex-col p-8">
                     <div className="flex h-10 items-center gap-3">
-                      {p.logo &&
-                        (p.logo.srcLight ? (
-                          <>
-                            <img
-                              src={p.logo.src}
-                              alt={p.logo.alt}
-                              width={32}
-                              height={32}
-                              className="only-dark h-8 w-8 object-contain"
-                            />
-                            <img
-                              src={p.logo.srcLight}
-                              alt={p.logo.alt}
-                              width={32}
-                              height={32}
-                              className="only-light h-8 w-8 object-contain"
-                            />
-                          </>
-                        ) : (
-                          <img
-                            src={p.logo.src}
-                            alt={p.logo.alt}
-                            width={32}
-                            height={32}
-                            className="h-8 w-8 object-contain"
-                          />
-                        ))}
+                      {p.logo && (
+                        <Logo
+                          src={p.logo.src}
+                          srcLight={p.logo.srcLight}
+                          alt={p.logo.alt}
+                          height={32}
+                        />
+                      )}
                       <h3 className="text-2xl font-semibold tracking-[-0.015em]">{p.name}</h3>
                     </div>
                     <p className="mt-3 text-fg-muted">{p.blurb}</p>
@@ -306,19 +314,19 @@ export default function Home() {
                     <p className="mono mt-8 text-fg-faint">{p.stack.join(' · ')}</p>
                     <p className="mono mt-4 flex flex-wrap gap-4">
                       {p.repo && (
-                        <a className="text-accent underline underline-offset-4" href={p.repo}>
+                        <ExternalLink className={LINK} href={p.repo}>
                           repo
-                        </a>
+                        </ExternalLink>
                       )}
                       {p.live && (
-                        <a className="text-accent underline underline-offset-4" href={p.live}>
+                        <ExternalLink className={LINK} href={p.live}>
                           live
-                        </a>
+                        </ExternalLink>
                       )}
                       {p.docs && (
-                        <a className="text-accent underline underline-offset-4" href={p.docs}>
+                        <ExternalLink className={LINK} href={p.docs}>
                           docs
-                        </a>
+                        </ExternalLink>
                       )}
                       {p.private && <span className="text-fg-faint">private repository</span>}
                     </p>
@@ -341,13 +349,11 @@ export default function Home() {
                 <Reveal key={paper.title}>
                   <article className="max-w-4xl">
                     <h3 className="text-xl font-semibold leading-snug tracking-[-0.01em]">
-                      {/* The paper itself, not a citation of it. */}
-                      <a
-                        href={paper.file}
-                        className="underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-accent"
-                      >
+                      {/* The paper itself, not a citation of it. Opens away so a
+                          reader keeps their place on the page. */}
+                      <ExternalLink href={paper.file} className={TITLE_LINK}>
                         {paper.title}
-                      </a>
+                      </ExternalLink>
                     </h3>
                     <p className="mono mt-2.5 text-fg-faint">{paper.venue}</p>
                     <ul className="mt-5 space-y-3">
@@ -362,13 +368,9 @@ export default function Home() {
                       ))}
                     </ul>
                     <p className="mono mt-5">
-                      <a
-                        className="text-accent underline underline-offset-4"
-                        href={paper.file}
-                        download
-                      >
+                      <ExternalLink href={paper.file} className={LINK}>
                         read the paper
-                      </a>
+                      </ExternalLink>
                       <span className="ml-3 text-fg-faint">
                         pdf · {paper.pages} pages · {paper.sizeMb} MB
                       </span>
@@ -428,13 +430,12 @@ export default function Home() {
                 <Reveal key={e.school}>
                   <article className="grid gap-3 sm:grid-cols-[160px_1fr] sm:gap-10">
                     <div>
-                      <img
+                      <Logo
                         src={e.logo.src}
+                        srcLight={'srcLight' in e.logo ? e.logo.srcLight : undefined}
                         alt={e.logo.alt}
-                        width={e.logo.width}
-                        height={e.logo.height}
-                        className="mb-4 object-contain"
-                        style={{ height: e.logo.height / 2, width: 'auto' }}
+                        height={56}
+                        className="mb-4"
                       />
                       <p className="mono text-fg-muted">
                         <time dateTime={e.from}>{e.from}</time> —{' '}
@@ -442,7 +443,11 @@ export default function Home() {
                       </p>
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold tracking-[-0.01em]">{e.school}</h3>
+                      <h3 className="text-xl font-semibold tracking-[-0.01em]">
+                        <ExternalLink href={e.href} className={TITLE_LINK}>
+                          {e.school}
+                        </ExternalLink>
+                      </h3>
                       <p className="mt-1.5 text-fg-muted">{e.detail}</p>
                       <p className="mono mt-2 text-fg-faint">{e.note}</p>
                     </div>
@@ -479,35 +484,24 @@ export default function Home() {
               </p>
               <ul className="mono mt-8 flex flex-wrap gap-x-10 gap-y-4">
                 <li>
-                  <a
-                    className="text-accent underline underline-offset-4"
-                    href={`mailto:${identity.email}`}
-                  >
+                  <a className={LINK} href={`mailto:${identity.email}`}>
                     {identity.email}
                   </a>
                 </li>
                 <li>
-                  <Link className="text-accent underline underline-offset-4" href="/resume">
+                  <Link className={LINK} href="/resume">
                     résumé
                   </Link>
                 </li>
-                {resume && (
-                  <li>
-                    <a className="text-accent underline underline-offset-4" href={resume.file}>
-                      résumé
-                    </a>
-                    <span className="ml-2 text-fg-faint">pdf · {resume.updated}</span>
-                  </li>
-                )}
                 <li>
-                  <a className="text-accent underline underline-offset-4" href={identity.github}>
+                  <ExternalLink className={LINK} href={identity.github}>
                     github
-                  </a>
+                  </ExternalLink>
                 </li>
                 <li>
-                  <a className="text-accent underline underline-offset-4" href={identity.linkedin}>
+                  <ExternalLink className={LINK} href={identity.linkedin}>
                     linkedin
-                  </a>
+                  </ExternalLink>
                 </li>
               </ul>
             </div>

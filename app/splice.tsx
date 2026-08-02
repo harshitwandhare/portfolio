@@ -30,11 +30,23 @@ interface Props {
   step?: number
 }
 
+/** How long the opening trace takes before the first splice. */
+const DRAW_MS = 1500
+
 export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props) {
   const [currentSeed, setCurrentSeed] = useState(seed)
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
+  /**
+   * The opening. Before any splicing, the raw tiling draws itself in — every
+   * loop traced from nothing. Without it the figure simply appears fully formed
+   * and the first thing the eye sees is an answer rather than a construction.
+   */
+  const [drawingIn, setDrawingIn] = useState(true)
+  /** Bumped on every play, so the draw animation actually restarts. */
+  const [run, setRun] = useState(0)
   const timer = useRef<number | null>(null)
+  const opening = useRef<number | null>(null)
 
   const model = useMemo(
     () => generateStages({ rows, cols, size, pad, seed: currentSeed }),
@@ -47,26 +59,38 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
       window.clearInterval(timer.current)
       timer.current = null
     }
+    if (opening.current !== null) {
+      window.clearTimeout(opening.current)
+      opening.current = null
+    }
     setPlaying(false)
   }, [])
 
   const play = useCallback(() => {
     stop()
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDrawingIn(false)
       setIndex(last)
       return
     }
+
     setIndex(0)
     setPlaying(true)
-    timer.current = window.setInterval(() => {
-      setIndex((i) => {
-        if (i >= last) {
-          stop()
-          return last
-        }
-        return i + 1
-      })
-    }, step)
+    setRun((r) => r + 1)
+    // Trace the raw tiling first, then start splicing once it is all on screen.
+    setDrawingIn(true)
+    opening.current = window.setTimeout(() => {
+      setDrawingIn(false)
+      timer.current = window.setInterval(() => {
+        setIndex((i) => {
+          if (i >= last) {
+            stop()
+            return last
+          }
+          return i + 1
+        })
+      }, step)
+    }, DRAW_MS)
   }, [last, step, stop])
 
   // Play once when the figure first appears, and again whenever it is reseeded.
@@ -102,15 +126,23 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
         {/* Grey loops first so the accent one always draws on top. */}
         {stage.loops.map((loop, i) => (
           <path
-            key={`${index}-${i}`}
+            // `run` is in the key so replay remounts the paths. Without it the
+            // element is unchanged, and a CSS animation does not restart just
+            // because its class was re-added.
+            key={`${run}-${index}-${i}`}
             d={loop.path}
             fill="none"
             stroke={i === 0 ? 'var(--accent)' : 'var(--fg-faint)'}
             strokeWidth={i === 0 ? size * 0.05 : size * 0.028}
             strokeLinecap="round"
             strokeLinejoin="round"
+            pathLength={1}
+            className={drawingIn ? 'stroke-draw' : undefined}
             opacity={i === 0 ? 1 : 0.5}
-            style={{ transition: 'stroke-width 220ms ease, opacity 220ms ease' }}
+            style={{
+              transition: 'stroke-width 220ms ease, opacity 220ms ease',
+              ...(drawingIn ? { animationDuration: `${DRAW_MS}ms` } : {}),
+            }}
           />
         ))}
 

@@ -66,7 +66,7 @@ export default function OpenGraphImage() {
           I build production systems end to end — and have shipped them alone.
         </div>
         <div style={{ fontSize: 21, color: MUTED, marginTop: 30, display: 'flex', gap: 26 }}>
-          <span>1,268 commits, #1 of 15</span>
+          <span>1,214 commits, #1 of 29</span>
           <span style={{ color: DOT }}>·</span>
           <span>100K+ users</span>
           <span style={{ color: DOT }}>·</span>
