@@ -98,6 +98,8 @@ export interface Role {
   readonly badge?: string
   /** Company mark, shown small beside the role. */
   readonly logo?: { src: string; alt: string }
+  /** Where the company mark and name link to. */
+  readonly href?: string
   readonly points: readonly Fact[]
 }
 
@@ -109,6 +111,7 @@ export const experience: readonly Role[] = [
     from: '2025-09',
     to: '2026-07',
     logo: { src: '/logos/yosemite.png', alt: 'Yosemite Crew' },
+    href: 'https://www.linkedin.com/company/yosemitecrew/',
     points: [
       {
         text: 'Sole engineer-owner of an open-source veterinary practice-management system at a three-person company — architecture, web platform, mobile app, integrations, CI and release.',
@@ -151,6 +154,7 @@ export const experience: readonly Role[] = [
     to: '2025-09',
     badge: 'A* annual rating — the firm’s highest performance category',
     logo: { src: '/logos/jio.svg', alt: 'Reliance Jio' },
+    href: 'https://www.linkedin.com/company/jioplatforms/',
     points: [
       {
         text: 'Rated A*, the highest performance category, awarded to a limited number of engineers.',
@@ -198,7 +202,36 @@ export interface Project {
   readonly points: readonly Fact[]
 }
 
+// Job Sentinel leads. It is the most inspectable thing here — the CI badges,
+// the test count and the ADRs are all publicly checkable in seconds, and
+// inviting inspection is a stronger move than describing the work.
 export const projects: readonly Project[] = [
+  {
+    name: 'Job Sentinel',
+    blurb: 'Local-first career platform.',
+    stack: ['Python', 'FastAPI', 'Playwright', 'Next.js', 'SQLite'],
+    repo: 'https://github.com/harshitwandhare/job-sentinel',
+    live: 'https://job-sentinel.vercel.app',
+    docs: 'https://harshitwandhare.github.io/job-sentinel/',
+    logo: { src: '/logos/job-sentinel.png', alt: '' },
+    points: [
+      {
+        text: 'Aggregates postings across sources, scores role fit with a local or bring-your-own-key LLM, and tracks the full application pipeline.',
+        source: 'self',
+      },
+      {
+        text: 'Ships a clip-to-track browser extension, a Typer CLI, a Next.js UI and a FastAPI backend.',
+        source: 'self',
+      },
+      { text: 'Local-first by design — no user data leaves the machine.', source: 'self' },
+      {
+        // 507 collected by pytest today. Written as a floor: the old "~450"
+        // counted test functions and missed every parametrised case.
+        text: '500+ tests, strict static typing, reproducible pinned builds, and CI gates for CodeQL, OpenSSF Scorecard, gitleaks, pip-audit and license compliance.',
+        source: 'confirmed',
+      },
+    ],
+  },
   {
     name: 'ATLAS',
     blurb: 'Multi-agent AI orchestration system.',
@@ -225,30 +258,6 @@ export const projects: readonly Project[] = [
       },
       {
         text: 'Strict static typing, 59 tests, and behavioural evals gating CI.',
-        source: 'confirmed',
-      },
-    ],
-  },
-  {
-    name: 'Job Sentinel',
-    blurb: 'Local-first career platform.',
-    stack: ['Python', 'FastAPI', 'Playwright', 'Next.js', 'SQLite'],
-    repo: 'https://github.com/harshitwandhare/job-sentinel',
-    live: 'https://job-sentinel.vercel.app',
-    docs: 'https://harshitwandhare.github.io/job-sentinel/',
-    logo: { src: '/logos/job-sentinel.png', alt: '' },
-    points: [
-      {
-        text: 'Aggregates postings across sources, scores role fit with a local or bring-your-own-key LLM, and tracks the full application pipeline.',
-        source: 'self',
-      },
-      {
-        text: 'Ships a clip-to-track browser extension, a Typer CLI, a Next.js UI and a FastAPI backend.',
-        source: 'self',
-      },
-      { text: 'Local-first by design — no user data leaves the machine.', source: 'self' },
-      {
-        text: '~450 tests, strict static typing, reproducible pinned builds, and CI gates for CodeQL, OpenSSF Scorecard, gitleaks, pip-audit and license compliance.',
         source: 'confirmed',
       },
     ],
@@ -380,15 +389,26 @@ export const education = [
     from: '2026-08',
     to: '2028-05',
     note: 'Jonsson School Dean’s Graduate Scholarship',
-    logo: { src: '/logos/utd.png', alt: '', width: 48, height: 48 },
+    href: 'https://www.utdallas.edu',
+    logo: { src: '/logos/utd.png', alt: 'The University of Texas at Dallas' },
   },
   {
-    school: 'Vidyalankar Institute of Technology, University of Mumbai',
-    detail: 'B.E. Computer Engineering',
+    // The degree-awarding university leads; the affiliated college is the
+    // detail. A reader outside India knows Mumbai and does not know Vidyalankar.
+    school: 'University of Mumbai',
+    detail: 'B.E. Computer Engineering · Vidyalankar Institute of Technology',
     from: '2019-08',
     to: '2023-05',
     note: 'CGPA 9.53 / 10.0',
-    logo: { src: '/logos/vit.png', alt: '', width: 96, height: 27 },
+    // Not mu.ac.in — it resolves but does not answer, and a link that hangs is
+    // worse than none. Wikipedia is reachable, and for a reader outside India
+    // it explains the university better than the university's own site does.
+    href: 'https://en.wikipedia.org/wiki/University_of_Mumbai',
+    logo: {
+      src: '/logos/mu-dark.png',
+      srcLight: '/logos/mu-light.png',
+      alt: 'University of Mumbai',
+    },
   },
 ] as const
 
