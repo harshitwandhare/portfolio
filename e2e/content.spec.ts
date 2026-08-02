@@ -34,7 +34,7 @@ test.describe('/', () => {
 
   test('leads the proof strip with commits, not a star count', async ({ page }) => {
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits — most on the project')).toBeVisible()
+    await expect(strip.getByText('commits, most on the project')).toBeVisible()
     // CountUp animates from zero, so wait for it to settle on the real figure.
     await expect(strip.getByText('1,214')).toBeVisible()
   })
@@ -44,7 +44,7 @@ test.describe('/', () => {
     // weakest fact on the page in the largest type. Scoped to the strip — the
     // splice panel legitimately starts at zero flips applied.
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits — most on the project')).toBeVisible()
+    await expect(strip.getByText('commits, most on the project')).toBeVisible()
     for (const value of await strip.locator('.tabular').allTextContents()) {
       expect(value.trim()).not.toBe('0')
     }
@@ -78,6 +78,15 @@ test.describe('/', () => {
       expect(text, `phone-shaped text matched ${shape}`).not.toMatch(shape)
       expect(html, `phone-shaped markup matched ${shape}`).not.toMatch(shape)
     }
+  })
+
+  test('uses no em dashes in anything a reader sees', async ({ page }) => {
+    // An em dash between clauses is one of the tells people read as machine-
+    // written. The prose was rewritten rather than find-and-replaced, so this
+    // guards the result: it fails on the character itself, wherever it appears.
+    const text = await page.locator('body').innerText()
+    const found = [...text.matchAll(/.{0,45}—.{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
+    expect(found, `em dash in rendered text:\n${found.join('\n')}`).toEqual([])
   })
 
   test('excludes the withdrawn tooling claims', async ({ page }) => {

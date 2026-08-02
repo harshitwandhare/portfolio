@@ -28,6 +28,12 @@ test.describe('/resume', () => {
     expect(await page.locator('iframe, object, embed').count()).toBe(0)
   })
 
+  test('uses no em dashes in anything a reader sees', async ({ page }) => {
+    const text = await page.locator('body').innerText()
+    const found = [...text.matchAll(/.{0,45}—.{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
+    expect(found, `em dash in rendered text:\n${found.join('\n')}`).toEqual([])
+  })
+
   test('carries no phone number', async ({ page }) => {
     const text = await page.locator('body').innerText()
     const html = await page.content()
@@ -54,7 +60,7 @@ test.describe('/resume', () => {
       'Software Development Engineer I',
       'Reliance Jio Platforms Limited',
       'CGPA 9.53 / 10.0',
-      'M.S. Computer Science — Intelligent Systems track',
+      'M.S. Computer Science, Intelligent Systems track',
     ]) {
       expect(resumeText, `résumé is missing: ${fact}`).toContain(fact)
       expect(homeText, `homepage is missing: ${fact}`).toContain(fact)
