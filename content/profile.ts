@@ -19,7 +19,7 @@ export interface Fact {
 export const identity = {
   name: 'Harshit Wandhare',
   location: 'Richardson, TX',
-  email: 'dal314006@utdallas.edu',
+  email: 'Harshit.Wandhare@utdallas.edu',
   altEmail: 'harshitwandhare45@gmail.com',
   github: 'https://github.com/harshitwandhare',
   // The `harshit-yc` work account was deleted and github.com/harshit-yc now
