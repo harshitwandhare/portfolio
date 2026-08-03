@@ -35,9 +35,29 @@ import {
 const LIMITS = {
   experience: [5, 3],
   projectBullets: 2,
-  researchBullets: 1,
-  /** Kalki is on the site but not the résumé — the same call the LaTeX makes. */
+  /** A bullet on the first paper only, matching the LaTeX. */
+  researchBullets: [1, 0] as readonly number[],
+  /** Kalki is on the site but not the résumé, the same call the LaTeX makes. */
   projects: 2,
+} as const
+
+/**
+ * Typography, tuned to one page.
+ *
+ * A résumé that prints to two pages is a worse document than one that prints to
+ * one, and the difference here was spacing rather than content: the first draft
+ * ran 1.44 pages purely on generous margins and line height. These values match
+ * the density of the LaTeX one-pager. They are named so the next person tuning
+ * this can see what the knobs are instead of hunting through class strings.
+ */
+const T = {
+  body: 'text-[11px] leading-[1.34]',
+  meta: 'text-[10.5px]',
+  sectionGap: 'mt-[8px]',
+  sectionHead: 'text-[11px]',
+  entryGap: 'space-y-[5px]',
+  bulletGap: 'space-y-[2px]',
+  entryTitle: 'text-[12px]',
 } as const
 
 function fmt(iso: string): string {
@@ -61,11 +81,13 @@ function fmt(iso: string): string {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="mt-6 break-inside-avoid first:mt-0">
-      <h2 className="border-b border-stone-400 pb-1 text-[13px] font-bold uppercase tracking-[0.09em] text-stone-900">
+    <section className={`${T.sectionGap} break-inside-avoid first:mt-0`}>
+      <h2
+        className={`${T.sectionHead} border-b border-stone-400 pb-[2px] font-bold uppercase tracking-[0.09em] text-stone-900`}
+      >
         {title}
       </h2>
-      <div className="mt-3 space-y-4">{children}</div>
+      <div className={`mt-[5px] ${T.entryGap}`}>{children}</div>
     </section>
   )
 }
@@ -86,19 +108,19 @@ function Entry({
   return (
     <article className="break-inside-avoid">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-        <p className="text-[13.5px] font-bold text-stone-900">{left}</p>
-        {right && <p className="text-[12px] text-stone-700">{right}</p>}
+        <p className={`${T.entryTitle} font-bold text-stone-900`}>{left}</p>
+        {right && <p className={`${T.meta} text-stone-700`}>{right}</p>}
       </div>
       {(leftSub || rightSub) && (
         <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-          {leftSub && <p className="text-[12.5px] italic text-stone-800">{leftSub}</p>}
-          {rightSub && <p className="text-[12px] italic text-stone-700">{rightSub}</p>}
+          {leftSub && <p className={`${T.body} italic text-stone-800`}>{leftSub}</p>}
+          {rightSub && <p className={`${T.meta} italic text-stone-700`}>{rightSub}</p>}
         </div>
       )}
       {bullets && bullets.length > 0 && (
-        <ul className="mt-1.5 space-y-1">
+        <ul className={`mt-[3px] ${T.bulletGap}`}>
           {bullets.map((b) => (
-            <li key={b} className="flex gap-2 text-[12.5px] leading-[1.45] text-stone-800">
+            <li key={b} className={`flex gap-2 ${T.body} text-stone-800`}>
               <span
                 aria-hidden
                 className="mt-[0.62em] h-[3px] w-[3px] shrink-0 rounded-full bg-stone-500"
@@ -118,12 +140,14 @@ export function ResumeSheet() {
       id="resume-sheet"
       // Serif and near-black on white, because this is the one surface that is
       // meant to look like paper and to survive being printed.
-      className="mx-auto w-full max-w-[820px] bg-white px-8 py-10 font-serif text-stone-900 shadow-2xl sm:px-14 sm:py-12"
+      className="mx-auto w-full max-w-[820px] bg-white px-8 py-9 font-serif text-stone-900 shadow-2xl sm:px-12 sm:py-10"
       style={{ aspectRatio: 'auto' }}
     >
       <header className="text-center">
-        <h1 className="text-[30px] font-bold tracking-[-0.01em] text-stone-900">{identity.name}</h1>
-        <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[12px] text-stone-700">
+        <h1 className="text-[26px] font-bold tracking-[-0.01em] text-stone-900">{identity.name}</h1>
+        <p
+          className={`mt-1.5 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-0.5 ${T.meta} text-stone-700`}
+        >
           <span>{identity.location}</span>
           <span aria-hidden>·</span>
           <a className="underline underline-offset-2" href={`mailto:${identity.email}`}>
@@ -144,9 +168,9 @@ export function ResumeSheet() {
         </p>
       </header>
 
-      <div className="mt-7">
+      <div className="mt-3">
         <Section title="Summary">
-          <p className="text-[12.5px] leading-[1.5] text-stone-800">{summary}</p>
+          <p className={`${T.body} text-stone-800`}>{summary}</p>
         </Section>
 
         <Section title="Education">
@@ -187,25 +211,25 @@ export function ResumeSheet() {
         </Section>
 
         <Section title="Research">
-          {research.map((paper) => (
+          {research.map((paper, i) => (
             <Entry
               key={paper.title}
               left={paper.title}
               leftSub={paper.venue}
-              bullets={paper.points.slice(0, LIMITS.researchBullets)}
+              bullets={paper.points.slice(0, LIMITS.researchBullets[i] ?? 0)}
             />
           ))}
         </Section>
 
         <Section title="Technical Skills">
-          <dl className="space-y-1">
+          <dl className={T.bulletGap}>
             {skills.map((g) => (
-              <div key={g.group} className="flex gap-2 text-[12.5px] leading-[1.45]">
+              <div key={g.group} className={`flex gap-2 ${T.body}`}>
                 <dt className="shrink-0 font-bold text-stone-900">{g.group}:</dt>
                 <dd className="text-stone-800">{g.items.join(' · ')}</dd>
               </div>
             ))}
-            <div className="flex gap-2 text-[12.5px] leading-[1.45]">
+            <div className={`flex gap-2 ${T.body}`}>
               <dt className="shrink-0 font-bold text-stone-900">Currently learning:</dt>
               <dd className="text-stone-800">{learning.join(', ')}</dd>
             </div>

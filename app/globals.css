@@ -298,7 +298,7 @@ a {
 @media print {
   @page {
     size: letter;
-    margin: 12mm 12mm;
+    margin: 10mm 11mm;
   }
 
   html,
