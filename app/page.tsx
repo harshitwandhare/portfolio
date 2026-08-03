@@ -17,13 +17,16 @@ import { RangoliFigure } from './rangoli-figure'
 import { SpliceFigure } from './splice'
 
 /**
- * The hero figure. Deliberately coarse: at six cells across each arc is large
- * enough that the eye can follow the line all the way round, which is the whole
- * point. A denser grid turns the same algorithm into wallpaper.
+ * The hero figure: coarse enough that the eye can follow the line all the way
+ * round, which is the whole point, but not so coarse that the edge dominates.
+ *
+ * The curve turns back at the edge of the lattice on a half circle bulging
+ * outward, so every turn-back is half a cell deep whatever the grid. Across six
+ * cells that is a sixth of the figure and the silhouette reads as a fringe of
+ * lobes; across eight it settles back into a filled square. `pad` has to clear
+ * that same half cell, or the bulge is cut off.
  */
-// `pad` has to clear half a cell: the curve turns back at the edge on a
-// semicircle that bulges outside the lattice, and a tighter pad clips it.
-const HERO = { rows: 6, cols: 6, size: 74, seed: 13, pad: 46 }
+const HERO = { rows: 8, cols: 8, size: 56, seed: 13, pad: 34 }
 
 const LINK = 'text-accent underline underline-offset-4'
 const TITLE_LINK =
@@ -66,7 +69,7 @@ export default function Home() {
           <figure className="w-full lg:ml-auto" style={{ maxWidth: 'min(100%, 520px, 44svh)' }}>
             <noscript>
               <div className="text-fg">
-                <RangoliFigure {...HERO} strokeWidth={2.4} duration={0} showOrigin />
+                <RangoliFigure {...HERO} strokeWidth={3.4} duration={0} showOrigin />
               </div>
             </noscript>
             <SpliceFigure {...HERO} />

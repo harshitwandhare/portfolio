@@ -122,7 +122,7 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
         }
       >
         {model.dots.map((d, i) => (
-          <circle key={i} cx={d[0]} cy={d[1]} r={size * 0.04} fill="var(--dot)" />
+          <circle key={i} cx={d[0]} cy={d[1]} r={size * 0.046} fill="var(--dot)" />
         ))}
 
         {/* Grey loops first so the accent one always draws on top. */}
@@ -136,7 +136,7 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
             d={loop.path}
             fill="none"
             stroke={i === 0 ? 'var(--accent)' : 'var(--fg-faint)'}
-            strokeWidth={i === 0 ? size * 0.05 : size * 0.028}
+            strokeWidth={i === 0 ? size * 0.062 : size * 0.034}
             strokeLinecap="round"
             strokeLinejoin="round"
             pathLength={1}
@@ -171,7 +171,7 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
           <circle
             cx={stage.loops[0].arcs[0].from[0]}
             cy={stage.loops[0].arcs[0].from[1]}
-            r={size * 0.075}
+            r={size * 0.09}
             fill="var(--accent)"
           />
         )}
