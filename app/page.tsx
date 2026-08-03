@@ -167,10 +167,76 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── projects ───────────────────────────────────────────────────── */}
-        <section aria-labelledby="work-heading" className="border-b border-line bg-bg-sunk">
+        {/* ── education ──────────────────────────────────────────────────────
+            Directly under experience: the two answer the same question, and a
+            reader checking whether someone is qualified should not have to pass
+            three other sections to find half the answer. */}
+        <section aria-labelledby="education-heading" className="border-b border-line bg-bg-sunk">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">02 - Selected work</p>
+            <p className="mono text-fg-faint">02 - Education</p>
+            <h2 id="education-heading" className="sr-only">
+              Education
+            </h2>
+
+            <div className="mt-14 grid gap-16 lg:grid-cols-[1fr_320px] lg:gap-20">
+              <div className="space-y-10">
+                {education.map((e) => (
+                  <Reveal key={e.school}>
+                    <article className="grid gap-3 sm:grid-cols-[160px_1fr] sm:gap-10">
+                      <div>
+                        <Logo
+                          src={e.logo.src}
+                          srcLight={'srcLight' in e.logo ? e.logo.srcLight : undefined}
+                          alt={e.logo.alt}
+                          height={56}
+                          className="mb-4"
+                        />
+                        <p className="mono text-fg-muted">
+                          <time dateTime={e.from}>{e.from}</time> to{' '}
+                          <time dateTime={e.to}>{e.to}</time>
+                        </p>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold tracking-[-0.01em]">
+                          <ExternalLink href={e.href} className={TITLE_LINK}>
+                            {e.school}
+                          </ExternalLink>
+                        </h3>
+                        <p className="mt-1.5 text-fg-muted">{e.detail}</p>
+                        <p className="mono mt-2 text-fg-faint">{e.note}</p>
+                      </div>
+                    </article>
+                  </Reveal>
+                ))}
+              </div>
+
+              <Reveal delay={100}>
+                {/* Not sticky. A pinned portrait beside a short list stutters
+                    more than it flatters, and the aspect ratio is declared so
+                    the frame holds its space before the image arrives. */}
+                <figure>
+                  <picture>
+                    <source srcSet="/portrait.webp" type="image/webp" />
+                    <img
+                      src={identity.portrait}
+                      alt="Harshit Wandhare"
+                      width={800}
+                      height={1000}
+                      className="w-full border border-line object-cover"
+                      style={{ aspectRatio: '4 / 5' }}
+                    />
+                  </picture>
+                  <figcaption className="mono mt-3 text-fg-faint">Richardson, TX</figcaption>
+                </figure>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* ── projects ───────────────────────────────────────────────────── */}
+        <section aria-labelledby="work-heading" className="border-b border-line">
+          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+            <p className="mono text-fg-faint">03 - Selected work</p>
             <h2 id="work-heading" className="sr-only">
               Selected work
             </h2>
@@ -224,9 +290,9 @@ export default function Home() {
         </section>
 
         {/* ── research ───────────────────────────────────────────────────── */}
-        <section aria-labelledby="research-heading" className="border-b border-line">
+        <section aria-labelledby="research-heading" className="border-b border-line bg-bg-sunk">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">03 - Research</p>
+            <p className="mono text-fg-faint">04 - Research</p>
             <h2 id="research-heading" className="sr-only">
               Research
             </h2>
@@ -269,9 +335,9 @@ export default function Home() {
         </section>
 
         {/* ── skills ─────────────────────────────────────────────────────── */}
-        <section aria-labelledby="skills-heading" className="border-b border-line bg-bg-sunk">
+        <section aria-labelledby="skills-heading" className="border-b border-line">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">04 - Stack</p>
+            <p className="mono text-fg-faint">05 - Stack</p>
             <h2 id="skills-heading" className="sr-only">
               Technical skills
             </h2>
@@ -300,71 +366,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── education, portrait and contact ────────────────────────────── */}
-        <section
-          aria-labelledby="contact-heading"
-          className="mx-auto max-w-7xl px-6 py-24 lg:px-10"
-        >
-          <p className="mono text-fg-faint">05 - Education</p>
-          <h2 id="contact-heading" className="sr-only">
-            Education and contact
-          </h2>
-
-          <div className="mt-12 grid gap-16 lg:grid-cols-[1fr_320px] lg:gap-20">
-            <div className="space-y-10">
-              {education.map((e) => (
-                <Reveal key={e.school}>
-                  <article className="grid gap-3 sm:grid-cols-[160px_1fr] sm:gap-10">
-                    <div>
-                      <Logo
-                        src={e.logo.src}
-                        srcLight={'srcLight' in e.logo ? e.logo.srcLight : undefined}
-                        alt={e.logo.alt}
-                        height={56}
-                        className="mb-4"
-                      />
-                      <p className="mono text-fg-muted">
-                        <time dateTime={e.from}>{e.from}</time> to{' '}
-                        <time dateTime={e.to}>{e.to}</time>
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold tracking-[-0.01em]">
-                        <ExternalLink href={e.href} className={TITLE_LINK}>
-                          {e.school}
-                        </ExternalLink>
-                      </h3>
-                      <p className="mt-1.5 text-fg-muted">{e.detail}</p>
-                      <p className="mono mt-2 text-fg-faint">{e.note}</p>
-                    </div>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-
-            <Reveal delay={100}>
-              {/* Not sticky. A pinned portrait beside a short list stutters more
-                  than it flatters, and the aspect ratio is declared so the frame
-                  holds its space before the image arrives. */}
-              <figure>
-                <picture>
-                  <source srcSet="/portrait.webp" type="image/webp" />
-                  <img
-                    src={identity.portrait}
-                    alt="Harshit Wandhare"
-                    width={800}
-                    height={1000}
-                    className="w-full border border-line object-cover"
-                    style={{ aspectRatio: '4 / 5' }}
-                  />
-                </picture>
-                <figcaption className="mono mt-3 text-fg-faint">Richardson, TX</figcaption>
-              </figure>
-            </Reveal>
-          </div>
-
-          <Reveal>
-            <div className="mt-24 border-t border-line pt-14">
+        {/* ── contact ────────────────────────────────────────────────────── */}
+        <section aria-labelledby="contact-heading" className="bg-bg-sunk">
+          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+            <h2 id="contact-heading" className="sr-only">
+              Contact
+            </h2>
+            <Reveal>
               <p className="text-[length:var(--text-lede)] leading-[1.4]">
                 Open to Summer 2027 SWE and AI/ML internships.
               </p>
@@ -390,8 +398,8 @@ export default function Home() {
                   </ExternalLink>
                 </li>
               </ul>
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
         </section>
       </main>
 
