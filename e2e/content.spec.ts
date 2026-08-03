@@ -50,6 +50,24 @@ test.describe('/', () => {
     }
   })
 
+  test('runs the sections in the intended order, numbered in sequence', async ({ page }) => {
+    // Education sits directly under experience: the two answer the same
+    // question, and a reader checking whether someone is qualified should not
+    // have to pass three other sections to find half the answer.
+    const labels = await page
+      .locator('main section > div > p.mono')
+      .filter({ hasText: /^\d{2} - / })
+      .allTextContents()
+
+    expect(labels).toEqual([
+      '01 - Experience',
+      '02 - Education',
+      '03 - Selected work',
+      '04 - Research',
+      '05 - Stack',
+    ])
+  })
+
   test('orders skills so backend and ML precede frontend', async ({ page }) => {
     const body = await page.locator('main').innerText()
     const jio = body.indexOf('Software Development Engineer I')
