@@ -79,6 +79,64 @@ describe('generateRangoli', () => {
     }
   })
 
+  it('keeps one radius for the whole figure, boundary included', () => {
+    // The rule of the form is that the line rounds every dot at the same
+    // distance. Boundary links used to be straight chords laid along the edge,
+    // which both broke that and ran straight through the perimeter dots.
+    const size = 40
+    for (const [rows, cols] of [
+      [6, 6],
+      [7, 9],
+      [9, 9],
+      [5, 12],
+    ] as const) {
+      const r = generateRangoli({ rows, cols, seed: 23, size, pad: size })
+      for (const arc of r.stroke) {
+        for (const p of [arc.from, arc.to]) {
+          const d = Math.hypot(p[0] - arc.around[0], p[1] - arc.around[1])
+          expect(d, `${rows}x${cols} arc at ${p} is ${d} from its dot`).toBeCloseTo(size / 2, 6)
+        }
+      }
+    }
+  })
+
+  it('never doubles back on itself, on any lattice', () => {
+    // A corner turn-back joins a horizontal midpoint to a vertical one, so it
+    // looks exactly like an ordinary cell arc. Drawn as one it took the short
+    // way round the corner dot, cutting inside the corner and reversing
+    // direction: a cusp on every odd-sided lattice, four of them, every time.
+    const size = 40
+    const unit = (v: readonly [number, number]) => {
+      const m = Math.hypot(v[0], v[1])
+      return [v[0] / m, v[1] / m] as const
+    }
+    /** Unit tangent at a point on an arc. Sweep 1 runs clockwise on screen. */
+    const tangent = (arc: Arc, p: readonly [number, number]) => {
+      const dx = p[0] - arc.around[0]
+      const dy = p[1] - arc.around[1]
+      return unit(arc.sweep === 1 ? [dy, -dx] : [-dy, dx])
+    }
+
+    for (const [rows, cols] of [
+      [6, 6],
+      [7, 7],
+      [8, 8],
+      [9, 9],
+      [7, 10],
+      [11, 5],
+    ] as const) {
+      const r = generateRangoli({ rows, cols, seed: 13, size, pad: size })
+      for (let i = 0; i < r.stroke.length; i++) {
+        const a = r.stroke[i]!
+        const b = r.stroke[(i + 1) % r.stroke.length]!
+        const [ax, ay] = tangent(a, a.to)
+        const [bx, by] = tangent(b, b.from)
+        const deg = (Math.acos(Math.max(-1, Math.min(1, ax * bx + ay * by))) * 180) / Math.PI
+        expect(deg, `${rows}x${cols}: ${deg.toFixed(0)}deg kink at ${a.to}`).toBeLessThan(1)
+      }
+    }
+  })
+
   it('turns back at the edge on a curve, never a straight line', () => {
     // The boundary links used to be straight chords, which drew a frame of
     // ruled lines around a field of curves and was the one place the figure
@@ -91,7 +149,8 @@ describe('generateRangoli', () => {
     const path = arcsToPath(r.stroke, size)
     expect(path).not.toMatch(/[LlHhVv]/)
 
-    const boundary = r.stroke.filter((a: Arc) => a.boundary)
+    // Edge turn-backs only. A corner one is a reflex arc, checked above.
+    const boundary = r.stroke.filter((a: Arc) => a.boundary && !a.largeArc)
     expect(boundary.length).toBeGreaterThan(0)
 
     for (const arc of boundary) {

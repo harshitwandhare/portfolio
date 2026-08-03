@@ -45,10 +45,15 @@ export interface Arc {
   /** SVG arc sweep flag. */
   sweep: 0 | 1
   /**
+   * SVG large-arc flag. Set only on a corner turn-back, which has to take the
+   * long way round the corner dot to stay outside the lattice.
+   */
+  largeArc?: true
+  /**
    * True where the curve turns back at the edge of the lattice rather than
-   * rounding an interior dot. Drawn as a semicircle bulging outward: a straight
-   * chord here reads as a frame of ruled lines around a field of curves, which
-   * is not what a rangoli does and not what the rest of the figure looks like.
+   * rounding an interior dot. It still curves around a dot, at the same radius
+   * as every other arc — a straight chord here read as a frame of ruled lines
+   * around a field of curves, and passed straight through the perimeter dots.
    */
   boundary?: true
 }
@@ -132,6 +137,53 @@ function perimeterNodes(rows: number, cols: number): NodeId[] {
   for (let c = cols - 1; c >= 0; c--) ring.push(hNode(rows, c)) // bottom, right to left
   for (let r = rows - 1; r >= 0; r--) ring.push(vNode(r, 0)) // left, bottom to top
   return ring
+}
+
+/**
+ * Pair consecutive perimeter midpoints so the curve turns back at the edge.
+ *
+ * On a lattice with an odd number of rows or columns, two of these pairs
+ * straddle a corner, and a corner pair joins exactly the two midpoints that the
+ * corner cell's own tile may already join. That would hang two arcs off one
+ * pair of nodes: a degenerate two-arc loop that no flip can ever absorb, and a
+ * visible spike where the curve doubles back on itself.
+ *
+ * Where that would happen the corner tile is turned the other way, which is the
+ * same primitive the splice itself uses, and the cell is then locked so the
+ * splice cannot turn it back.
+ */
+function pairPerimeter(
+  tiles: Tile[][],
+  rows: number,
+  cols: number,
+): { pairs: Array<readonly [NodeId, NodeId]>; locked: ReadonlySet<string> } {
+  const ring = perimeterNodes(rows, cols)
+  const pairs: Array<readonly [NodeId, NodeId]> = []
+  const locked = new Set<string>()
+
+  for (let i = 0; i < ring.length; i += 2) {
+    const a = ring[i]
+    const b = ring[(i + 1) % ring.length]
+    if (!a || !b) continue
+    pairs.push([a, b])
+    if (a[0] === b[0]) continue
+
+    // A corner pair. Its cell takes its row from the vertical midpoint and its
+    // column from the horizontal one.
+    const [ka, ar, ac] = a.split(':')
+    const [, br, bc] = b.split(':')
+    const hc = Number(ka === 'h' ? ac : bc)
+    const vr = Number(ka === 'h' ? br : ar)
+    const row = tiles[vr]
+    const tile = row?.[hc]
+    if (!row || tile === undefined) continue
+
+    locked.add(`${vr},${hc}`)
+    const key = pairKey(a, b)
+    const clashes = (t: Tile) => tilePairs(vr, hc, t).some(([p, q]) => pairKey(p, q) === key)
+    if (clashes(tile)) row[hc] = (tile === 0 ? 1 : 0) as Tile
+  }
+  return { pairs, locked }
 }
 
 /* ── deterministic randomness ────────────────────────────────────────────── */
@@ -259,44 +311,65 @@ function outwardAt(id: NodeId): readonly [number, number] {
   return kind === 'h' ? (Number(rs) === 0 ? [0, -1] : [0, 1]) : Number(cs) === 0 ? [-1, 0] : [1, 0]
 }
 
-/** Build the arc joining two adjacent midpoints. */
-function makeArc(a: NodeId, b: NodeId, size: number, pad: number): Arc {
+/** An order-independent key for the pair of nodes an arc joins. */
+const pairKey = (a: NodeId, b: NodeId): string => (a < b ? `${a}~${b}` : `${b}~${a}`)
+
+/**
+ * Build the arc joining two adjacent midpoints.
+ *
+ * Every arc in the figure curves around exactly one dot at exactly one radius,
+ * half a cell. That is the whole rule of the form, and it holds for boundary
+ * links too — the difference is only how far around the dot the curve travels:
+ *
+ *   - inside a cell, a quarter turn around a lattice corner;
+ *   - along an edge, a half turn around the perimeter dot between the two
+ *     midpoints, bulging out of the lattice;
+ *   - at a corner, three quarters of a turn around the corner dot, which is
+ *     the only way to get from one edge to the next while staying outside.
+ *
+ * The corner case is why `boundary` cannot be inferred from the node ids: a
+ * corner pair joins a horizontal midpoint to a vertical one and so is shaped
+ * exactly like an ordinary cell arc. Drawn as one it takes the short way round,
+ * cutting inside the corner and reversing direction — a visible cusp. Only the
+ * caller knows the pair came from the perimeter ring, so it has to say so.
+ */
+function makeArc(a: NodeId, b: NodeId, size: number, pad: number, isBoundary: boolean): Arc {
   const from = nodePoint(a, size, pad)
   const to = nodePoint(b, size, pad)
-  // Arcs inside a cell join a horizontal edge midpoint to a vertical one. A
-  // pair of like-kind nodes is a boundary link: the curve reaching the edge of
-  // the lattice and turning back on itself.
-  if (a[0] === b[0]) {
-    // A semicircle bulging away from the lattice, not a straight chord. Chords
-    // made the border a frame of ruled lines around a field of curves, which is
-    // the one place the figure stopped looking like one continuous line.
-    const out = outwardAt(a)
-    const dx = to[0] - from[0]
-    const dy = to[1] - from[1]
-    // With sweep 1 the arc's apex lies along (dy, -dx); pick the flag that puts
-    // it on the outward side.
-    const sweep = dy * out[0] - dx * out[1] > 0 ? 1 : 0
-    return { from, to, around: from, sweep, boundary: true }
+
+  if (!isBoundary) {
+    const around = sharedCorner(a, b, size, pad)
+    return { from, to, around, sweep: sweepFor(from, to, around) }
   }
-  const around = sharedCorner(a, b, size, pad)
-  return { from, to, around, sweep: sweepFor(from, to, around) }
+
+  if (a[0] !== b[0]) {
+    // A corner turn-back. Same circle as the short arc, opposite sweep, taking
+    // the reflex three quarters so it passes outside the corner dot.
+    const around = sharedCorner(a, b, size, pad)
+    const short = sweepFor(from, to, around)
+    return { from, to, around, sweep: short === 1 ? 0 : 1, largeArc: true, boundary: true }
+  }
+
+  // An edge turn-back: a half turn around the dot midway between the two
+  // midpoints, which is exactly the chord's midpoint.
+  const around = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2] as const
+  const out = outwardAt(a)
+  const dx = to[0] - from[0]
+  const dy = to[1] - from[1]
+  // With sweep 1 the arc's apex lies along (dy, -dx); pick the flag that puts
+  // it on the outward side.
+  const sweep = dy * out[0] - dx * out[1] > 0 ? 1 : 0
+  return { from, to, around, sweep, boundary: true }
 }
 
 /** SVG path data for an ordered ring of arcs. */
 export function arcsToPath(arcs: readonly Arc[], size: number): string {
   if (!arcs.length) return ''
+  // One radius for the whole figure: every arc rounds a dot at half a cell.
   const r = size / 2
   const head = `M ${arcs[0]!.from[0]} ${arcs[0]!.from[1]}`
   const body = arcs
-    .map((arc) => {
-      // Boundary turn-backs span a whole cell, so their radius is half the
-      // chord rather than half a cell: the same number here only because
-      // consecutive midpoints on an edge happen to be one cell apart.
-      const rad = arc.boundary
-        ? Math.hypot(arc.to[0] - arc.from[0], arc.to[1] - arc.from[1]) / 2
-        : r
-      return `A ${rad} ${rad} 0 0 ${arc.sweep} ${arc.to[0]} ${arc.to[1]}`
-    })
+    .map((arc) => `A ${r} ${r} 0 ${arc.largeArc ? 1 : 0} ${arc.sweep} ${arc.to[0]} ${arc.to[1]}`)
     .join(' ')
   return `${head} ${body} Z`
 }
@@ -307,6 +380,7 @@ function walkRing(
   start: NodeId,
   size: number,
   pad: number,
+  bset: ReadonlySet<string>,
   seen?: Set<NodeId>,
 ): Arc[] {
   const arcs: Arc[] = []
@@ -320,7 +394,7 @@ function walkRing(
     const next = neighbours.find((n) => n !== previous) ?? neighbours[0]
     if (next === undefined) break
 
-    arcs.push(makeArc(current, next, size, pad))
+    arcs.push(makeArc(current, next, size, pad, bset.has(pairKey(current, next))))
     previous = current
     current = next
     if (current === start) break
@@ -329,12 +403,17 @@ function walkRing(
 }
 
 /** Every closed loop currently present, each as its own ordered ring. */
-function collectLoops(adj: Map<NodeId, NodeId[]>, size: number, pad: number): Loop[] {
+function collectLoops(
+  adj: Map<NodeId, NodeId[]>,
+  size: number,
+  pad: number,
+  bset: ReadonlySet<string>,
+): Loop[] {
   const seen = new Set<NodeId>()
   const loops: Loop[] = []
   for (const start of adj.keys()) {
     if (seen.has(start)) continue
-    const arcs = walkRing(adj, start, size, pad, seen)
+    const arcs = walkRing(adj, start, size, pad, bset, seen)
     if (arcs.length) loops.push({ arcs, path: arcsToPath(arcs, size) })
   }
   // Largest first, so colour assignment stays stable as loops merge.
@@ -369,14 +448,8 @@ export function generateRangoli({
     Array.from({ length: cols }, () => (rand() < 0.5 ? 0 : 1) as Tile),
   )
 
-  // Pair consecutive perimeter midpoints so the curve turns back at the edge.
-  const ring = perimeterNodes(rows, cols)
-  const boundaryPairs: Array<readonly [NodeId, NodeId]> = []
-  for (let i = 0; i < ring.length; i += 2) {
-    const a = ring[i]
-    const b = ring[(i + 1) % ring.length]
-    if (a && b) boundaryPairs.push([a, b])
-  }
+  const { pairs: boundaryPairs, locked } = pairPerimeter(tiles, rows, cols)
+  const bset = new Set(boundaryPairs.map(([a, b]) => pairKey(a, b)))
 
   let adj = buildAdjacency(tiles, rows, cols, boundaryPairs)
   let loopOf = traceLoops(adj)
@@ -393,6 +466,7 @@ export function generateRangoli({
     let flipped = false
     for (let r = 0; r < rows && !flipped; r++) {
       for (let c = 0; c < cols && !flipped; c++) {
+        if (locked.has(`${r},${c}`)) continue
         const row = tiles[r]
         if (!row) continue
         const tile = row[c]
@@ -416,7 +490,7 @@ export function generateRangoli({
 
   // Walk the finished curve into an ordered ring of arcs.
   const startNode = adj.keys().next().value
-  const stroke = startNode === undefined ? [] : walkRing(adj, startNode, size, pad)
+  const stroke = startNode === undefined ? [] : walkRing(adj, startNode, size, pad, bset)
 
   return {
     dots: latticeDots(rows, cols, size, pad),
@@ -472,19 +546,14 @@ export function generateStages({
     Array.from({ length: cols }, () => (rand() < 0.5 ? 0 : 1) as Tile),
   )
 
-  const ring = perimeterNodes(rows, cols)
-  const boundaryPairs: Array<readonly [NodeId, NodeId]> = []
-  for (let i = 0; i < ring.length; i += 2) {
-    const a = ring[i]
-    const b = ring[(i + 1) % ring.length]
-    if (a && b) boundaryPairs.push([a, b])
-  }
+  const { pairs: boundaryPairs, locked } = pairPerimeter(tiles, rows, cols)
+  const bset = new Set(boundaryPairs.map(([a, b]) => pairKey(a, b)))
 
   let adj = buildAdjacency(tiles, rows, cols, boundaryPairs)
   let loopOf = traceLoops(adj)
   let loopCount = new Set(loopOf.values()).size
 
-  const stages: Stage[] = [{ loops: collectLoops(adj, size, pad), loopCount, flips: 0 }]
+  const stages: Stage[] = [{ loops: collectLoops(adj, size, pad, bset), loopCount, flips: 0 }]
 
   let flips = 0
   let guard = rows * cols * 4
@@ -493,6 +562,7 @@ export function generateStages({
     let flipped = false
     for (let r = 0; r < rows && !flipped; r++) {
       for (let c = 0; c < cols && !flipped; c++) {
+        if (locked.has(`${r},${c}`)) continue
         const row = tiles[r]
         if (!row) continue
         const tile = row[c]
@@ -512,7 +582,7 @@ export function generateStages({
     adj = buildAdjacency(tiles, rows, cols, boundaryPairs)
     loopOf = traceLoops(adj)
     loopCount = new Set(loopOf.values()).size
-    stages.push({ loops: collectLoops(adj, size, pad), loopCount, flips })
+    stages.push({ loops: collectLoops(adj, size, pad, bset), loopCount, flips })
   }
 
   return {
