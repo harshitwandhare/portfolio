@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateRangoli, generateStages, type Arc } from './rangoli'
+import { arcsToPath, generateRangoli, generateStages, type Arc } from './rangoli'
 
 /**
  * The figure on the page is only worth anything if the constraint actually
@@ -72,10 +72,47 @@ describe('generateRangoli', () => {
       expect(dots.has(key(arc.to))).toBe(false)
 
       // A curved arc sits exactly one radius from the dot it goes around.
-      if (arc.around !== arc.from) {
+      if (!arc.boundary) {
         const d = Math.hypot(arc.from[0] - arc.around[0], arc.from[1] - arc.around[1])
         expect(d).toBeCloseTo(size / 2, 6)
       }
+    }
+  })
+
+  it('turns back at the edge on a curve, never a straight line', () => {
+    // The boundary links used to be straight chords, which drew a frame of
+    // ruled lines around a field of curves and was the one place the figure
+    // stopped reading as a single continuous stroke.
+    const size = 40
+    const rows = 6
+    const cols = 6
+    const pad = size / 2
+    const r = generateRangoli({ rows, cols, seed: 23, size, pad })
+    const path = arcsToPath(r.stroke, size)
+    expect(path).not.toMatch(/[LlHhVv]/)
+
+    const boundary = r.stroke.filter((a: Arc) => a.boundary)
+    expect(boundary.length).toBeGreaterThan(0)
+
+    for (const arc of boundary) {
+      // Each turn-back is a semicircle bulging away from the lattice, so its
+      // apex lands half a cell outside the edge it sits on — which is why the
+      // callers pad by at least size / 2.
+      const mid = [(arc.from[0] + arc.to[0]) / 2, (arc.from[1] + arc.to[1]) / 2] as const
+      const dx = arc.to[0] - arc.from[0]
+      const dy = arc.to[1] - arc.from[1]
+      const rad = Math.hypot(dx, dy) / 2
+      // Apex direction for sweep 1 is (dy, -dx); sweep 0 flips it.
+      const s = arc.sweep === 1 ? 1 : -1
+      const apex = [mid[0] + (s * dy) / 2, mid[1] - (s * dx) / 2] as const
+      expect(rad).toBeCloseTo(size / 2, 6)
+
+      const outside =
+        apex[0] < pad - 1e-9 ||
+        apex[1] < pad - 1e-9 ||
+        apex[0] > pad + cols * size + 1e-9 ||
+        apex[1] > pad + rows * size + 1e-9
+      expect(outside, `turn-back at ${arc.from} bulges inward`).toBe(true)
     }
   })
 

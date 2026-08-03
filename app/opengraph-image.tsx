@@ -19,7 +19,7 @@ const ACCENT = '#f2a25c'
 const DOT = '#35322f'
 
 export default function OpenGraphImage() {
-  const r = generateRangoli({ rows: 5, cols: 5, size: 84, seed: 23, pad: 42 })
+  const r = generateRangoli({ rows: 5, cols: 5, size: 84, seed: 23, pad: 50 })
 
   // Satori does not run our CSS, so the figure is inlined as an SVG data URI.
   const svg = [

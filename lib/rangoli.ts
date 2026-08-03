@@ -44,6 +44,13 @@ export interface Arc {
   around: readonly [number, number]
   /** SVG arc sweep flag. */
   sweep: 0 | 1
+  /**
+   * True where the curve turns back at the edge of the lattice rather than
+   * rounding an interior dot. Drawn as a semicircle bulging outward: a straight
+   * chord here reads as a frame of ruled lines around a field of curves, which
+   * is not what a rangoli does and not what the rest of the figure looks like.
+   */
+  boundary?: true
 }
 
 /** One closed loop of the tiling, as an ordered ring of arcs. */
@@ -240,15 +247,39 @@ function sweepFor(
 
 /* ── walking the graph into drawable arcs ────────────────────────────────── */
 
+/**
+ * Which way is "out of the lattice" from a boundary node?
+ *
+ * A same-kind pair only ever sits on one edge, and the node id says which: a
+ * horizontal midpoint on row 0 is the top edge, any other row is the bottom;
+ * a vertical midpoint on column 0 is the left edge, any other column the right.
+ */
+function outwardAt(id: NodeId): readonly [number, number] {
+  const [kind, rs, cs] = id.split(':')
+  return kind === 'h' ? (Number(rs) === 0 ? [0, -1] : [0, 1]) : Number(cs) === 0 ? [-1, 0] : [1, 0]
+}
+
 /** Build the arc joining two adjacent midpoints. */
 function makeArc(a: NodeId, b: NodeId, size: number, pad: number): Arc {
   const from = nodePoint(a, size, pad)
   const to = nodePoint(b, size, pad)
   // Arcs inside a cell join a horizontal edge midpoint to a vertical one. A
-  // pair of like-kind nodes is a boundary link, drawn as a straight chord.
-  const sameKind = a[0] === b[0]
-  const around = sameKind ? from : sharedCorner(a, b, size, pad)
-  return { from, to, around, sweep: sameKind ? 0 : sweepFor(from, to, around) }
+  // pair of like-kind nodes is a boundary link: the curve reaching the edge of
+  // the lattice and turning back on itself.
+  if (a[0] === b[0]) {
+    // A semicircle bulging away from the lattice, not a straight chord. Chords
+    // made the border a frame of ruled lines around a field of curves, which is
+    // the one place the figure stopped looking like one continuous line.
+    const out = outwardAt(a)
+    const dx = to[0] - from[0]
+    const dy = to[1] - from[1]
+    // With sweep 1 the arc's apex lies along (dy, -dx); pick the flag that puts
+    // it on the outward side.
+    const sweep = dy * out[0] - dx * out[1] > 0 ? 1 : 0
+    return { from, to, around: from, sweep, boundary: true }
+  }
+  const around = sharedCorner(a, b, size, pad)
+  return { from, to, around, sweep: sweepFor(from, to, around) }
 }
 
 /** SVG path data for an ordered ring of arcs. */
@@ -257,11 +288,15 @@ export function arcsToPath(arcs: readonly Arc[], size: number): string {
   const r = size / 2
   const head = `M ${arcs[0]!.from[0]} ${arcs[0]!.from[1]}`
   const body = arcs
-    .map((arc) =>
-      arc.around === arc.from
-        ? `L ${arc.to[0]} ${arc.to[1]}`
-        : `A ${r} ${r} 0 0 ${arc.sweep} ${arc.to[0]} ${arc.to[1]}`,
-    )
+    .map((arc) => {
+      // Boundary turn-backs span a whole cell, so their radius is half the
+      // chord rather than half a cell: the same number here only because
+      // consecutive midpoints on an edge happen to be one cell apart.
+      const rad = arc.boundary
+        ? Math.hypot(arc.to[0] - arc.from[0], arc.to[1] - arc.from[1]) / 2
+        : r
+      return `A ${rad} ${rad} 0 0 ${arc.sweep} ${arc.to[0]} ${arc.to[1]}`
+    })
     .join(' ')
   return `${head} ${body} Z`
 }

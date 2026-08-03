@@ -21,7 +21,9 @@ import { SpliceFigure } from './splice'
  * enough that the eye can follow the line all the way round, which is the whole
  * point. A denser grid turns the same algorithm into wallpaper.
  */
-const HERO = { rows: 6, cols: 6, size: 74, seed: 13, pad: 40 }
+// `pad` has to clear half a cell: the curve turns back at the edge on a
+// semicircle that bulges outside the lattice, and a tighter pad clips it.
+const HERO = { rows: 6, cols: 6, size: 74, seed: 13, pad: 46 }
 
 const LINK = 'text-accent underline underline-offset-4'
 const TITLE_LINK =
