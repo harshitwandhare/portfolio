@@ -106,6 +106,8 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
   if (!stage) return null
 
   const done = stage.loopCount === 1
+  /** Longest loop in this stage, used to keep the drawing rate constant. */
+  const longestLoop = Math.max(...stage.loops.map((l) => l.arcs.length), 1)
 
   return (
     <div data-splice className="w-full">
@@ -126,10 +128,11 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
         {/* Grey loops first so the accent one always draws on top. */}
         {stage.loops.map((loop, i) => (
           <path
-            // `run` is in the key so replay remounts the paths. Without it the
-            // element is unchanged, and a CSS animation does not restart just
-            // because its class was re-added.
-            key={`${run}-${index}-${i}`}
+            // Keyed by slot, not by stage. Keying on the stage index remounted
+            // every path on every step, which meant the transition below never
+            // ran and each splice landed as a hard cut. `run` is still in the
+            // key so replay does remount and restarts the draw animation.
+            key={`${run}-${i}`}
             d={loop.path}
             fill="none"
             stroke={i === 0 ? 'var(--accent)' : 'var(--fg-faint)'}
@@ -140,8 +143,25 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
             className={drawingIn ? 'stroke-draw' : undefined}
             opacity={i === 0 ? 1 : 0.5}
             style={{
-              transition: 'stroke-width 220ms ease, opacity 220ms ease',
-              ...(drawingIn ? { animationDuration: `${DRAW_MS}ms` } : {}),
+              transition:
+                'stroke 300ms cubic-bezier(0.22,1,0.36,1), stroke-width 300ms cubic-bezier(0.22,1,0.36,1), opacity 300ms cubic-bezier(0.22,1,0.36,1)',
+              ...(drawingIn
+                ? {
+                    // Every loop is normalised to pathLength 1, so a fixed
+                    // duration would draw a 3-arc loop and a 22-arc loop in the
+                    // same time: a sevenfold difference in speed, which is what
+                    // made the opening look uneven. Scaling the duration by
+                    // length lays ink down at one rate across the whole figure.
+                    animationDuration: `${Math.round(
+                      DRAW_MS * Math.max(loop.arcs.length / longestLoop, 0.18),
+                    )}ms`,
+                    // Linear, not the eased curve the static figure uses. An
+                    // ease-in-out makes a single stroke feel drawn by hand, but
+                    // across thirteen loops at once it reads as the whole figure
+                    // surging and stalling.
+                    animationTimingFunction: 'linear',
+                  }
+                : {}),
             }}
           />
         ))}
