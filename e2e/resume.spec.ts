@@ -67,6 +67,28 @@ test.describe('/resume', () => {
     }
   })
 
+  test('prints to a single page', async ({ page }) => {
+    // US Letter at 96dpi, less the margins declared in @page. Printing lays out
+    // at paper width regardless of the device, so the viewport is set to match:
+    // `emulateMedia` switches the stylesheet but leaves the viewport alone, and
+    // measuring at a phone's width would report wrapping that paper never sees.
+    const PAGE_W = Math.round(8.5 * 96 - (22 / 25.4) * 96)
+    const PAGE_H = Math.round(11 * 96 - (20 / 25.4) * 96)
+
+    await page.setViewportSize({ width: PAGE_W, height: PAGE_H })
+    await page.emulateMedia({ media: 'print' })
+    await page.goto('/resume')
+
+    // A résumé that spills onto a second page is a worse document than one that
+    // does not, and the overflow is almost always spacing rather than content.
+    const height = await page
+      .locator('#resume-sheet')
+      .evaluate((el) => Math.round(el.getBoundingClientRect().height))
+
+    expect(height, `sheet is ${height}px against ${PAGE_H}px of page`).toBeLessThanOrEqual(PAGE_H)
+    await page.emulateMedia({ media: 'screen' })
+  })
+
   test('hides the page furniture when printed', async ({ page }) => {
     await page.emulateMedia({ media: 'print' })
     // The controls and navigation are not part of the document.
