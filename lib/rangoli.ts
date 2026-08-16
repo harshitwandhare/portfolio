@@ -1,5 +1,5 @@
 /**
- * Tipkyanchi rangoli — the dot-grid form of Maharashtra.
+ * Tipkyanchi rangoli, the dot-grid form of Maharashtra.
  *
  * The rule the drawing obeys is old and exact: lay a lattice of equidistant
  * dots, then draw a line that goes *around* every dot, never through one, never
@@ -20,7 +20,7 @@
  *
  *   1. Every arc endpoint sits at the midpoint of a cell edge, and every
  *      interior edge is shared by exactly two cells. So every midpoint has
- *      degree two, and the arcs can only ever form disjoint closed loops —
+ *      degree two, and the arcs can only ever form disjoint closed loops,
  *      never a dangling end, never a crossing.
  *   2. Flipping one tile rewires exactly the two arcs inside that cell. If the
  *      two arcs belonged to different loops, the flip splices those loops into
@@ -32,7 +32,7 @@
 
 export type Tile = 0 | 1
 
-/** A point where two arcs meet — always the midpoint of a lattice cell edge. */
+/** A point where two arcs meet, always the midpoint of a lattice cell edge. */
 type NodeId = string
 
 export interface Arc {
@@ -52,7 +52,7 @@ export interface Arc {
   /**
    * True where the curve turns back at the edge of the lattice rather than
    * rounding an interior dot. It still curves around a dot, at the same radius
-   * as every other arc — a straight chord here read as a frame of ruled lines
+   * as every other arc. A straight chord here read as a frame of ruled lines
    * around a field of curves, and passed straight through the perimeter dots.
    */
   boundary?: true
@@ -86,7 +86,7 @@ export interface Rangoli {
   loopsBefore: number
   /** How many tile flips were needed to reach one stroke. */
   flips: number
-  /** Total arc count — the length of the single closed curve. */
+  /** Total arc count, the length of the single closed curve. */
   length: number
   width: number
   height: number
@@ -109,7 +109,7 @@ function cellNodes(r: number, c: number) {
 
 /**
  * The two arcs a tile contributes, as node-id pairs.
- * Tile 0 joins N–W and S–E; tile 1 joins N–E and S–W.
+ * Tile 0 joins N-W and S-E; tile 1 joins N-E and S-W.
  */
 function tilePairs(r: number, c: number, tile: Tile): [[NodeId, NodeId], [NodeId, NodeId]] {
   const { n, s, w, e } = cellNodes(r, c)
@@ -127,7 +127,7 @@ function tilePairs(r: number, c: number, tile: Tile): [[NodeId, NodeId], [NodeId
 /**
  * The perimeter midpoints, walked in order around the outside of the lattice.
  * These have only one cell against them, so they are joined to each other in
- * consecutive pairs to close the curve at the boundary — which is exactly what
+ * consecutive pairs to close the curve at the boundary, which is exactly what
  * a rangoli does when the line turns back at the edge of the pattern.
  */
 function perimeterNodes(rows: number, cols: number): NodeId[] {
@@ -319,7 +319,7 @@ const pairKey = (a: NodeId, b: NodeId): string => (a < b ? `${a}~${b}` : `${b}~$
  *
  * Every arc in the figure curves around exactly one dot at exactly one radius,
  * half a cell. That is the whole rule of the form, and it holds for boundary
- * links too — the difference is only how far around the dot the curve travels:
+ * links too. The difference is only how far around the dot the curve travels:
  *
  *   - inside a cell, a quarter turn around a lattice corner;
  *   - along an edge, a half turn around the perimeter dot between the two
@@ -330,7 +330,7 @@ const pairKey = (a: NodeId, b: NodeId): string => (a < b ? `${a}~${b}` : `${b}~$
  * The corner case is why `boundary` cannot be inferred from the node ids: a
  * corner pair joins a horizontal midpoint to a vertical one and so is shaped
  * exactly like an ordinary cell arc. Drawn as one it takes the short way round,
- * cutting inside the corner and reversing direction — a visible cusp. Only the
+ * cutting inside the corner and reversing direction, a visible cusp. Only the
  * caller knows the pair came from the perimeter ring, so it has to say so.
  */
 function makeArc(a: NodeId, b: NodeId, size: number, pad: number, isBoundary: boolean): Arc {
@@ -476,7 +476,7 @@ export function generateRangoli({
         const lq = loopOf.get(q[0])
         if (lp === undefined || lq === undefined || lp === lq) continue
 
-        // Two different loops pass through this cell — flipping splices them.
+        // Two different loops pass through this cell, so flipping splices them.
         row[c] = (tile === 0 ? 1 : 0) as Tile
         flips++
         flipped = true
@@ -529,7 +529,7 @@ export interface Stages {
 /**
  * The same construction, but recording the figure after every splice.
  *
- * `generateRangoli` only needs the answer. This returns the working — the raw
+ * `generateRangoli` only needs the answer. This returns the working, the raw
  * tiling with all its separate loops, then each one absorbed, down to the
  * single stroke. It exists so the page can show the algorithm running rather
  * than assert that it did.

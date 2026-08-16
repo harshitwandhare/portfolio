@@ -48,7 +48,7 @@ describe('generateRangoli', () => {
       for (let i = 1; i < stroke.length; i++) {
         expect(key(stroke[i]!.from)).toBe(key(stroke[i - 1]!.to))
       }
-      // And the last must return to the first — a closed loop, not a path.
+      // And the last must return to the first, a closed loop, not a path.
       expect(key(stroke.at(-1)!.to)).toBe(key(stroke[0]!.from))
     }
   })
@@ -61,7 +61,7 @@ describe('generateRangoli', () => {
     }
   })
 
-  it('never draws through a dot — every arc keeps its radius from the dot it circles', () => {
+  it('never draws through a dot, keeping every arc a fixed radius from its dot', () => {
     const size = 40
     const r = generateRangoli({ rows: 6, cols: 6, seed: 23, size })
     const dots = new Set(r.dots.map(key))
@@ -155,7 +155,7 @@ describe('generateRangoli', () => {
 
     for (const arc of boundary) {
       // Each turn-back is a semicircle bulging away from the lattice, so its
-      // apex lands half a cell outside the edge it sits on — which is why the
+      // apex lands half a cell outside the edge it sits on, which is why the
       // callers pad by at least size / 2.
       const mid = [(arc.from[0] + arc.to[0]) / 2, (arc.from[1] + arc.to[1]) / 2] as const
       const dx = arc.to[0] - arc.from[0]
@@ -182,7 +182,7 @@ describe('generateRangoli', () => {
     }
   })
 
-  it('is deterministic — the same seed gives the same figure', () => {
+  it('is deterministic, so the same seed gives the same figure', () => {
     const a = generateRangoli({ rows: 6, cols: 9, seed: 42, size: 40 })
     const b = generateRangoli({ rows: 6, cols: 9, seed: 42, size: 40 })
     expect(a.path).toBe(b.path)
@@ -218,7 +218,7 @@ describe('generateRangoli', () => {
     }
   })
 
-  it('conserves every arc at every stage — splicing rewires, it never deletes', () => {
+  it('conserves every arc at every stage, because splicing rewires and never deletes', () => {
     const rows = 6
     const cols = 9
     const total = expectedArcs(rows, cols)

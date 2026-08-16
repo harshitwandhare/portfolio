@@ -16,7 +16,7 @@ const config = [
       'node_modules/**',
       'next-env.d.ts',
       'out/**',
-      // Generated reports and artefacts — not source.
+      // Generated reports and artefacts, not source.
       'coverage/**',
       'playwright-report/**',
       'test-results/**',

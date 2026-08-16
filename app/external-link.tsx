@@ -3,7 +3,7 @@ import type { AnchorHTMLAttributes, ReactNode } from 'react'
 /**
  * Every link that leaves the site.
  *
- * Centralised so `target` and `rel` cannot be forgotten at a call site — and
+ * Centralised so `target` and `rel` cannot be forgotten at a call site. And
  * `rel="noopener"` in particular is a security control, not a preference: it
  * stops the opened page reaching back through `window.opener`.
  *

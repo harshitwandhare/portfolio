@@ -103,7 +103,7 @@ export function CountUp({
 
         // Zeroed here rather than on mount. Doing it up front would leave the
         // real figure replaced by a 0 for anything that never scrolls into
-        // view — which is exactly where these numbers live.
+        // view, which is exactly where these numbers live.
         el.textContent = `${prefix}0${suffix}`
 
         const tick = (now: number) => {

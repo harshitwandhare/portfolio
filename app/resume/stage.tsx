@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 /**
  * The sheet on a stage: a slight pointer-driven tilt, plus the two things
- * anyone actually wants from a résumé page — take a copy, send it to someone.
+ * anyone actually wants from a résumé page: take a copy, send it to someone.
  *
  * The tilt is a single CSS transform written straight to the node, so it costs
  * one compositor update per frame and no React render. It is disabled entirely
@@ -18,7 +18,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 export function Stage({ children }: { children: ReactNode }) {
   const sheetRef = useRef<HTMLDivElement | null>(null)
   // Only set from a click handler. Whether the share sheet exists is decided at
-  // click time rather than mirrored into state on mount — the label reads
+  // click time rather than mirrored into state on mount, so the label reads
   // "share" either way, and the fallback reports itself when it runs.
   const [copied, setCopied] = useState(false)
 
@@ -67,7 +67,7 @@ export function Stage({ children }: { children: ReactNode }) {
       setCopied(true)
       window.setTimeout(() => setCopied(false), 2200)
     } catch {
-      /* dismissed, or clipboard unavailable — nothing to recover from */
+      /* dismissed, or clipboard unavailable, so nothing to recover from */
     }
   }
 

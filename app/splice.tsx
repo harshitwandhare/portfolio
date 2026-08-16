@@ -6,13 +6,13 @@ import { generateStages } from '@/lib/rangoli'
 /**
  * The hero figure, and the algorithm behind it.
  *
- * A raw tiling is not one line — it is a dozen separate closed loops. Each tile
+ * A raw tiling is not one line. It is a dozen separate closed loops. Each tile
  * flip splices two of them together. This plays that through: the longest loop
  * is drawn in the accent and the rest stay grey, so the accent visibly spreads
  * across the lattice as loops are absorbed, ending on a single unbroken stroke.
  *
  * It runs once on load and can be replayed or reseeded. It is not tied to
- * scroll — the figure is the first thing on the page, and a reader should not
+ * scroll. The figure is the first thing on the page, and a reader should not
  * have to scroll past their own introduction to see it resolve.
  *
  * Progressive throughout: the server renders the finished stroke, so the answer
@@ -38,7 +38,7 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
   /**
-   * The opening. Before any splicing, the raw tiling draws itself in — every
+   * The opening. Before any splicing, the raw tiling draws itself in: every
    * loop traced from nothing. Without it the figure simply appears fully formed
    * and the first thing the eye sees is an answer rather than a construction.
    */
@@ -166,7 +166,7 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
           />
         ))}
 
-        {/* The bindu — the origin dot a rangoli is started from. */}
+        {/* The bindu, the origin dot a rangoli is started from. */}
         {done && stage.loops[0]?.arcs[0] && (
           <circle
             cx={stage.loops[0].arcs[0].from[0]}
@@ -178,7 +178,7 @@ export function SpliceFigure({ rows, cols, size, pad, seed, step = 320 }: Props)
       </svg>
 
       {/* Every value here changes as the splice runs, and each one used to
-          resize its own box — the counter from two digits to one, the label
+          resize its own box: the counter from two digits to one, the label
           from "separate loops" to "unbroken stroke", the note from two lines to
           one. With the hero grid centred, that reflow moved the whole column.
           Each slot now reserves its widest state, so nothing shifts. */}

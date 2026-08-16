@@ -13,7 +13,7 @@ import {
  * The résumé, as a document rather than an embedded PDF.
  *
  * Rendered from the same `content/profile.ts` the homepage uses, so the two can
- * never disagree — which is the failure mode a separately-maintained PDF always
+ * never disagree, which is the failure mode a separately-maintained PDF always
  * eventually hits.
  *
  * Being HTML rather than a PDF buys three things a file cannot: it is indexable
