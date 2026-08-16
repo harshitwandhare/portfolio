@@ -20,7 +20,7 @@ export default defineConfig({
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
-  // Tests run against a production build, not the dev server — dev ships an
+  // Tests run against a production build, not the dev server: dev ships an
   // overlay and unminified bundles, so a11y and bundle results would not
   // reflect what a visitor actually gets.
   webServer: {

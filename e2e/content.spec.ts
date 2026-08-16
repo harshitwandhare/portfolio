@@ -36,12 +36,21 @@ test.describe('/', () => {
     const strip = page.locator('section').nth(1)
     await expect(strip.getByText('commits, most on the project')).toBeVisible()
     // CountUp animates from zero, so wait for it to settle on the real figure.
-    await expect(strip.getByText('1,214')).toBeVisible()
+    await expect(strip.getByText('1,394')).toBeVisible()
+
+    // The figure is only worth leading with if a reader can check it, so the
+    // tile is a link. It has to be the author-filtered commit list rather than
+    // the contributors graph: the graph shows a signed-out visitor no
+    // per-person breakdown, which is the reader this link exists for.
+    await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveAttribute(
+      'href',
+      /Yosemite-Crew\/commits\?author=harshitwandhare/,
+    )
   })
 
   test('never shows a zero in the proof strip', async ({ page }) => {
     // Job Sentinel and ATLAS have no stars; a panel reading "0" would put the
-    // weakest fact on the page in the largest type. Scoped to the strip — the
+    // weakest fact on the page in the largest type. Scoped to the strip: the
     // splice panel legitimately starts at zero flips applied.
     const strip = page.locator('section').nth(1)
     await expect(strip.getByText('commits, most on the project')).toBeVisible()
@@ -84,7 +93,7 @@ test.describe('/', () => {
     const text = await page.locator('body').innerText()
     const html = await page.content()
 
-    // Examples use the 555 range, which is reserved for fiction — the real
+    // Examples use the 555 range, which is reserved for fiction. The real
     // number must not appear even in a comment.
     const shapes = [
       /\+\d{1,3}[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/, // +1 (555) 010-0100
@@ -98,13 +107,13 @@ test.describe('/', () => {
     }
   })
 
-  test('uses no em dashes in anything a reader sees', async ({ page }) => {
+  test('uses no em or en dashes in anything a reader sees', async ({ page }) => {
     // An em dash between clauses is one of the tells people read as machine-
     // written. The prose was rewritten rather than find-and-replaced, so this
     // guards the result: it fails on the character itself, wherever it appears.
     const text = await page.locator('body').innerText()
-    const found = [...text.matchAll(/.{0,45}—.{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
-    expect(found, `em dash in rendered text:\n${found.join('\n')}`).toEqual([])
+    const found = [...text.matchAll(/.{0,45}[—–].{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
+    expect(found, `long dash in rendered text:\n${found.join('\n')}`).toEqual([])
   })
 
   test('excludes the withdrawn tooling claims', async ({ page }) => {
@@ -126,7 +135,7 @@ test.describe('/', () => {
     expect(hrefs.length).toBeGreaterThan(0)
 
     // Structured-data URLs are checked too. A dead link in `sameAs` is just as
-    // broken as one in the markup and nobody sees it until a crawler does —
+    // broken as one in the markup and nobody sees it until a crawler does,
     // which is how a deleted account's profile URL survived here for a while.
     const ld = JSON.parse(
       (await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}',
@@ -144,7 +153,7 @@ test.describe('/', () => {
       }
 
       // 999 is LinkedIn's response to anything that is not a browser. It is a
-      // bot block, not a broken link — real visitors get the page. Everything
+      // bot block, not a broken link: real visitors get the page. Everything
       // else must be a genuine success.
       if (status === 999 && new URL(href).hostname.endsWith('linkedin.com')) continue
       expect(status, `${href} returned ${status}`).toBeLessThan(400)
@@ -164,7 +173,7 @@ test.describe('the hero figure', () => {
     await expect(page.getByText('unbroken stroke')).toBeVisible()
   })
 
-  test('draws a closed path — no gap left by a short dash pattern', async ({ page }) => {
+  test('draws a closed path with no gap left by a short dash pattern', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
 
@@ -230,7 +239,7 @@ test.describe('the hero figure', () => {
     await page.goto('/')
     await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
 
-    // Compare the whole figure, not one loop — two different tilings can share
+    // Compare the whole figure, not one loop: two different tilings can share
     // their largest loop by coincidence.
     const shape = () =>
       page

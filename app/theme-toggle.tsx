@@ -3,8 +3,8 @@
 /**
  * Explicit light/dark switch.
  *
- * Deliberately stateless. The current theme already lives in one place — the
- * `data-theme` attribute on <html> — so mirroring it into React state would mean
+ * Deliberately stateless. The current theme already lives in one place, the
+ * `data-theme` attribute on <html>, so mirroring it into React state would mean
  * an effect that reads the DOM on mount, a hydration mismatch to suppress, and
  * two sources of truth. Instead the click reads the attribute, and the label is
  * chosen by CSS from that same attribute.
@@ -23,7 +23,7 @@ export function ThemeToggle() {
     try {
       localStorage.setItem('theme', next)
     } catch {
-      /* storage unavailable — the choice just will not persist */
+      /* storage unavailable, so the choice just will not persist */
     }
   }
 
@@ -32,7 +32,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       // Both labels are in the DOM so CSS can pick one without JavaScript, which
-      // means the visible text is unreliable as an accessible name — a screen
+      // means the visible text is unreliable as an accessible name, a screen
       // reader would read "darklight". The label is stated explicitly instead.
       aria-label="Switch colour theme"
       className="mono theme-toggle border border-line px-2.5 py-1 text-fg-muted transition-colors hover:border-accent hover:text-accent"

@@ -28,21 +28,21 @@ export const identity = {
   // without depending on a profile that no longer exists.
   linkedin: 'https://linkedin.com/in/harshit-wandhare-a088201aa',
   status: 'Open to Summer 2027 SWE and AI/ML internships',
-  // Replace this file with a real headshot — see public/portrait.README.
+  // Replace this file with a real headshot. See public/portrait.README.
   portrait: '/portrait.jpg',
   // No phone number, deliberately, and not merely because one was missing.
   //
   // A number on a public page is harvested within days, and in this repo it
   // would also sit in git history forever. Recruiters open with email in any
   // case. The number belongs on the résumé PDF, which is sent to a named
-  // recipient rather than crawled — so it lives there and nowhere in here.
+  // recipient rather than crawled, so it lives there and nowhere in here.
 } as const
 
 /**
  * The one-paragraph summary at the top of the résumé sheet.
  *
  * Mirrors the LaTeX résumé so the two read as one document, with the star count
- * stated as a floor rather than a moving figure — the résumé's "2,100+" was
+ * stated as a floor rather than a moving figure. The résumé's "2,100+" was
  * already above the real number by the time it was printed.
  */
 export const summary =
@@ -62,29 +62,55 @@ export interface Metric {
   readonly value: string
   readonly label: string
   readonly source: Source
-  /** When true, the value is fetched live rather than typed. */
-  readonly live?: boolean
+  /**
+   * Where a reader goes to check the number themselves. A `confirmed` metric
+   * that nobody can reach in one click is only as good as the reader's trust,
+   * which is the thing the number is meant to earn.
+   */
+  readonly href?: string
   readonly note?: string
   /** Path to the backing document, when there is one. */
   readonly evidence?: string
 }
 
+// Every figure below was re-checked against the GitHub API on 2026-08-16. They
+// drift, so re-check before claiming them elsewhere; the commit count only ever
+// grows, the star count moves both ways.
 export const metrics: readonly Metric[] = [
   {
-    // Was 1,268 and "#1 of 15". Both moved when the `harshit-yc` work account
-    // was deleted: GitHub re-attributes a deleted account's commits, and the
-    // contributor count is 29 once anonymous attribution is included. 1,214 is
-    // the figure the API returns today, and it is still the largest share of
-    // any contributor — 982 is next.
-    value: '1,214',
+    // History of this number, because it has moved twice for non-obvious
+    // reasons. It was 1,268 and "#1 of 15" while the `harshit-yc` work account
+    // existed. The company deleted that account, which orphaned every commit:
+    // the count read 1,214 and he was absent from the contributors graph
+    // entirely. Verifying harshit@yosemitecrew.com on his personal account made
+    // GitHub re-attribute them retroactively, so the commits now resolve to a
+    // profile that exists. 1,394 of 28 contributor identities, and the next
+    // engineer is on 1,058.
+    //
+    // The link is the author-filtered commit list, not
+    // /graphs/contributors?all=1, which is the page the ranking comes from.
+    // Signed out, that graph renders the aggregate chart and no per-person
+    // list at all, so a visitor following it would see nothing about him. The
+    // commit list renders in full for everyone. A number nobody can check is
+    // worth less than a smaller one they can.
+    value: '1,394',
     label: 'commits, most on the project',
     source: 'confirmed',
-    note: 'Verifiable via the contributors API with anon=1; the account itself is gone.',
+    href: 'https://github.com/YosemiteCrew/Yosemite-Crew/commits?author=harshitwandhare',
+    note: 'Top of the contributors graph, all time',
   },
   // The only star count anywhere on the site. Job Sentinel and ATLAS are young
   // repos with none, and leading a panel with a zero would draw the eye
   // straight to the weakest fact on the page.
-  { value: '2,045', label: 'stars on that project', source: 'confirmed', live: true },
+  {
+    value: '2,036',
+    label: 'stars on that project',
+    source: 'confirmed',
+    // The repo home, not /stargazers: GitHub 404s the stargazers list for
+    // signed-out visitors, and the count is on the repo header anyway.
+    href: 'https://github.com/YosemiteCrew/Yosemite-Crew',
+    note: 'Check it on GitHub',
+  },
   { value: '100K+', label: 'monthly users', source: 'self' },
   { value: 'A*', label: 'top rating, Jio', source: 'document', evidence: '/docs/jio-rating.pdf' },
 ]
@@ -119,7 +145,7 @@ export const experience: readonly Role[] = [
         evidence: '/docs/lor-founder.pdf',
       },
       {
-        text: 'The #1 contributor to the project by commits, ahead of every other engineer on it.',
+        text: 'The #1 contributor to the project by commits, ahead of every other engineer on it, and still the top of the contributors graph after leaving.',
         source: 'confirmed',
       },
       {
@@ -192,7 +218,7 @@ export interface Project {
   readonly name: string
   readonly blurb: string
   readonly stack: readonly string[]
-  /** Omitted when the repository is private — a link that 404s is worse than none. */
+  /** Omitted when the repository is private: a link that 404s is worse than none. */
   readonly repo?: string
   readonly live?: string
   readonly docs?: string
@@ -202,7 +228,7 @@ export interface Project {
   readonly points: readonly Fact[]
 }
 
-// Job Sentinel leads. It is the most inspectable thing here — the CI badges,
+// Job Sentinel leads. It is the most inspectable thing here, the CI badges,
 // the test count and the ADRs are all publicly checkable in seconds, and
 // inviting inspection is a stronger move than describing the work.
 export const projects: readonly Project[] = [
@@ -257,7 +283,7 @@ export const projects: readonly Project[] = [
         source: 'confirmed',
       },
       {
-        text: 'Strict static typing, 59 tests, and behavioural evals gating CI.',
+        text: 'Strict static typing, 60 tests, and behavioural evals gating CI.',
         source: 'confirmed',
       },
     ],
@@ -281,12 +307,12 @@ export const projects: readonly Project[] = [
  * The résumé download.
  *
  * Deliberately `null` for now. The current PDF carries a US phone number, and a
- * PDF linked from a public page is harvested the same way a page is — which
+ * PDF linked from a public page is harvested the same way a page is, which
  * would undo the decision made in `identity` above for the sake of one file.
  *
  * To publish it: remove the phone from the header in the résumé source,
  * recompile, save as `public/resume.pdf`, and set this to
- * `{ file: '/resume.pdf', updated: 'YYYY-MM' }`. Nothing else needs changing —
+ * `{ file: '/resume.pdf', updated: 'YYYY-MM' }`. Nothing else needs changing,
  * the contact section renders the link only when this is set, and a test
  * asserts the published file carries no phone number.
  */
@@ -400,7 +426,7 @@ export const education = [
     from: '2019-08',
     to: '2023-05',
     note: 'CGPA 9.53 / 10.0',
-    // Not mu.ac.in — it resolves but does not answer, and a link that hangs is
+    // Not mu.ac.in. It resolves but does not answer, and a link that hangs is
     // worse than none. Wikipedia is reachable, and for a reader outside India
     // it explains the university better than the university's own site does.
     href: 'https://en.wikipedia.org/wiki/University_of_Mumbai',
@@ -412,7 +438,7 @@ export const education = [
   },
 ] as const
 
-/** The narrative layer — deliberately behind an opt-in, not in the recruiter path. */
+/** The narrative layer, deliberately behind an opt-in, not in the recruiter path. */
 export const story = [
   {
     year: '2015',

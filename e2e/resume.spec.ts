@@ -28,10 +28,10 @@ test.describe('/resume', () => {
     expect(await page.locator('iframe, object, embed').count()).toBe(0)
   })
 
-  test('uses no em dashes in anything a reader sees', async ({ page }) => {
+  test('uses no em or en dashes in anything a reader sees', async ({ page }) => {
     const text = await page.locator('body').innerText()
-    const found = [...text.matchAll(/.{0,45}—.{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
-    expect(found, `em dash in rendered text:\n${found.join('\n')}`).toEqual([])
+    const found = [...text.matchAll(/.{0,45}[—–].{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
+    expect(found, `long dash in rendered text:\n${found.join('\n')}`).toEqual([])
   })
 
   test('carries no phone number', async ({ page }) => {
@@ -48,7 +48,7 @@ test.describe('/resume', () => {
     }
   })
 
-  test('cannot drift from the homepage — both read one source', async ({ page }) => {
+  test('cannot drift from the homepage, because both read one source', async ({ page }) => {
     const resumeText = await page.locator('#resume-sheet').innerText()
     await page.goto('/')
     const homeText = await page.locator('main').innerText()

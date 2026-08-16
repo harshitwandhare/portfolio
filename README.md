@@ -10,8 +10,6 @@ twenty-second skim and an engineer's twenty-minute one.
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178c6)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-a3480a.svg)](LICENSE)
 
----
-
 ## The idea
 
 A **tipkyanchi rangoli** is the dot-grid form drawn on doorsteps across Maharashtra:
@@ -20,30 +18,30 @@ never through one, never crossing itself, closing where it began.
 
 That is not a decoration. It is a constraint, and it is solvable.
 
-The figure on the site is the solution — computed at build time, shipped as static
-SVG, and drawn over the author's real GitHub contribution history so the ornament
-and the data are the same object.
+The figure on the site is the solution. It is computed at build time, shipped as
+static SVG, and drawn over the author's real GitHub contribution history, so the
+ornament and the data are the same object.
 
 ```
-lay a lattice          →  every cell gets one of two tiles, each a pair of
-                          quarter-arcs centred on opposite corners
+lay a lattice          ->  every cell gets one of two tiles, each a pair of
+                           quarter-arcs centred on opposite corners
 
-count the loops        →  every arc endpoint lands on a shared edge midpoint, so
-                          every midpoint has degree two — the arcs can only form
-                          closed loops, never a dangling end and never a crossing
+count the loops        ->  every arc endpoint lands on a shared edge midpoint, so
+                           every midpoint has degree two. The arcs can only form
+                           closed loops, never a dangling end and never a crossing
 
-splice them            →  flipping one tile rewires exactly the two arcs inside
-                          that cell; if they belonged to different loops, the flip
-                          joins those loops into one
+splice them            ->  flipping one tile rewires exactly the two arcs inside
+                           that cell. If they belonged to different loops, the flip
+                           joins those loops into one
 
-repeat                 →  until a single unbroken stroke is left
+repeat                 ->  until a single unbroken stroke is left
 ```
 
-The implementation is [`lib/rangoli.ts`](lib/rangoli.ts). It is deterministic —
-same seed, same figure — which is why the centrepiece can be rendered on the
-server and cost the browser nothing.
+The implementation is [`lib/rangoli.ts`](lib/rangoli.ts). It is deterministic, so
+the same seed gives the same figure, which is why the centrepiece can be rendered
+on the server and cost the browser nothing.
 
-`flips === loops − 1` on every input tested, which is the optimal number of
+`flips === loops - 1` on every input tested, which is the optimal number of
 splices. That property is asserted in the test suite rather than assumed.
 
 ## Running it
@@ -69,14 +67,14 @@ app/
   page.tsx              the site
   resume/               the résumé, as a document that prints to PDF
   layout.tsx            fonts, theme bootstrap, skip link
-  globals.css           design tokens — both themes, contrast-checked
+  globals.css           design tokens for both themes, contrast-checked
   rangoli-figure.tsx    server-rendered SVG figure
-  splice.tsx            the algorithm running, scrubbed by scroll
-  motion.tsx            reveal / count-up / scroll progress
+  splice.tsx            the algorithm running, in the hero
+  motion.tsx            reveal, count-up, scroll progress
   theme-toggle.tsx      stateless light-dark switch
 lib/
   rangoli.ts            the curve generator, and its intermediate stages
-  rangoli.test.ts       21 tests asserting the constraint actually holds
+  rangoli.test.ts       24 tests asserting the constraint actually holds
 content/
   profile.ts            every claim the site makes, with its provenance
 data/
@@ -88,10 +86,13 @@ scripts/
 
 ### The centrepiece is the working, not the answer
 
-Scrolling the `01 — The rule` section steps through the splice: the raw tiling
-starts as a dozen separate closed loops, the largest is drawn in the accent and
-the rest in grey, and the accent visibly spreads as loops are absorbed — down to
-one unbroken stroke. `new figure` regenerates it from a fresh seed, live.
+The figure in the hero plays the splice on load rather than presenting the
+finished curve. The raw tiling starts as a dozen separate closed loops, the
+largest is drawn in the accent and the rest in grey, and the accent visibly
+spreads as loops are absorbed, down to one unbroken stroke. `replay` runs it
+again and `new figure` regenerates it from a fresh seed, live. It is not tied to
+scroll, because a reader should not have to scroll past their own introduction
+to watch it resolve.
 
 That section is progressive. The server renders the finished figure, so with
 scripting off you get the answer; JavaScript only adds the ability to watch it
@@ -105,11 +106,22 @@ Every fact in [`content/profile.ts`](content/profile.ts) carries a `source`:
 | Tag         | Meaning                                                          |
 | ----------- | ---------------------------------------------------------------- |
 | `document`  | Backed by a letter or record in the repository, and linked to it |
-| `confirmed` | Publicly checkable — a live API, a public repository             |
+| `confirmed` | Publicly checkable: a live API, a public repository              |
 | `self`      | The author's own account, written as such                        |
 
 Nothing renders without one. Claims tagged `document` show a marker on the page so
-a reader can go and check.
+a reader can go and check, and the numbers in the proof strip link straight to the
+GitHub page they come from.
+
+Anything sourced from GitHub drifts, so it gets re-read from the API rather than
+remembered. The commit count and contributor ranking were last checked on
+2026-08-16 against `/repos/{owner}/{repo}/contributors?anon=1`.
+
+The proof strip links to
+[the author-filtered commit list](https://github.com/YosemiteCrew/Yosemite-Crew/commits?author=harshitwandhare)
+rather than to the contributors graph the ranking comes from. Signed out, that
+graph renders the aggregate chart and no per-person breakdown, so a visitor
+following it would learn nothing about the person who linked it.
 
 ## Quality gates
 
@@ -120,15 +132,15 @@ CI fails on any of these, and they run on every pull request.
 | Format         | Prettier, checked not fixed                                         |
 | Lint           | ESLint, zero warnings                                               |
 | Types          | `tsc --strict`, `noUncheckedIndexedAccess`, zero `any`              |
-| Unit           | Vitest — **100% line and function coverage** on `lib/`              |
+| Unit           | Vitest, **100% line and function coverage** on `lib/`               |
 | E2E            | Playwright × Chromium, Firefox, WebKit, mobile                      |
-| Accessibility  | `@axe-core/playwright` — zero critical or serious violations        |
+| Accessibility  | `@axe-core/playwright`, zero critical or serious violations         |
 | Console        | Zero errors _and_ zero warnings in production                       |
 | No-JS          | Core content must render with scripting disabled                    |
 | Reduced motion | The finished figure must show immediately, not animate faster       |
 | Overflow       | No horizontal scroll at 375 / 768 / 1280 / 1920                     |
 | Links          | Every external URL must resolve under 400                           |
-| Bundle         | First-load JS, gzipped, from a clean install — under 160 KB         |
+| Bundle         | First-load JS, gzipped, from a clean install, under 160 KB          |
 | Lighthouse     | Performance ≥ 95 · Accessibility 100 · Best Practices 100 · SEO 100 |
 
 Measured locally against the production build:
@@ -141,7 +153,7 @@ first-load JS 146 KB gzipped of a 160 KB budget
 ### The résumé is a page, not a file
 
 `/resume` renders from the same constants the homepage does, so the two cannot
-disagree — which is the failure mode a separately-maintained PDF always eventually
+disagree, which is the failure mode a separately maintained PDF always eventually
 hits. Printing it produces the PDF, so the copy a recruiter takes is never a stale
 upload someone forgot to replace.
 
@@ -154,22 +166,23 @@ surfaces agree, and that no phone-shaped string reaches either.
 **The bundle number took four attempts to measure, and three of them were
 confidently wrong.** Kept here because the failure mode is the interesting part:
 
-1. Summing the built chunk directory — counted assets belonging to other routes.
-2. Trusting the browser's reported transfer size — made the answer depend on
+1. Summing the built chunk directory counted assets belonging to other routes.
+2. Trusting the browser's reported transfer size made the answer depend on
    whether that server compressed.
-3. Gzipping each script here instead — correct method, but measured against a
-   local `node_modules` grown by repeated `npm install` runs rather than from
-   the lockfile. It reported **69 KB** and I believed it, because it was the
-   answer I wanted.
-4. Same method after a clean `npm ci` — **146 KB**, matching CI exactly, and
-   later confirmed against the deployed site itself: Vercel serves **145.9 KB**.
+3. Gzipping each script here instead was the correct method, but it measured
+   against a local `node_modules` grown by repeated `npm install` runs rather
+   than from the lockfile. It reported **69 KB** and I believed it, because it
+   was the answer I wanted.
+4. The same method after a clean `npm ci` reported **146 KB**, matching CI
+   exactly, and later confirmed against the deployed site itself: Vercel serves
+   **145.9 KB**.
 
-A local `node_modules` grown by repeated installs still reports ~70 KB, so the
-script now says so out loud rather than letting the smaller number look like
+A local `node_modules` grown by repeated installs still reports about 70 KB, so
+the script now says so out loud rather than letting the smaller number look like
 progress.
 
-The real figure is ~146 KB, and almost all of it is React 19 plus the Next App
-Router runtime; this site's own components are a few kilobytes of it. Going
+The real figure is about 146 KB, and almost all of it is React 19 plus the Next
+App Router runtime; this site's own components are a few kilobytes of it. Going
 materially lower means dropping hydration, which is a framework choice rather
 than a tuning exercise. The budget sits at 160 KB so it still catches
 regressions in the part we control.
@@ -184,16 +197,16 @@ lattice. Tests that fake those states would assert nothing real.
 
 ## Design notes
 
-Chosen deliberately against the 2026 generated-site signature — no Inter, no
+Chosen deliberately against the 2026 generated-site signature: no Inter, no
 blue/indigo/violet, no default Tailwind scale, no glassmorphism.
 
-- **Type** — Instrument Sans for text, JetBrains Mono for every number, date and
+- **Type.** Instrument Sans for text, JetBrains Mono for every number, date and
   stack label, Newsreader for narrative. Three families, four sizes, self-hosted.
-- **Colour** — one accent, a warm orange. Nagpur is India's Orange City, which puts
+- **Colour.** One accent, a warm orange. Nagpur is India's Orange City, which puts
   the single saturated colour on the site outside the hue band every template lives
   in. Light mode is designed independently, not inverted, and both themes are
   checked to WCAG AA contrast.
-- **Motion** — the centrepiece draws itself. Everything else is a 200 ms fade and
+- **Motion.** The centrepiece draws itself. Everything else is a 200 ms fade and
   rise. No parallax, no scroll-hijacking, no cursor followers.
 
 ## Licence

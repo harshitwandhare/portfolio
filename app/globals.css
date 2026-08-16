@@ -5,8 +5,8 @@
 
    Chosen deliberately against the 2026 generated-site signature: no Inter, no
    blue/indigo/violet, no default Tailwind scale. The single accent is a warm
-   orange — Nagpur is India's Orange City, which puts the one saturated colour
-   on the site outside the 200–290° hue band that every template lives in.
+   orange. Nagpur is India's Orange City, which puts the one saturated colour
+   on the site outside the 200 to 290 degree hue band that every template lives in.
 
    Light is designed, not inverted. Both modes are checked to WCAG AA.
    ────────────────────────────────────────────────────────────────────────── */
@@ -16,7 +16,7 @@
   --font-mono: var(--font-mono-face), ui-monospace, 'SF Mono', monospace;
   --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
 
-  /* A strict modular scale — four sizes for the whole site. */
+  /* A strict modular scale: four sizes for the whole site. */
   --text-meta: 0.75rem;
   --text-meta--line-height: 1.5;
   --text-body: 1.0625rem;
@@ -107,7 +107,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Same voice, but for a sentence rather than a label — uppercasing a whole
+/* Same voice, but for a sentence rather than a label, because uppercasing a whole
    paragraph is unreadable. */
 .mono-note {
   font-family: var(--font-mono);
@@ -176,7 +176,7 @@ a {
 /* ── cursor ────────────────────────────────────────────────────────────────
    Only applied once the script has confirmed a fine pointer and no
    reduced-motion preference, so the system cursor is never hidden without a
-   working replacement. Both layers are pointer-events:none — they decorate,
+   working replacement. Both layers are pointer-events:none, so they decorate
    they never intercept a click. */
 .cursor-dot,
 .cursor-ring {
@@ -255,10 +255,10 @@ a {
   color: var(--bg);
 }
 
-/* The stroke draws itself. Honoured fully by the reduced-motion rule below —
+/* The stroke draws itself. Honoured fully by the reduced-motion rule below,
    the finished figure is shown immediately rather than the motion being
    merely shortened. */
-/* The figure draws itself. Lengths are in pathLength units — the <path> sets
+/* The figure draws itself. Lengths are in pathLength units, so the <path> sets
    pathLength="1", so 1 is the whole curve no matter its real size. */
 @keyframes draw {
   from {
@@ -292,7 +292,7 @@ a {
 
 /* ── print ─────────────────────────────────────────────────────────────────
    Printing /resume is the download. The sheet is already a single-column
-   document, so this strips the page around it and lets the browser paginate —
+   document, so this strips the page around it and lets the browser paginate,
    which keeps the PDF in step with the site instead of being a file that has
    to be regenerated and re-uploaded whenever a fact changes. */
 @media print {

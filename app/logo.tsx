@@ -4,8 +4,8 @@
 /**
  * A logo that may need a different file per theme.
  *
- * Several of these are single-colour line art — the University of Mumbai crest
- * is black, and vanishes on the dark theme — so they ship as a pair and CSS
+ * Several of these are single-colour line art. The University of Mumbai crest
+ * is black, and vanishes on the dark theme, so they ship as a pair and CSS
  * picks one. Marks that read on both backgrounds (the UTD monogram, in flame
  * orange) supply only `src` and render once.
  */

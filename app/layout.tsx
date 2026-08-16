@@ -103,7 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             sibling of main rather than nested inside it. */}
         {children}
         {/* Structured data, so a search result shows a person rather than a
-            page. Kept in sync with content/profile.ts by hand — it is small
+            page. Kept in sync with content/profile.ts by hand, because it is small
             enough that generating it would cost more than it saves. */}
         <script
           type="application/ld+json"

@@ -3,7 +3,7 @@ import { generateRangoli, type RangoliOptions } from '@/lib/rangoli'
 interface Props extends RangoliOptions {
   /**
    * Per-dot weights, row-major, matching the lattice. Where a weight is given
-   * the dot is drawn at a size proportional to it — which is how the ornament
+   * the dot is drawn at a size proportional to it, which is how the ornament
    * and the data end up being the same object.
    */
   weights?: readonly number[]
@@ -14,7 +14,7 @@ interface Props extends RangoliOptions {
   showDots?: boolean
   /**
    * Mark where the stroke begins. A rangoli is started from a single placed
-   * point — the bindu — and marking it is what makes "one line" legible rather
+   * point, the bindu, and marking it is what makes "one line" legible rather
    * than merely asserted.
    */
   showOrigin?: boolean
@@ -22,7 +22,7 @@ interface Props extends RangoliOptions {
 
 /**
  * Server-rendered. The curve is deterministic for a given seed, so it is
- * computed once at build time and shipped as plain SVG — no client JavaScript,
+ * computed once at build time and shipped as plain SVG, no client JavaScript,
  * and it still renders with scripting disabled.
  */
 export function RangoliFigure({
@@ -68,7 +68,7 @@ export function RangoliFigure({
         })}
       {/* pathLength re-scales the path to 1 unit, so the dash pattern is exact
           without anyone having to know how long the curve really is. Estimating
-          it — quarter-arcs plus straight boundary chords — under-counted, and a
+          it, quarter-arcs plus straight boundary chords, under-counted, and a
           dasharray shorter than the path leaves a gap that reads, wrongly, as
           the figure being open. */}
       <path

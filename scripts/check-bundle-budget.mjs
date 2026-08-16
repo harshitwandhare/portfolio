@@ -17,7 +17,7 @@
  * these compressed, so this is what a visitor actually downloads.
  *
  * The budget is 160 KB because ~146 KB of it is React 19 plus the Next App
- * Router client runtime, not this site's code — the app's own components are a
+ * Router client runtime, not this site's code, the app's own components are a
  * few kilobytes. It sits just above that floor so it still catches regressions
  * in what we control. Going materially below means dropping hydration, which is
  * a framework decision rather than a tuning exercise.
@@ -121,7 +121,7 @@ try {
     console.log(
       `\nnote: ${worst.toFixed(1)} KB is well under what CI and production report (~146 KB).\n` +
         '      A node_modules grown by repeated installs chunks differently from the\n' +
-        '      lockfile. Run `npm ci` before trusting a local figure — the gate in CI\n' +
+        '      lockfile. Run `npm ci` before trusting a local figure. The gate in CI\n' +
         '      is the one that matches what a visitor downloads.',
     )
   }

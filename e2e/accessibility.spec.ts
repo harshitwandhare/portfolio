@@ -9,7 +9,7 @@ for (const path of PAGES) {
       await page.goto(path)
 
       // Scroll the whole page first and let it settle. Reveal fades content in
-      // from opacity 0, and axe computes effective colour through opacity — so
+      // from opacity 0, and axe computes effective colour through opacity, so
       // auditing mid-fade reports contrast failures against a colour that only
       // exists for a few hundred milliseconds. The settled page is what a
       // reader actually sees, and it is what must pass.
