@@ -48,9 +48,9 @@ export const identity = {
 export const summary =
   'Software and product engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the highest-traffic module of a 30-engineer program ' +
-  'at Reliance Jio (top annual performance rating), then served as the sole engineer at a ' +
+  'at Reliance Jio (top annual performance rating), then was the sole engineer at a ' +
   '3-person company, building an open-source platform now past 2,000 GitHub stars. Seeking a ' +
-  'Summer 2027 software, product or AI/ML engineering internship.'
+  'Summer 2027 software, product or AI/ML internship.'
 
 export const hero = {
   // Not "shipped them alone". Owning a system end to end is the claim worth
