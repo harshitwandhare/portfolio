@@ -27,7 +27,7 @@ export const identity = {
   // Yosemite-Crew history, and the founder's letter covers the same ground
   // without depending on a profile that no longer exists.
   linkedin: 'https://linkedin.com/in/harshit-wandhare-a088201aa',
-  status: 'Open to Summer 2027 SWE and AI/ML internships',
+  status: 'Open to Summer 2027 software, product and AI/ML engineering internships',
   // Replace this file with a real headshot. See public/portrait.README.
   portrait: '/portrait.jpg',
   // No phone number, deliberately, and not merely because one was missing.
@@ -46,14 +46,17 @@ export const identity = {
  * already above the real number by the time it was printed.
  */
 export const summary =
-  'Software engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
+  'Software and product engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the highest-traffic module of a 30-engineer program ' +
-  'at Reliance Jio (top annual performance rating), then served as the sole engineer at a ' +
+  'at Reliance Jio (top annual performance rating), then was the sole engineer at a ' +
   '3-person company, building an open-source platform now past 2,000 GitHub stars. Seeking a ' +
-  'Summer 2027 software engineering or AI/ML internship.'
+  'Summer 2027 software, product or AI/ML internship.'
 
 export const hero = {
-  line: 'I build production systems end to end, and have shipped them alone.',
+  // Not "shipped them alone". Owning a system end to end is the claim worth
+  // making; "alone" invites the reader to ask whether he can work on a team,
+  // which the Jio scrum lead and the engineer he hired both answer below.
+  line: 'I own systems end to end, from the data model to the app store.',
   sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering function at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track.',
 } as const
 
@@ -87,12 +90,10 @@ export const metrics: readonly Metric[] = [
     // profile that exists. 1,394 of 28 contributor identities, and the next
     // engineer is on 1,058.
     //
-    // The link is the author-filtered commit list, not
-    // /graphs/contributors?all=1, which is the page the ranking comes from.
-    // Signed out, that graph renders the aggregate chart and no per-person
-    // list at all, so a visitor following it would see nothing about him. The
-    // commit list renders in full for everyone. A number nobody can check is
-    // worth less than a smaller one they can.
+    // The link is /graphs/contributors?all=1, not the author-filtered commit
+    // list. The claim being made is a ranking, and the graph is the only page
+    // that shows the ranking: the commit list proves the count and leaves the
+    // reader to take "most on the project" on trust.
     value: '1,394',
     label: 'commits, most on the project',
     source: 'confirmed',

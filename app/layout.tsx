@@ -24,9 +24,9 @@ const newsreader = Newsreader({
   display: 'swap',
 })
 
-const TITLE = 'Harshit Wandhare, Software Engineer'
+const TITLE = 'Harshit Wandhare, Software and Product Engineer'
 const DESCRIPTION =
-  'Software engineer. Three years shipping production web, mobile and backend at scale: ' +
+  'Software and product engineer. Three years shipping production web, mobile and backend at scale: ' +
   'enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering ' +
   'function at a three-person startup in Germany. MS Computer Science at UT Dallas.'
 
@@ -44,6 +44,8 @@ export const metadata: Metadata = {
   keywords: [
     'Harshit Wandhare',
     'software engineer',
+    'product engineer',
+    'forward deployed engineer',
     'backend engineer',
     'AI ML engineer',
     'UT Dallas',
@@ -114,7 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'Harshit Wandhare',
               url: SITE_URL,
               image: `${SITE_URL}/portrait.jpg`,
-              jobTitle: 'Software Engineer',
+              jobTitle: 'Software and Product Engineer',
               email: `mailto:${identity.email}`,
               address: {
                 '@type': 'PostalAddress',
