@@ -96,7 +96,7 @@ export const metrics: readonly Metric[] = [
     value: '1,394',
     label: 'commits, most on the project',
     source: 'confirmed',
-    href: 'https://github.com/YosemiteCrew/Yosemite-Crew/commits?author=harshitwandhare',
+    href: 'https://github.com/YosemiteCrew/Yosemite-Crew/graphs/contributors?all=1',
     note: 'Top of the contributors graph, all time',
   },
   // The only star count anywhere on the site. Job Sentinel and ATLAS are young
