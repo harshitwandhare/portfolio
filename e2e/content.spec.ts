@@ -39,12 +39,12 @@ test.describe('/', () => {
     await expect(strip.getByText('1,394')).toBeVisible()
 
     // The figure is only worth leading with if a reader can check it, so the
-    // tile is a link. It has to be the author-filtered commit list rather than
-    // the contributors graph: the graph shows a signed-out visitor no
-    // per-person breakdown, which is the reader this link exists for.
+    // tile is a link. It has to be the contributors graph rather than the
+    // author-filtered commit list: the claim is a ranking, and the graph is
+    // the only page that ranks anyone.
     await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveAttribute(
       'href',
-      /Yosemite-Crew\/commits\?author=harshitwandhare/,
+      /Yosemite-Crew\/graphs\/contributors/,
     )
   })
 

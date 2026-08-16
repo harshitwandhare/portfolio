@@ -8,7 +8,7 @@ import { generateRangoli } from '@/lib/rangoli'
  * preview is the real thing rather than a screenshot that drifts out of date.
  */
 
-export const alt = 'Harshit Wandhare, Software Engineer'
+export const alt = 'Harshit Wandhare, Software and Product Engineer'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
