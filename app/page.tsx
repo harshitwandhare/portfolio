@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Metric } from '@/content/profile'
 import {
   education,
   experience,
@@ -31,6 +32,43 @@ const HERO = { rows: 8, cols: 8, size: 56, seed: 13, pad: 34 }
 const LINK = 'text-accent underline underline-offset-4'
 const TITLE_LINK =
   'underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-accent'
+
+/**
+ * One number in the proof strip.
+ *
+ * When the metric carries an `href` the entire tile is the anchor, so the
+ * target is the size of the tile rather than the size of a word, the numbers
+ * are the first thing a reader wants to test, and hunting for a small link to
+ * do it is friction on exactly the wrong step. The `note` is what the reader
+ * will see when they land, said before they click.
+ */
+function MetricTile({ metric }: { metric: Metric }) {
+  const body = (
+    <>
+      <p className="tabular text-4xl font-medium tracking-tight md:text-5xl">
+        <CountUp value={metric.value} />
+      </p>
+      <p className="mono mt-3 text-fg-muted group-hover:text-fg">{metric.label}</p>
+      {metric.href && metric.note && (
+        <p className="mono mt-1.5 text-fg-faint group-hover:text-accent">
+          {metric.note} <span aria-hidden>-&gt;</span>
+        </p>
+      )}
+    </>
+  )
+
+  if (!metric.href) return <div className="px-2 py-10 md:px-7">{body}</div>
+
+  return (
+    <ExternalLink
+      href={metric.href}
+      aria-label={`${metric.value} ${metric.label} - verify on GitHub`}
+      className="group block px-2 py-10 transition-colors hover:bg-bg md:px-7"
+    >
+      {body}
+    </ExternalLink>
+  )
+}
 
 export default function Home() {
   return (
@@ -81,12 +119,11 @@ export default function Home() {
           <div className="mx-auto grid max-w-7xl grid-cols-2 divide-line px-6 md:grid-cols-4 md:divide-x lg:px-10">
             {metrics.map((m, i) => (
               <Reveal key={m.label} delay={i * 70}>
-                <div className="px-2 py-10 md:px-7">
-                  <p className="tabular text-4xl font-medium tracking-tight md:text-5xl">
-                    <CountUp value={m.value} />
-                  </p>
-                  <p className="mono mt-3 text-fg-muted">{m.label}</p>
-                </div>
+                {/* A number a reader can check beats a number they have to take
+                    on faith, so where the proof is a public page the whole tile
+                    is the link to it. Tiles without one stay plain rather than
+                    borrowing the affordance. */}
+                <MetricTile metric={m} />
               </Reveal>
             ))}
           </div>
