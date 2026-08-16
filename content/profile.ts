@@ -53,7 +53,10 @@ export const summary =
   'Summer 2027 software engineering or AI/ML internship.'
 
 export const hero = {
-  line: 'I build production systems end to end, and have shipped them alone.',
+  // Not "shipped them alone". Owning a system end to end is the claim worth
+  // making; "alone" invites the reader to ask whether he can work on a team,
+  // which the Jio scrum lead and the engineer he hired both answer below.
+  line: 'I own systems end to end, from the data model to the app store.',
   sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering function at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track.',
 } as const
 

@@ -63,10 +63,10 @@ export default function OpenGraphImage() {
           <span>Wandhare</span>
         </div>
         <div style={{ fontSize: 30, color: FG, marginTop: 34, lineHeight: 1.35 }}>
-          I build production systems end to end, and have shipped them alone.
+          I own systems end to end, from the data model to the app store.
         </div>
         <div style={{ fontSize: 21, color: MUTED, marginTop: 30, display: 'flex', gap: 26 }}>
-          <span>1,214 commits, #1 of 29</span>
+          <span>1,394 commits, #1 of 28</span>
           <span style={{ color: DOT }}>·</span>
           <span>100K+ users</span>
           <span style={{ color: DOT }}>·</span>
