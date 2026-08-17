@@ -104,7 +104,7 @@ export const metrics: readonly Metric[] = [
   // repos with none, and leading a panel with a zero would draw the eye
   // straight to the weakest fact on the page.
   {
-    value: '2,036',
+    value: '2,038',
     label: 'stars on that project',
     source: 'confirmed',
     // The repo home, not /stargazers: GitHub 404s the stargazers list for
@@ -135,7 +135,7 @@ export const experience: readonly Role[] = [
     org: 'Yosemite Crew · DuneXploration UG',
     title: 'Product Engineer',
     where: 'Germany · Remote',
-    from: '2025-09',
+    from: '2025-10',
     to: '2026-07',
     logo: { src: '/logos/yosemite.png', alt: 'Yosemite Crew' },
     href: 'https://www.linkedin.com/company/yosemitecrew/',
