@@ -114,14 +114,20 @@ a reader can go and check, and the numbers in the proof strip link straight to t
 GitHub page they come from.
 
 Anything sourced from GitHub drifts, so it gets re-read from the API rather than
-remembered. The commit count and contributor ranking were last checked on
-2026-08-16 against `/repos/{owner}/{repo}/contributors?anon=1`.
+remembered. The commit count and ranking were last checked on 2026-08-18 against
+`/repos/{owner}/{repo}/commits?author=<email>`, paginated: harshit 1,394,
+harshvardhan 1,058, ankit 81, all on `main`.
 
 The proof strip links to
-[the author-filtered commit list](https://github.com/YosemiteCrew/Yosemite-Crew/commits?author=harshitwandhare)
-rather than to the contributors graph the ranking comes from. Signed out, that
-graph renders the aggregate chart and no per-person breakdown, so a visitor
-following it would learn nothing about the person who linked it.
+[the commit list filtered by author email](https://github.com/YosemiteCrew/Yosemite-Crew/commits/main?author=harshit%40yosemitecrew.com)
+rather than to the contributors graph. Two reasons. Signed out, the graph renders
+the aggregate chart and no per-person breakdown, so a visitor following it would
+learn nothing about the person who linked it. More importantly, the graph only
+lists contributors whose commits currently resolve to a GitHub account, and these
+do not: the work address they were authored under is no longer verified on any
+account, so the graph omits him entirely. The author email is part of each commit
+object and cannot be reassigned, so filtering on it is stable no matter who holds
+the address. Swap the email in that URL to check anyone else's count.
 
 ## Quality gates
 
