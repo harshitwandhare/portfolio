@@ -81,30 +81,37 @@ export interface Metric {
 // grows, the star count moves both ways.
 export const metrics: readonly Metric[] = [
   {
-    // History of this number, because it has moved twice for non-obvious
-    // reasons. It was 1,268 and "#1 of 15" while the `harshit-yc` work account
-    // existed. The company deleted that account, which orphaned every commit:
-    // the count read 1,214 and he was absent from the contributors graph
-    // entirely. Verifying harshit@yosemitecrew.com on his personal account made
-    // GitHub re-attribute them retroactively, so the commits now resolve to a
-    // profile that exists. 1,394 of 28 contributor identities, and the next
-    // engineer is on 1,058.
+    // History of this number, because the attribution behind it has broken
+    // twice. It was 1,268 and "#1 of 15" while the `harshit-yc` work account
+    // existed. The company deleted that account, which orphaned every commit.
+    // Verifying harshit@yosemitecrew.com on the personal account made GitHub
+    // re-attribute them retroactively. On 2026-08-18 that email was removed
+    // again and briefly ended up verified on a colleague's account, which made
+    // these commits render under his profile; it has since been released and
+    // the email is now held by nobody.
     //
-    // The link is /graphs/contributors?all=1, not the author-filtered commit
-    // list. The claim being made is a ranking, and the graph is the only page
-    // that shows the ranking: the commit list proves the count and leaves the
-    // reader to take "most on the project" on trust.
+    // So the link is the author-filtered commit list, NOT
+    // /graphs/contributors. While the commits are unattributed the graph does
+    // not list him at all, and sending a reader there would show them a page he
+    // is absent from. The commit list is filtered on the git author *email*,
+    // which lives in the commit objects themselves and is true regardless of
+    // which GitHub account happens to hold that address. It renders his name on
+    // all 1,394 rows.
+    //
+    // Counted on `main` via /repos/.../commits?author=<email>, 2026-08-18:
+    // harshit 1,394, harshvardhan 1,058, ankit 81. The ranking is checkable by
+    // swapping the email in that URL, which is why the claim can still be made.
     value: '1,394',
     label: 'commits, most on the project',
     source: 'confirmed',
-    href: 'https://github.com/YosemiteCrew/Yosemite-Crew/graphs/contributors?all=1',
-    note: 'Top of the contributors graph, all time',
+    href: 'https://github.com/YosemiteCrew/Yosemite-Crew/commits/main?author=harshit%40yosemitecrew.com',
+    note: 'Every one of them, filtered by author email',
   },
   // The only star count anywhere on the site. Job Sentinel and ATLAS are young
   // repos with none, and leading a panel with a zero would draw the eye
   // straight to the weakest fact on the page.
   {
-    value: '2,038',
+    value: '2,034',
     label: 'stars on that project',
     source: 'confirmed',
     // The repo home, not /stargazers: GitHub 404s the stargazers list for
@@ -146,7 +153,7 @@ export const experience: readonly Role[] = [
         evidence: '/docs/lor-founder.pdf',
       },
       {
-        text: 'The #1 contributor to the project by commits, ahead of every other engineer on it, and still the top of the contributors graph after leaving.',
+        text: 'The largest contributor to the project by commits, ahead of every other engineer on it, with 1,394 against 1,058 for the next.',
         source: 'confirmed',
       },
       {
