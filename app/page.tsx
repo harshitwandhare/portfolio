@@ -13,6 +13,7 @@ import {
 } from '@/content/profile'
 import { ExternalLink } from './external-link'
 import { Logo } from './logo'
+import { ContactForm } from './contact-form'
 import { CountUp, Reveal, ScrollProgress } from './motion'
 import { RangoliFigure } from './rangoli-figure'
 import { SpliceFigure } from './splice'
@@ -440,6 +441,7 @@ export default function Home() {
                   </ExternalLink>
                 </li>
               </ul>
+              <ContactForm />
             </Reveal>
           </div>
         </section>
