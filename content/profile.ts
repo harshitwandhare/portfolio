@@ -48,16 +48,16 @@ export const identity = {
 export const summary =
   'Software and product engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the highest-traffic module of a 30-engineer program ' +
-  'at Reliance Jio (top annual performance rating), then was the sole engineer at a ' +
-  '3-person company, building an open-source platform now past 2,000 GitHub stars. Seeking a ' +
-  'Summer 2027 software, product or AI/ML internship.'
+  'at Reliance Jio (top annual rating), then owned the full stack of an open-source platform at a ' +
+  '3-person company. 7 pull requests merged into Google, AWS and Anthropic repositories. ' +
+  'Seeking a Summer 2027 software or AI/ML internship.'
 
 export const hero = {
   // Not "shipped them alone". Owning a system end to end is the claim worth
   // making; "alone" invites the reader to ask whether he can work on a team,
   // which the Jio scrum lead and the engineer he hired both answer below.
   line: 'I own systems end to end, from the data model to the app store.',
-  sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering function at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track.',
+  sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track, and sending patches to other people’s repositories most weeks.',
 } as const
 
 /** The four numbers under the hero. Each implies a different competency. */
@@ -111,7 +111,10 @@ export const metrics: readonly Metric[] = [
   // repos with none, and leading a panel with a zero would draw the eye
   // straight to the weakest fact on the page.
   {
-    value: '2,034',
+    // A floor, not a reading. This was 2,045, then 2,034, and is 2,025 today:
+    // stars move both ways and a figure printed above the real one is the worst
+    // version of a true claim. The floor stays true without maintenance.
+    value: '2,000+',
     label: 'stars on that project',
     source: 'confirmed',
     // The repo home, not /stargazers: GitHub 404s the stargazers list for
@@ -148,7 +151,10 @@ export const experience: readonly Role[] = [
     href: 'https://www.linkedin.com/company/yosemitecrew/',
     points: [
       {
-        text: 'Sole engineer-owner of an open-source veterinary practice-management system at a three-person company: architecture, web platform, mobile app, integrations, CI and release.',
+        // Not "sole engineer". A backend product engineer worked alongside him
+        // and is the 1,058 in the line below, so the honest claim is the scope
+        // he owned, not the absence of anyone else.
+        text: 'Owned the full stack of an open-source veterinary practice-management system at a three-person company: architecture, web platform, mobile app, integrations, CI and release.',
         source: 'document',
         evidence: '/docs/lor-founder.pdf',
       },
@@ -167,7 +173,10 @@ export const experience: readonly Role[] = [
         source: 'self',
       },
       {
-        text: 'Built the auth stack on AWS Cognito and Amplify Gen 2 (custom Lambda OTP triggers, WebAuthn passkeys, TOTP MFA, OAuth across Google/Apple/Facebook), then led its migration to SuperTokens.',
+        // Scoped down deliberately. Passkeys, TOTP and the SuperTokens
+        // migration were mostly the backend engineer's work; what he owns here
+        // is the Cognito sign-in and the docs the migration was built from.
+        text: 'Built sign-in on AWS Cognito and Amplify Gen 2, covering OAuth across several identity providers and email with one-time codes, and wrote the integration docs the backend engineer worked from.',
         source: 'self',
       },
       {
@@ -291,25 +300,176 @@ export const projects: readonly Project[] = [
         source: 'confirmed',
       },
       {
-        text: 'Strict static typing, 60 tests, and behavioural evals gating CI.',
+        // A floor. The suite is at 64 today and only grows, so an exact count
+        // here is a number that goes stale every time a test is added.
+        text: 'Strict static typing, 60+ tests, and behavioural evals gating CI.',
         source: 'confirmed',
       },
     ],
   },
+  // Kalki, an autonomous short-form video generator, used to sit here. It came
+  // out because its repository is private, so the card was the only one on a
+  // page built around checkable claims that a reader could not open. A card
+  // nobody can click is the weakest thing in a section called Selected work.
   {
-    name: 'Kalki',
-    blurb: 'Autonomous AI content generation.',
-    stack: ['TypeScript', 'Node.js', 'LLM APIs'],
-    // The repository is private, so no link is rendered.
-    private: true,
+    name: 'dsa-mastery',
+    blurb: 'Algorithms curriculum that runs in the browser.',
+    stack: ['Python', 'TypeScript', 'Next.js', 'Pyodide'],
+    repo: 'https://github.com/harshitwandhare/dsa-mastery',
+    live: 'https://dsa-mastery-delta.vercel.app',
+    logo: { src: '/logos/dsa-dark.svg', srcLight: '/logos/dsa-light.svg', alt: '' },
     points: [
       {
-        text: 'Generates and publishes short-form video autonomously: LLM-driven scripting, automated media processing, scheduled publishing.',
-        source: 'self',
+        text: '315 indexed problems and 75 graded drills across 29 lessons, from first principles rather than from a problem list.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Python executes in the browser in a Web Worker, with a timeout enforced by terminating the worker, since nothing else can interrupt running Python.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Every page is generated from markdown, and CI fails the build if the published output drifts from its source.',
+        source: 'confirmed',
+      },
+      {
+        text: 'A stylesheet test reads the real tokens and fails if any colour drops below WCAG AA.',
+        source: 'confirmed',
       },
     ],
   },
 ]
+
+export interface MergedPr {
+  readonly number: number
+  readonly title: string
+  /** ISO date it landed. */
+  readonly merged: string
+  readonly url: string
+  /** Set only where the change is worth calling out as more than a fix. */
+  readonly tag?: string
+}
+
+export interface Contribution {
+  /** owner/name, exactly as GitHub spells it. */
+  readonly repo: string
+  /** His merged pull requests on that repo, filtered by author. */
+  readonly href: string
+  readonly what: string
+  readonly language: string
+  readonly logo: { src: string; alt: string }
+  readonly merged: readonly MergedPr[]
+}
+
+/**
+ * Work merged into other people's repositories.
+ *
+ * This section exists because it is the only thing on the page that a stranger
+ * can verify without taking his word for anything. The Yosemite commit count
+ * needs an author-email filter to survive a broken attribution; a merged pull
+ * request in someone else's repository needs nothing. It is either there or it
+ * is not, the maintainer's name is on the merge, and the diff is public.
+ *
+ * Ordered by what was merged, not by how famous the owner is. Two more are open
+ * and are listed separately, because "open" and "merged" are different claims
+ * and collapsing them would be the whole point of the section, lost.
+ *
+ * Every URL here is checked by the link test in e2e/content.spec.ts.
+ * Verified against `gh pr list --author harshitwandhare` on 2026-09-01.
+ */
+export const openSource = {
+  since: 'August 2026',
+  mergedCount: 7,
+  method:
+    'The method does not vary. Reproduce the failure, write the test that fails first, state the broken invariant in one sentence, then send the smallest change that passes.',
+  repos: [
+    {
+      repo: 'awslabs/cli-agent-orchestrator',
+      href: 'https://github.com/awslabs/cli-agent-orchestrator/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'Multi-agent orchestration for coding CLIs, in isolated tmux sessions.',
+      language: 'Python',
+      logo: { src: '/logos/gh-awslabs.png', alt: 'awslabs on GitHub' },
+      merged: [
+        {
+          number: 656,
+          title: 'make _origin_authority total against a malformed Origin',
+          merged: '2026-08-22',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/656',
+          tag: 'security',
+        },
+        {
+          number: 658,
+          title: 'make the same-origin check scheme-aware',
+          merged: '2026-08-23',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/658',
+          tag: 'security',
+        },
+        {
+          number: 669,
+          title: 'drop the _origin_authority wrapper, document when the scheme guard applies',
+          merged: '2026-08-25',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/669',
+        },
+        {
+          number: 683,
+          title: 'wait for the server to exit before asserting the absence',
+          merged: '2026-08-26',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/683',
+          tag: 'flaky test',
+        },
+      ],
+    },
+    {
+      repo: 'google/adk-go',
+      href: 'https://github.com/google/adk-go/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'Google’s Agent Development Kit, the Go toolkit for building and deploying agents.',
+      language: 'Go',
+      logo: { src: '/logos/gh-google.png', alt: 'google on GitHub' },
+      merged: [
+        {
+          number: 1394,
+          title: 'match the copyright skip list against slash-separated paths',
+          merged: '2026-08-25',
+          url: 'https://github.com/google/adk-go/pull/1394',
+        },
+        {
+          number: 1400,
+          title: 'name the awaited event instead of panicking on a closed channel',
+          merged: '2026-08-30',
+          url: 'https://github.com/google/adk-go/pull/1400',
+          tag: 'concurrency',
+        },
+      ],
+    },
+    {
+      repo: 'anthropics/buffa',
+      href: 'https://github.com/anthropics/buffa/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'A protobuf implementation in Rust, with editions support and zero-copy views.',
+      language: 'Rust',
+      logo: { src: '/logos/gh-anthropics.png', alt: 'anthropics on GitHub' },
+      merged: [
+        {
+          number: 375,
+          title: 'qualify the core::fmt path in the generated Deserialize impl',
+          merged: '2026-08-29',
+          url: 'https://github.com/anthropics/buffa/pull/375',
+        },
+      ],
+    },
+  ] as readonly Contribution[],
+  /** In review. Kept apart from the merged list on purpose. */
+  open: [
+    {
+      repo: 'a2aproject/a2a-js',
+      title: 'expose v0.3 to v1.0 translators as a subpath export',
+      url: 'https://github.com/a2aproject/a2a-js/pull/670',
+    },
+    {
+      repo: 'NVIDIA/cosmos-framework',
+      title: 'jitter the DROID composite instead of the three full-size views',
+      url: 'https://github.com/NVIDIA/cosmos-framework/pull/219',
+    },
+  ],
+} as const
 
 /**
  * The résumé download.
@@ -478,7 +638,7 @@ export const story = [
     lat: 49.99,
     lon: 8.25,
     title: 'Three people, one engineer',
-    body: 'A German startup, and I was the entire engineering function. Architecture, the web platform, the React Native app on both stores, the FHIR data models, the auth stack, the CI, the cloud. I ran the customer interviews. I hired the engineer who came after me and wrote the specs he built against. The project is open source and I am still its largest contributor.',
+    body: 'A German startup, three people, and I owned the whole stack. Architecture, the web platform, the React Native app on both stores, the FHIR data models, the sign-in, the CI, the cloud. I ran the customer interviews. I hired the second engineer and wrote the specs he built against. The project is open source and I am still its largest contributor by commits.',
   },
   {
     year: '2026',

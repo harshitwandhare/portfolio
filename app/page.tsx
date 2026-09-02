@@ -7,6 +7,7 @@ import {
   identity,
   learning,
   metrics,
+  openSource,
   projects,
   research,
   skills,
@@ -276,10 +277,111 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── projects ───────────────────────────────────────────────────── */}
-        <section aria-labelledby="work-heading" className="border-b border-line">
+        {/* ── open source ────────────────────────────────────────────────────
+            Ahead of his own projects, deliberately. Everything in Selected work
+            is self-published: he decided it was done and he decided it was
+            good. Everything here was read by a maintainer who had no reason to
+            be kind, run through that project's CI, and merged by someone else.
+            That is a different kind of claim and it belongs first.
+
+            Laid out on the same 220px column as Experience so the page reads as
+            one document rather than a stack of unrelated blocks. */}
+        <section aria-labelledby="oss-heading" className="border-b border-line">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">03 - Selected work</p>
+            <p className="mono text-fg-faint">03 - Open source</p>
+            <h2 id="oss-heading" className="sr-only">
+              Open-source contributions
+            </h2>
+
+            <Reveal>
+              <p className="mt-8 max-w-3xl text-[length:var(--text-lede)] leading-[1.4]">
+                <strong className="font-semibold">
+                  {openSource.mergedCount} pull requests merged
+                </strong>{' '}
+                into repositories owned by Google, AWS and Anthropic since {openSource.since}, in
+                three languages, across three codebases I had never opened before.
+              </p>
+              <p className="mt-5 max-w-3xl text-fg-muted">{openSource.method}</p>
+            </Reveal>
+
+            <div className="mt-16 space-y-16">
+              {openSource.repos.map((c) => (
+                <Reveal key={c.repo}>
+                  <article className="grid gap-6 lg:grid-cols-[220px_1fr] lg:gap-14">
+                    <div>
+                      <ExternalLink
+                        href={c.href}
+                        aria-label={c.logo.alt}
+                        className="mb-4 inline-block"
+                      >
+                        <Logo src={c.logo.src} alt={c.logo.alt} height={40} />
+                      </ExternalLink>
+                      <p className="mono text-fg-muted">{c.language}</p>
+                      <p className="mono mt-1.5 text-fg-faint">{c.merged.length} merged</p>
+                    </div>
+                    <div className="border-l border-line pl-7 lg:pl-10">
+                      <h3 className="text-2xl font-semibold tracking-[-0.015em]">
+                        {/* The repo name links to his pull requests on it, not
+                            to the repo home. The claim is the work, so the link
+                            should land on the work. */}
+                        <ExternalLink href={c.href} className={TITLE_LINK}>
+                          {c.repo}
+                        </ExternalLink>
+                      </h3>
+                      <p className="mt-1.5 text-fg-muted">{c.what}</p>
+                      <ul className="mt-6 space-y-3.5">
+                        {c.merged.map((pr) => (
+                          <li
+                            key={pr.number}
+                            className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5"
+                          >
+                            {/* The number is a label, the title is the link.
+                                Doing it the other way round gave every link the
+                                accessible name "#1400", which tells a screen
+                                reader running through the links nothing at all,
+                                and needed an aria-label to paper over it. The
+                                title is already the description, so let it be
+                                the link and the target gets bigger too. */}
+                            <span className="mono shrink-0 text-fg-faint">#{pr.number}</span>
+                            <ExternalLink
+                              href={pr.url}
+                              className="text-fg-muted underline decoration-line-strong decoration-1 underline-offset-[5px] transition-colors hover:text-fg hover:decoration-accent"
+                            >
+                              {pr.title}
+                            </ExternalLink>
+                            {pr.tag && (
+                              <span className="mono border border-line-strong px-1.5 py-0.5 text-fg-faint">
+                                {pr.tag}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+
+            {/* Kept apart from the merged list. Open and merged are different
+                claims, and running them together would undo the section. */}
+            <Reveal>
+              <p className="mono mt-16 flex flex-wrap items-baseline gap-x-4 gap-y-2 border-t border-line pt-6 text-fg-faint">
+                <span>in review</span>
+                {openSource.open.map((pr) => (
+                  <ExternalLink key={pr.url} href={pr.url} className={LINK}>
+                    {pr.repo}
+                  </ExternalLink>
+                ))}
+              </p>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ── projects ───────────────────────────────────────────────────── */}
+        <section aria-labelledby="work-heading" className="border-b border-line bg-bg-sunk">
+          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+            <p className="mono text-fg-faint">04 - Selected work</p>
             <h2 id="work-heading" className="sr-only">
               Selected work
             </h2>
@@ -333,9 +435,9 @@ export default function Home() {
         </section>
 
         {/* ── research ───────────────────────────────────────────────────── */}
-        <section aria-labelledby="research-heading" className="border-b border-line bg-bg-sunk">
+        <section aria-labelledby="research-heading" className="border-b border-line">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">04 - Research</p>
+            <p className="mono text-fg-faint">05 - Research</p>
             <h2 id="research-heading" className="sr-only">
               Research
             </h2>
@@ -378,9 +480,9 @@ export default function Home() {
         </section>
 
         {/* ── skills ─────────────────────────────────────────────────────── */}
-        <section aria-labelledby="skills-heading" className="border-b border-line">
+        <section aria-labelledby="skills-heading" className="border-b border-line bg-bg-sunk">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-            <p className="mono text-fg-faint">05 - Stack</p>
+            <p className="mono text-fg-faint">06 - Stack</p>
             <h2 id="skills-heading" className="sr-only">
               Technical skills
             </h2>
@@ -409,8 +511,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── contact ────────────────────────────────────────────────────── */}
-        <section aria-labelledby="contact-heading" className="bg-bg-sunk">
+        {/* ── contact ──────────────────────────────────────────────────────
+            Plain rather than sunk: the sections alternate tone the whole way
+            down and adding Open source shifted the parity by one. */}
+        <section aria-labelledby="contact-heading">
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
             <h2 id="contact-heading" className="sr-only">
               Contact

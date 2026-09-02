@@ -37,7 +37,7 @@ const LIMITS = {
   projectBullets: 2,
   /** A bullet on the first paper only, matching the LaTeX. */
   researchBullets: [1, 0] as readonly number[],
-  /** Kalki is on the site but not the résumé, the same call the LaTeX makes. */
+  /** dsa-mastery is on the site but not the résumé, the same call the LaTeX makes. */
   projects: 2,
 } as const
 

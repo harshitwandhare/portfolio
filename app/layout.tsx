@@ -27,8 +27,9 @@ const newsreader = Newsreader({
 const TITLE = 'Harshit Wandhare, Software and Product Engineer'
 const DESCRIPTION =
   'Software and product engineer. Three years shipping production web, mobile and backend at scale: ' +
-  'enterprise platforms serving 100K+ users at Reliance Jio, then the entire engineering ' +
-  'function at a three-person startup in Germany. MS Computer Science at UT Dallas.'
+  'enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an ' +
+  'open-source platform at a three-person startup in Germany. 7 pull requests merged into Google, ' +
+  'AWS and Anthropic repositories. MS Computer Science at UT Dallas.'
 
 export const metadata: Metadata = {
   // Resolves relative Open Graph and canonical URLs against the real domain
