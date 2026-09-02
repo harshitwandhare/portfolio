@@ -89,7 +89,11 @@ export default function Home() {
             <h1 className="mt-5 text-[length:var(--text-display)] font-semibold leading-[0.96] tracking-[-0.035em]">
               <span className="block">Harshit</span> <span className="block">Wandhare</span>
             </h1>
-            <p className="mt-7 max-w-xl text-[length:var(--text-lede)] leading-[1.4]">
+            {/* Directly under the name, where a reader looks for it. Everything
+                below this answers what he has built; this answers what he is,
+                which nothing on the page said before. */}
+            <p className="mono mt-4 text-accent">{hero.role}</p>
+            <p className="mt-6 max-w-xl text-[length:var(--text-lede)] leading-[1.4]">
               {hero.line}
             </p>
             <p className="mt-5 max-w-lg text-fg-muted">{hero.sub}</p>
@@ -298,8 +302,9 @@ export default function Home() {
                 <strong className="font-semibold">
                   {openSource.mergedCount} pull requests merged
                 </strong>{' '}
-                into repositories owned by Google, AWS and Anthropic since {openSource.since}, in
-                three languages, across three codebases I had never opened before.
+                into repositories owned by Google, AWS, NVIDIA and Anthropic since{' '}
+                {openSource.since}, in three languages, across four codebases I had never opened
+                before.
               </p>
               <p className="mt-5 max-w-3xl text-fg-muted">{openSource.method}</p>
             </Reveal>
@@ -314,7 +319,12 @@ export default function Home() {
                         aria-label={c.logo.alt}
                         className="mb-4 inline-block"
                       >
-                        <Logo src={c.logo.src} alt={c.logo.alt} height={40} />
+                        <Logo
+                          src={c.logo.src}
+                          srcLight={c.logo.srcLight}
+                          alt={c.logo.alt}
+                          height={40}
+                        />
                       </ExternalLink>
                       <p className="mono text-fg-muted">{c.language}</p>
                       <p className="mono mt-1.5 text-fg-faint">{c.merged.length} merged</p>

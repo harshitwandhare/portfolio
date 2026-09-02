@@ -49,11 +49,18 @@ const LIMITS = {
  * ran 1.44 pages purely on generous margins and line height. These values match
  * the density of the LaTeX one-pager. They are named so the next person tuning
  * this can see what the knobs are instead of hunting through class strings.
+ *
+ * Leave real headroom rather than tuning until it just fits. Linux lays this
+ * sheet out about fifteen pixels taller than Windows does, a whole line of body
+ * text, so a version measured at 980 on a laptop is a version that fails in CI.
+ * That is exactly how it broke: the sheet sat at 966 locally and 981 on the
+ * runner. Aim for thirty pixels of slack and the next sentence added upstream
+ * does not take the build with it.
  */
 const T = {
-  body: 'text-[11px] leading-[1.34]',
+  body: 'text-[11px] leading-[1.3]',
   meta: 'text-[10.5px]',
-  sectionGap: 'mt-[8px]',
+  sectionGap: 'mt-[7px]',
   sectionHead: 'text-[11px]',
   entryGap: 'space-y-[5px]',
   bulletGap: 'space-y-[2px]',
