@@ -8,11 +8,12 @@ import { LIMITS } from '@/lib/contact'
  * The contact form.
  *
  * Posts to /api/contact, which sends through Resend. When that endpoint says it
- * cannot send, or the network never reaches it, the form falls back to handing
- * the message to the visitor's own mail client with everything they typed
- * already in it. The point of the fallback is that a missing key or a provider
- * outage costs the visitor one extra click instead of the message, and they
- * never see a dead end with their text trapped behind it.
+ * cannot send, or the network never reaches it, the form offers a mail link
+ * with everything they typed already composed into it. The point of the
+ * fallback is that a missing key or a provider outage costs the visitor one
+ * extra click instead of the message, and they never see a dead end with their
+ * text trapped behind it. The link is offered rather than opened, for the
+ * reason set out where it is built.
  *
  * The address stays visible above the form either way, because some people will
  * simply prefer to write the email themselves.
@@ -22,7 +23,8 @@ type State =
   | { kind: 'idle' }
   | { kind: 'sending' }
   | { kind: 'sent' }
-  | { kind: 'handed-off' }
+  /** Carries the composed mailto so the visitor can open it themselves. */
+  | { kind: 'handed-off'; mailto: string }
   | { kind: 'error'; message: string }
 
 const FIELD =
@@ -74,10 +76,28 @@ export function ContactForm() {
 
     const subject = `Portfolio message from ${payload.name}`
     const body = `${payload.message}\n\n---\n${payload.name}\n${payload.email}`
-    window.location.href =
+    const mailto =
       `mailto:${identity.email}` +
       `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setState({ kind: 'handed-off' })
+
+    // Offer the mail client. Do not open it.
+    //
+    // This used to fire the handoff itself, by assigning location.href and
+    // later by clicking a synthetic anchor, and both lose the message on any
+    // browser with no handler registered for the scheme. Such a browser does
+    // not ignore `mailto:someone@utdallas.edu?subject=...`: WebKit reads the
+    // address as userinfo and a host and navigates the tab to
+    // https://www.utdallas.edu, carrying the visitor off the site with
+    // everything they typed still in the form behind them. Losing the message
+    // is the one outcome this path exists to prevent, so it cannot be the
+    // thing the path does.
+    //
+    // Rendering a link the visitor clicks removes the failure entirely. A
+    // click they make themselves either opens their mail client or does
+    // nothing at all, the page stays up either way, the text stays in the
+    // fields, and the address is on screen for anyone who would rather write
+    // it out. It also costs the same single click the automatic version did.
+    setState({ kind: 'handed-off', mailto })
   }
 
   return (
@@ -156,7 +176,15 @@ function Status({ state }: { state: State }) {
     case 'sent':
       return <>sent. I read everything that lands here.</>
     case 'handed-off':
-      return <>opened in your mail app. if nothing happened, write to {identity.email}</>
+      return (
+        <>
+          could not reach the server.{' '}
+          <a className="text-accent underline underline-offset-4" href={state.mailto}>
+            open this in your mail app
+          </a>
+          , or write to {identity.email}
+        </>
+      )
     case 'error':
       return <>{state.message}</>
     default:

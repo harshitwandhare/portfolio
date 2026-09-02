@@ -70,12 +70,16 @@ test.describe('/', () => {
       .filter({ hasText: /^\d{2} - / })
       .allTextContents()
 
+    // Open source sits ahead of Selected work: everything in Selected work is
+    // self-published, and everything in Open source was reviewed and merged by
+    // someone with no reason to be kind.
     expect(labels).toEqual([
       '01 - Experience',
       '02 - Education',
-      '03 - Selected work',
-      '04 - Research',
-      '05 - Stack',
+      '03 - Open source',
+      '04 - Selected work',
+      '05 - Research',
+      '06 - Stack',
     ])
   })
 
@@ -154,10 +158,11 @@ test.describe('/', () => {
         throw new Error(`${href} did not respond: ${String(err).split('\n')[0]}`)
       }
 
-      // 999 is LinkedIn's response to anything that is not a browser. It is a
-      // bot block, not a broken link: real visitors get the page. Everything
-      // else must be a genuine success.
-      if (status === 999 && new URL(href).hostname.endsWith('linkedin.com')) continue
+      // LinkedIn answers automation with 999 (bot block) and, once the same
+      // run has asked a few times, 429 (slow down). Neither says anything
+      // about the link: a real visitor gets the page in both cases. Everything
+      // else, on any host, must be a genuine success.
+      if ([999, 429].includes(status) && new URL(href).hostname.endsWith('linkedin.com')) continue
       expect(status, `${href} returned ${status}`).toBeLessThan(400)
     }
   })

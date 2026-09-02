@@ -35,7 +35,18 @@ export function Reveal({
     const el = ref.current
     if (!el || usesReducedMotion()) return
 
-    // Hide only now that we know we can animate it back.
+    // Never hide something the reader can already see, or has already scrolled
+    // past. This is an entrance, and an element that is not below the fold has
+    // no entrance left to make.
+    //
+    // Without this the section is hidden here and can only be shown again by
+    // the observer, so anything already behind the reader stays blank for good.
+    // It is a race with hydration rather than a rare case: on a fast scroll the
+    // proof strip, which carries the four numbers the whole page rests on, was
+    // reliably left at opacity 0 with its markup present and invisible.
+    if (el.getBoundingClientRect().top < window.innerHeight) return
+
+    // Hide only now that we know it is below the fold and we can animate it back.
     el.style.opacity = '0'
     el.style.transform = 'translateY(14px)'
     el.style.transition = `opacity 620ms cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 620ms cubic-bezier(0.22,1,0.36,1) ${delay}ms`
