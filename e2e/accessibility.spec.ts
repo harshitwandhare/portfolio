@@ -104,8 +104,13 @@ test('renders its content with JavaScript disabled', async ({ browser }) => {
   // survive without scripting.
   await expect(page.locator('h1')).toContainText('Harshit Wandhare')
   await expect(page.locator('svg[role="img"]').first()).toBeVisible()
-  await expect(page.getByText('Product Engineer')).toBeVisible()
-  await expect(page.getByText('Software Development Engineer I')).toBeVisible()
+  // The job titles in Experience, addressed as headings. getByText takes a
+  // substring, so a bare "Product Engineer" also matches the role line under
+  // the name in the hero, and what this test means is the section below.
+  await expect(page.getByRole('heading', { name: 'Product Engineer', exact: true })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Software Development Engineer I', exact: true }),
+  ).toBeVisible()
   await context.close()
 })
 

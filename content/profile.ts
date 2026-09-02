@@ -49,15 +49,26 @@ export const summary =
   'Software and product engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the highest-traffic module of a 30-engineer program ' +
   'at Reliance Jio (top annual rating), then owned the full stack of an open-source platform at a ' +
-  '3-person company. 7 pull requests merged into Google, AWS and Anthropic repositories. ' +
+  '3-person company. 8 pull requests merged into Google, AWS, NVIDIA and Anthropic repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
 export const hero = {
+  // The role, said plainly, directly under the name.
+  //
+  // The page used to open on "I own systems end to end", which says how much of
+  // a system he takes on but never says what he is. Someone hiring a software
+  // engineer had to read three paragraphs and infer it, and the only place the
+  // job title appeared at all was the structured data, which no human sees.
+  // Machines knew and people did not, which is the wrong way round.
+  role: 'Software and product engineer',
   // Not "shipped them alone". Owning a system end to end is the claim worth
   // making; "alone" invites the reader to ask whether he can work on a team,
   // which the Jio scrum lead and the engineer he hired both answer below.
   line: 'I own systems end to end, from the data model to the app store.',
-  sub: 'Three years shipping web, mobile and backend at scale: enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas on the Intelligent Systems track, and sending patches to other people’s repositories most weeks.',
+  // Names the surfaces rather than gesturing at them. A reader hiring for the
+  // web, for mobile, for backend or for AI work should find their own words
+  // here instead of deciding it is probably not for them.
+  sub: 'Three years shipping production software: React and Next.js on the web, React Native on both app stores, Node and Python services on AWS underneath, and AI agent systems on top. Enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas, still sending patches to other people’s repositories most weeks.',
 } as const
 
 /** The four numbers under the hero. Each implies a different competency. */
@@ -356,7 +367,8 @@ export interface Contribution {
   readonly href: string
   readonly what: string
   readonly language: string
-  readonly logo: { src: string; alt: string }
+  /** `srcLight` only where the published avatar needs a second file per theme. */
+  readonly logo: { src: string; srcLight?: string; alt: string }
   readonly merged: readonly MergedPr[]
 }
 
@@ -378,7 +390,7 @@ export interface Contribution {
  */
 export const openSource = {
   since: 'August 2026',
-  mergedCount: 7,
+  mergedCount: 8,
   method:
     'The method does not vary. Reproduce the failure, write the test that fails first, state the broken invariant in one sentence, then send the smallest change that passes.',
   repos: [
@@ -455,6 +467,29 @@ export const openSource = {
         },
       ],
     },
+    {
+      repo: 'NVIDIA/cosmos-framework',
+      href: 'https://github.com/NVIDIA/cosmos-framework/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'NVIDIA’s inference and training framework for the Cosmos models.',
+      language: 'Python',
+      // The published avatar sets the wordmark in near black, which disappears
+      // on the dark theme, so it ships as a pair. Only the monochrome pixels
+      // are lifted to the page foreground; the green eye is untouched.
+      logo: {
+        src: '/logos/gh-nvidia-dark.png',
+        srcLight: '/logos/gh-nvidia-light.png',
+        alt: 'NVIDIA on GitHub',
+      },
+      merged: [
+        {
+          number: 219,
+          title: 'jitter the DROID composite instead of the three full-size views',
+          merged: '2026-09-02',
+          url: 'https://github.com/NVIDIA/cosmos-framework/pull/219',
+          tag: 'performance',
+        },
+      ],
+    },
   ] as readonly Contribution[],
   /** In review. Kept apart from the merged list on purpose. */
   open: [
@@ -464,9 +499,9 @@ export const openSource = {
       url: 'https://github.com/a2aproject/a2a-js/pull/670',
     },
     {
-      repo: 'NVIDIA/cosmos-framework',
-      title: 'jitter the DROID composite instead of the three full-size views',
-      url: 'https://github.com/NVIDIA/cosmos-framework/pull/219',
+      repo: 'awslabs/cli-agent-orchestrator',
+      title: 'keep another socket bound while asserting the lsof absence',
+      url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/716',
     },
   ],
 } as const
