@@ -46,8 +46,8 @@ export const identity = {
  * already above the real number by the time it was printed.
  */
 export const summary =
-  'Software and product engineer with 3 years shipping production systems end to end, now an M.S. Computer ' +
-  'Science student at UT Dallas. Solo-owned the highest-traffic module of a 30-engineer program ' +
+  'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
+  'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio (top annual rating), then owned the full stack of an open-source platform at a ' +
   '3-person company. 8 pull requests merged into Google, AWS, NVIDIA and Anthropic repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
