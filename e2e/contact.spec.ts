@@ -13,10 +13,15 @@ test.describe('the contact form', () => {
     await page.goto('/')
   })
 
+  // Matched exactly. getByLabel does a substring match by default, and every
+  // outbound link on the page carries an accessible name ending in "(opens in a
+  // new tab)", so a loose "name" also matched a pull request title that happened
+  // to begin with the word. The labels here are one word each, so ask for the
+  // whole word and the page is free to say what it likes.
   async function fill(page: import('@playwright/test').Page) {
-    await page.getByLabel('name').fill('Ada Lovelace')
-    await page.getByLabel('email').fill('ada@example.com')
-    await page.getByLabel('message').fill('Saw the rangoli. Lets talk.')
+    await page.getByLabel('name', { exact: true }).fill('Ada Lovelace')
+    await page.getByLabel('email', { exact: true }).fill('ada@example.com')
+    await page.getByLabel('message', { exact: true }).fill('Saw the rangoli. Lets talk.')
   }
 
   test('sends and clears once the endpoint accepts it', async ({ page }) => {
@@ -55,8 +60,21 @@ test.describe('the contact form', () => {
     await page.route('**/api/contact', (route) => route.fulfill({ status: 503, json: {} }))
 
     await fill(page)
+    const before = page.url()
     await page.getByRole('button', { name: 'send' }).click()
 
-    await expect(page.getByText(/opened in your mail app/)).toBeVisible()
+    // Offered, not opened. Firing the handoff automatically navigated the tab
+    // away on any engine with no handler for the scheme, which lost the
+    // message. So the assertions are that the page survives, the link is there
+    // with the text already composed into it, and nothing the visitor typed
+    // has gone anywhere.
+    const mail = page.getByRole('link', { name: /open this in your mail app/ })
+    await expect(mail).toBeVisible()
+    await expect(mail).toHaveAttribute('href', /^mailto:.*Saw%20the%20rangoli/)
+
+    expect(page.url(), 'the visitor must still be on the site').toBe(before)
+    await expect(page.getByLabel('message', { exact: true })).toHaveValue(
+      'Saw the rangoli. Lets talk.',
+    )
   })
 })
