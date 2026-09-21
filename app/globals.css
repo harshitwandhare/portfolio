@@ -290,6 +290,54 @@ a {
   animation: rise 0.2s ease-out both;
 }
 
+/* ── disclosure ────────────────────────────────────────────────
+   The longer pull request lists fold their older rows away behind a native
+   <details>. It costs no JavaScript, the keyboard already works, and a screen
+   reader already announces the open and closed states.
+
+   Safari will not drop the triangle for list-style alone; it needs its own
+   pseudo-element named. Both rules are here because both are needed. */
+
+.disclosure > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* A triangle of our own, in place of the one just removed. The native marker
+   is drawn differently in every browser, and without something here the label
+   reads as a caption rather than a control. It turns to point down when the
+   rows are out. */
+.disclosure > summary::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: 0.6em;
+  vertical-align: 0.05em;
+  border-left: 0.36em solid currentColor;
+  border-top: 0.26em solid transparent;
+  border-bottom: 0.26em solid transparent;
+  transition: transform 0.15s ease;
+}
+
+.disclosure[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+/* One label for each state, swapped by CSS so the markup stays static. */
+.disclosure > summary .disclosure-hide,
+.disclosure[open] > summary .disclosure-show {
+  display: none;
+}
+
+.disclosure[open] > summary .disclosure-hide {
+  display: inline;
+}
+
 /* ── print ─────────────────────────────────────────────────────────────────
    Printing /resume is the download. The sheet is already a single-column
    document, so this strips the page around it and lets the browser paginate,

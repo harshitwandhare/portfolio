@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { Metric } from '@/content/profile'
+import type { MergedPr, Metric } from '@/content/profile'
 import {
   education,
   experience,
@@ -42,6 +42,83 @@ const OSS_LANGUAGES = new Set(openSource.repos.map((repo) => repo.language)).siz
 const LINK = 'text-accent underline underline-offset-4'
 const TITLE_LINK =
   'underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-accent'
+
+/**
+ * How many merged pull requests a repository shows before the rest fold away.
+ */
+const PRS_SHOWN = 4
+
+/**
+ * Split a repository's pull requests into the ones on show and the older ones
+ * behind the disclosure, keeping both halves in the order they landed.
+ *
+ * Nothing folds unless at least two rows would go, because a control that
+ * reveals a single row costs the reader more attention than the row does.
+ */
+function splitMerged(merged: readonly MergedPr[]) {
+  if (merged.length <= PRS_SHOWN + 1) return { earlier: [], recent: merged }
+  return {
+    earlier: merged.slice(0, merged.length - PRS_SHOWN),
+    recent: merged.slice(-PRS_SHOWN),
+  }
+}
+
+function MergedRow({ pr }: { pr: MergedPr }) {
+  return (
+    <li className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+      {/* The number is a label, the title is the link. Doing it the other way
+          round gave every link the accessible name "#1400", which tells a
+          screen reader running through the links nothing at all, and needed an
+          aria-label to paper over it. The title is already the description, so
+          let it be the link and the target gets bigger too. */}
+      <span className="mono shrink-0 text-fg-faint">#{pr.number}</span>
+      <ExternalLink
+        href={pr.url}
+        className="text-fg-muted underline decoration-line-strong decoration-1 underline-offset-[5px] transition-colors hover:text-fg hover:decoration-accent"
+      >
+        {pr.title}
+      </ExternalLink>
+      {pr.tag && (
+        <span className="mono border border-line-strong px-1.5 py-0.5 text-fg-faint">{pr.tag}</span>
+      )}
+    </li>
+  )
+}
+
+/**
+ * A repository's merged pull requests, most of them anyway.
+ *
+ * The four most recent stay in view and the earlier ones sit above them inside
+ * a <details>, which keeps the list in the order the work happened while the
+ * section stays a readable length. Closed content is still in the document, so
+ * the links are still there to be crawled and the page still answers for them.
+ */
+function MergedList({ merged }: { merged: readonly MergedPr[] }) {
+  const { earlier, recent } = splitMerged(merged)
+
+  return (
+    <div className="mt-6">
+      {earlier.length > 0 && (
+        <details className="disclosure">
+          <summary className="mono mb-3.5 inline-block text-fg-faint transition-colors hover:text-accent focus-visible:text-accent">
+            <span className="disclosure-show">show {earlier.length} earlier</span>
+            <span className="disclosure-hide">hide the earlier {earlier.length}</span>
+          </summary>
+          <ul className="mb-3.5 space-y-3.5">
+            {earlier.map((pr) => (
+              <MergedRow key={pr.number} pr={pr} />
+            ))}
+          </ul>
+        </details>
+      )}
+      <ul className="space-y-3.5">
+        {recent.map((pr) => (
+          <MergedRow key={pr.number} pr={pr} />
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 /**
  * One number in the proof strip.
@@ -345,34 +422,7 @@ export default function Home() {
                         </ExternalLink>
                       </h3>
                       <p className="mt-1.5 text-fg-muted">{c.what}</p>
-                      <ul className="mt-6 space-y-3.5">
-                        {c.merged.map((pr) => (
-                          <li
-                            key={pr.number}
-                            className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5"
-                          >
-                            {/* The number is a label, the title is the link.
-                                Doing it the other way round gave every link the
-                                accessible name "#1400", which tells a screen
-                                reader running through the links nothing at all,
-                                and needed an aria-label to paper over it. The
-                                title is already the description, so let it be
-                                the link and the target gets bigger too. */}
-                            <span className="mono shrink-0 text-fg-faint">#{pr.number}</span>
-                            <ExternalLink
-                              href={pr.url}
-                              className="text-fg-muted underline decoration-line-strong decoration-1 underline-offset-[5px] transition-colors hover:text-fg hover:decoration-accent"
-                            >
-                              {pr.title}
-                            </ExternalLink>
-                            {pr.tag && (
-                              <span className="mono border border-line-strong px-1.5 py-0.5 text-fg-faint">
-                                {pr.tag}
-                              </span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
+                      <MergedList merged={c.merged} />
                     </div>
                   </article>
                 </Reveal>

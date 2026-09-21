@@ -117,9 +117,66 @@ test.describe('/', () => {
     // An em dash between clauses is one of the tells people read as machine-
     // written. The prose was rewritten rather than find-and-replaced, so this
     // guards the result: it fails on the character itself, wherever it appears.
+    // innerText skips whatever is inside a closed <details>, and the longer
+    // pull request lists keep their older rows in one, so open them all first
+    // or those titles never get read.
+    await page.evaluate(() => {
+      document.querySelectorAll('details').forEach((d) => {
+        d.open = true
+      })
+    })
+
     const text = await page.locator('body').innerText()
     const found = [...text.matchAll(/.{0,45}[—–].{0,45}/g)].map((m) => m[0].replace(/\s+/g, ' '))
     expect(found, `long dash in rendered text:\n${found.join('\n')}`).toEqual([])
+  })
+
+  test('folds the longer pull request lists without hiding them from a crawler', async ({
+    page,
+  }) => {
+    const section = page.locator('section[aria-labelledby="oss-heading"]')
+    const articles = section.locator('article')
+
+    // Every repository shows at most four rows to start with. The disclosure
+    // exists so the section stays a readable length, and that only holds if
+    // nothing has quietly grown past the limit.
+    for (const article of await articles.all()) {
+      const shown = await article.locator('ul:not(details ul) > li').count()
+      expect(shown, 'a repository is showing more rows than the limit').toBeLessThanOrEqual(4)
+    }
+
+    // A link inside a closed <details> is still in the document, which is the
+    // reason for using one rather than dropping the rows.
+    const hidden = section.locator('details a[href*="/pull/"]')
+    const hiddenCount = await hidden.count()
+    expect(hiddenCount, 'nothing is folded away, so there is nothing to test').toBeGreaterThan(0)
+    for (const href of await hidden.evaluateAll((els) =>
+      els.map((e) => (e as HTMLAnchorElement).href),
+    )) {
+      expect(href).toMatch(/^https:\/\/github\.com\/.+\/pull\/\d+$/)
+    }
+    await expect(hidden.first()).toBeHidden()
+
+    // Opening it from the keyboard alone, which is what the native element
+    // buys us over a div and a click handler.
+    const summary = section.locator('details > summary').first()
+    await expect(summary).toContainText(/show \d+ earlier/)
+    await summary.focus()
+    await page.keyboard.press('Enter')
+    await expect(hidden.first()).toBeVisible()
+    await expect(summary).toContainText(/hide the earlier \d+/)
+
+    await page.keyboard.press('Enter')
+    await expect(hidden.first()).toBeHidden()
+  })
+
+  test('leaves the short pull request lists alone', async ({ page }) => {
+    // A disclosure that reveals one row is worse than the row. Repositories at
+    // or under the limit render as a plain list.
+    const shortOnes = page.locator('section[aria-labelledby="oss-heading"] article', {
+      hasText: 'cosmos-framework',
+    })
+    await expect(shortOnes.locator('details')).toHaveCount(0)
   })
 
   test('excludes the withdrawn tooling claims', async ({ page }) => {
