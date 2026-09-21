@@ -49,7 +49,8 @@ export const summary =
   'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio (top annual rating), then owned the full stack of an open-source platform at a ' +
-  '3-person company. 8 pull requests merged into Google, AWS, NVIDIA and Anthropic repositories. ' +
+  '3-person company. 17 pull requests merged into Google, AWS, NVIDIA, Anthropic and Linux ' +
+  'Foundation repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
 export const hero = {
@@ -381,16 +382,16 @@ export interface Contribution {
  * request in someone else's repository needs nothing. It is either there or it
  * is not, the maintainer's name is on the merge, and the diff is public.
  *
- * Ordered by what was merged, not by how famous the owner is. Two more are open
- * and are listed separately, because "open" and "merged" are different claims
- * and collapsing them would be the whole point of the section, lost.
+ * Ordered by how much was merged, not by how famous the owner is. The three
+ * still in review are listed separately, because "open" and "merged" are
+ * different claims and collapsing them would lose the whole point of the
+ * section.
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
- * Verified against `gh pr list --author harshitwandhare` on 2026-09-01.
+ * Verified against `gh search prs --author harshitwandhare` on 2026-09-21.
  */
 export const openSource = {
   since: 'August 2026',
-  mergedCount: 8,
   method:
     'The method does not vary. Reproduce the failure, write the test that fails first, state the broken invariant in one sentence, then send the smallest change that passes.',
   repos: [
@@ -428,6 +429,67 @@ export const openSource = {
           url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/683',
           tag: 'flaky test',
         },
+        {
+          number: 716,
+          title: 'keep another socket bound while asserting the lsof absence',
+          merged: '2026-09-03',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/716',
+          tag: 'flaky test',
+        },
+        {
+          number: 730,
+          title: 'raise the fast-uri and qs overrides so the Security Scan passes',
+          merged: '2026-09-04',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/730',
+          tag: 'dependencies',
+        },
+        {
+          number: 769,
+          title: "enforce a profile's tools allowlist for assign and handoff",
+          merged: '2026-09-11',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/769',
+          tag: 'security',
+        },
+        {
+          number: 787,
+          title: 'honour server.mcp_request_timeout in the mcp_server helper modules',
+          merged: '2026-09-14',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/787',
+        },
+      ],
+    },
+    {
+      repo: 'anthropics/buffa',
+      href: 'https://github.com/anthropics/buffa/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'A protobuf implementation in Rust, with editions support and zero-copy views.',
+      language: 'Rust',
+      logo: { src: '/logos/gh-anthropics.png', alt: 'anthropics on GitHub' },
+      merged: [
+        {
+          number: 375,
+          title: 'qualify the core::fmt path in the generated Deserialize impl',
+          merged: '2026-08-29',
+          url: 'https://github.com/anthropics/buffa/pull/375',
+        },
+        {
+          number: 436,
+          title: 'pin bsr-quickstart to one buffa release and check it in CI',
+          merged: '2026-09-12',
+          url: 'https://github.com/anthropics/buffa/pull/436',
+        },
+        {
+          number: 438,
+          title: 'expose the pool ordinal of MessageIndex, EnumIndex and ExtensionIndex',
+          merged: '2026-09-20',
+          url: 'https://github.com/anthropics/buffa/pull/438',
+        },
+        {
+          number: 440,
+          title: 'resolve each stored field once in DynamicMessage::for_each_set',
+          merged: '2026-09-20',
+          url: 'https://github.com/anthropics/buffa/pull/440',
+          tag: 'performance',
+        },
       ],
     },
     {
@@ -450,20 +512,15 @@ export const openSource = {
           url: 'https://github.com/google/adk-go/pull/1400',
           tag: 'concurrency',
         },
-      ],
-    },
-    {
-      repo: 'anthropics/buffa',
-      href: 'https://github.com/anthropics/buffa/pulls?q=is%3Apr+author%3Aharshitwandhare',
-      what: 'A protobuf implementation in Rust, with editions support and zero-copy views.',
-      language: 'Rust',
-      logo: { src: '/logos/gh-anthropics.png', alt: 'anthropics on GitHub' },
-      merged: [
         {
-          number: 375,
-          title: 'qualify the core::fmt path in the generated Deserialize impl',
-          merged: '2026-08-29',
-          url: 'https://github.com/anthropics/buffa/pull/375',
+          // The same change as 1394, carried onto the v1 branch. Tagged rather
+          // than dropped: it is a merged pull request, and it is also not a
+          // second piece of work. A reader should be able to see both.
+          number: 1488,
+          title: 'match the copyright skip list against slash-separated paths (#1394)',
+          merged: '2026-09-03',
+          url: 'https://github.com/google/adk-go/pull/1488',
+          tag: 'v1 backport',
         },
       ],
     },
@@ -490,21 +547,49 @@ export const openSource = {
         },
       ],
     },
+    {
+      repo: 'a2aproject/a2a-js',
+      href: 'https://github.com/a2aproject/a2a-js/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'The official JavaScript SDK for the Agent2Agent protocol, which Google donated to the Linux Foundation.',
+      language: 'TypeScript',
+      logo: { src: '/logos/gh-a2aproject.png', alt: 'Agent2Agent Project on GitHub' },
+      merged: [
+        {
+          number: 729,
+          title: 'v0.3 webhooks receive the full Task, not the delta events',
+          merged: '2026-09-16',
+          url: 'https://github.com/a2aproject/a2a-js/pull/729',
+          tag: 'docs',
+        },
+      ],
+    },
   ] as readonly Contribution[],
   /** In review. Kept apart from the merged list on purpose. */
   open: [
     {
       repo: 'a2aproject/a2a-js',
-      title: 'expose v0.3 to v1.0 translators as a subpath export',
-      url: 'https://github.com/a2aproject/a2a-js/pull/670',
+      title: 'convert a v0.3 push notification body to a v1.0 StreamResponse',
+      url: 'https://github.com/a2aproject/a2a-js/pull/726',
     },
     {
-      repo: 'awslabs/cli-agent-orchestrator',
-      title: 'keep another socket bound while asserting the lsof absence',
-      url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/716',
+      repo: 'google/adk-go',
+      title: 'classify a dropped live connection by type, not error text',
+      url: 'https://github.com/google/adk-go/pull/1603',
+    },
+    {
+      repo: 'NVIDIA-NeMo/Switchyard',
+      title: 'keep foreign reasoning controls out of Responses requests',
+      url: 'https://github.com/NVIDIA-NeMo/Switchyard/pull/792',
     },
   ],
 } as const
+
+/**
+ * Counted from the list rather than kept beside it, so the headline number and
+ * the pull requests under it cannot disagree. They did: the page read 8 for
+ * three weeks after the ninth landed.
+ */
+export const mergedPrCount = openSource.repos.reduce((total, repo) => total + repo.merged.length, 0)
 
 /**
  * The résumé download.
