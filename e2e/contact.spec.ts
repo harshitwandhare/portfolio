@@ -40,7 +40,7 @@ test.describe('the contact form', () => {
       email: 'ada@example.com',
     })
     await expect(page.getByText(/^sent\./)).toBeVisible()
-    await expect(page.getByLabel('message')).toHaveValue('')
+    await expect(page.getByLabel('message', { exact: true })).toHaveValue('')
   })
 
   test('says what is wrong when the endpoint refuses it', async ({ page }) => {
@@ -53,7 +53,9 @@ test.describe('the contact form', () => {
 
     await expect(page.getByText('That is a few too many messages.')).toBeVisible()
     // The text stays put, so the visitor can wait and send the same thing again.
-    await expect(page.getByLabel('message')).toHaveValue('Saw the rangoli. Lets talk.')
+    await expect(page.getByLabel('message', { exact: true })).toHaveValue(
+      'Saw the rangoli. Lets talk.',
+    )
   })
 
   test('falls back to the mail client when the endpoint is down', async ({ page }) => {

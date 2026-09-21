@@ -6,6 +6,7 @@ import {
   hero,
   identity,
   learning,
+  mergedPrCount,
   metrics,
   openSource,
   projects,
@@ -30,6 +31,13 @@ import { SpliceFigure } from './splice'
  * that same half cell, or the bulge is cut off.
  */
 const HERO = { rows: 8, cols: 8, size: 56, seed: 13, pad: 34 }
+
+/**
+ * Counted from the data rather than written into the sentence below, which is
+ * how that sentence came to claim three languages and four codebases while the
+ * list under it had grown to four and five.
+ */
+const OSS_LANGUAGES = new Set(openSource.repos.map((repo) => repo.language)).size
 
 const LINK = 'text-accent underline underline-offset-4'
 const TITLE_LINK =
@@ -299,12 +307,10 @@ export default function Home() {
 
             <Reveal>
               <p className="mt-8 max-w-3xl text-[length:var(--text-lede)] leading-[1.4]">
-                <strong className="font-semibold">
-                  {openSource.mergedCount} pull requests merged
-                </strong>{' '}
-                into repositories owned by Google, AWS, NVIDIA and Anthropic since{' '}
-                {openSource.since}, in three languages, across four codebases I had never opened
-                before.
+                <strong className="font-semibold">{mergedPrCount} pull requests merged</strong> into
+                repositories owned by Google, AWS, NVIDIA, Anthropic and the Linux Foundation since{' '}
+                {openSource.since}, in {OSS_LANGUAGES} languages, across {openSource.repos.length}{' '}
+                codebases I had never opened before.
               </p>
               <p className="mt-5 max-w-3xl text-fg-muted">{openSource.method}</p>
             </Reveal>

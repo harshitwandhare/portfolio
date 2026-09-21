@@ -67,6 +67,24 @@ test.describe('/resume', () => {
     }
   })
 
+  test('counts the same merged pull requests in the summary as in the section', async ({
+    page,
+  }) => {
+    // The homepage counts these from the list itself, the summary paragraph
+    // spells the number out, and the two sat three apart for most of September.
+    // Nothing reads one from the other, so this is what holds them together.
+    const summary = await page.locator('#resume-sheet').innerText()
+    const claimed = /(\d+) pull requests merged/.exec(summary)
+    expect(claimed, 'the summary no longer states a merged count').not.toBeNull()
+
+    await page.goto('/')
+    const section = await page.locator('main').innerText()
+    const rendered = /(\d+) pull requests merged/.exec(section)
+    expect(rendered, 'the open source section no longer states a merged count').not.toBeNull()
+
+    expect(claimed?.[1], 'summary and open source section disagree').toBe(rendered?.[1])
+  })
+
   test('prints to a single page', async ({ page }) => {
     // US Letter at 96dpi, less the margins declared in @page. Printing lays out
     // at paper width regardless of the device, so the viewport is set to match:

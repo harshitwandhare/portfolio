@@ -135,6 +135,11 @@ test.describe('/', () => {
     // which fails the run for a reason that has nothing to do with the site.
     test.skip(testInfo.project.name !== 'chromium', 'checked once, in chromium')
 
+    // Every merged pull request adds a link, and each one is a round trip to
+    // GitHub made one at a time to stay under the rate limit. The default 30s
+    // stopped being enough somewhere around the fifteenth.
+    test.slow()
+
     const hrefs = await page
       .locator('a[href^="http"]')
       .evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).href))
