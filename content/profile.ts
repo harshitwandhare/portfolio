@@ -26,7 +26,7 @@ export const identity = {
   // 404s, so it is not linked anywhere. The commits it made are still in the
   // Yosemite-Crew history, and the founder's letter covers the same ground
   // without depending on a profile that no longer exists.
-  linkedin: 'https://linkedin.com/in/harshit-wandhare-a088201aa',
+  linkedin: 'https://linkedin.com/in/harshit-wandhare',
   status: 'Open to Summer 2027 software, product and AI/ML engineering internships',
   // Replace this file with a real headshot. See public/portrait.README.
   portrait: '/portrait.jpg',
@@ -49,7 +49,7 @@ export const summary =
   'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio (top annual rating), then owned the full stack of an open-source platform at a ' +
-  '3-person company. 19 pull requests merged into Google, AWS, NVIDIA, Anthropic and Linux ' +
+  '3-person company. 28 pull requests merged into Google, AWS, NVIDIA, Anthropic and Linux ' +
   'Foundation repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
@@ -153,6 +153,31 @@ export interface Role {
 }
 
 export const experience: readonly Role[] = [
+  {
+    org: 'UT Dallas · Office of Information Technology',
+    title: 'Student Assistant, Identity and Access Management',
+    where: 'Richardson, TX',
+    from: '2026-08',
+    to: 'Present',
+    points: [
+      {
+        text: 'Identity and access management for university-wide systems on a Python and Django stack deployed on AWS.',
+        source: 'self',
+      },
+      {
+        text: 'Designs and maintains RBAC role hierarchies and primary-permission mappings governing access across enterprise systems.',
+        source: 'self',
+      },
+      {
+        text: 'Implements row-level permissions and database-level access controls enforcing least privilege, and runs recurring audits for over-provisioned accounts and stale role assignments.',
+        source: 'self',
+      },
+      {
+        text: 'Builds reusable reference components for the internal Django platform to standardise provisioning workflows, and maintains the legacy Perl automation behind identity provisioning.',
+        source: 'self',
+      },
+    ],
+  },
   {
     org: 'Yosemite Crew · DuneXploration UG',
     title: 'Product Engineer',
@@ -388,7 +413,7 @@ export interface Contribution {
  * section.
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
- * Verified against `gh search prs --author harshitwandhare` on 2026-09-25.
+ * Verified against `gh search prs --author harshitwandhare --merged` on 2026-10-13: 28 upstream merges, 23 of them in agent frameworks.
  */
 export const openSource = {
   since: 'August 2026',
@@ -463,6 +488,50 @@ export const openSource = {
           url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/803',
           tag: 'security',
         },
+        {
+          number: 811,
+          title: "check the caller's allowlist in assign_elastic",
+          merged: '2026-09-26',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/811',
+          tag: 'security',
+        },
+        {
+          number: 816,
+          title: 'match completion markers for agent names with spaces',
+          merged: '2026-09-28',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/816',
+        },
+        {
+          number: 819,
+          title: 'retry the exit-empty set once when it reaches a dying server',
+          merged: '2026-09-28',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/819',
+        },
+        {
+          number: 831,
+          title: 'cover spaced agent names in reply extraction',
+          merged: '2026-09-29',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/831',
+          tag: 'tests',
+        },
+        {
+          number: 875,
+          title: 'advance next_run before a scheduled run can fail',
+          merged: '2026-10-04',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/875',
+        },
+        {
+          number: 876,
+          title: 'run the schedule script off the event loop',
+          merged: '2026-10-04',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/876',
+        },
+        {
+          number: 895,
+          title: 'settle a script run on its exit, not on pipe EOF',
+          merged: '2026-10-13',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/895',
+        },
       ],
     },
     {
@@ -528,6 +597,19 @@ export const openSource = {
           merged: '2026-09-03',
           url: 'https://github.com/google/adk-go/pull/1488',
           tag: 'v1 backport',
+        },
+        {
+          number: 1668,
+          title: 'make arm() force a sweep on a coarse clock',
+          merged: '2026-09-29',
+          url: 'https://github.com/google/adk-go/pull/1668',
+          tag: 'tests',
+        },
+        {
+          number: 1603,
+          title: 'classify a dropped live connection by type, not error text',
+          merged: '2026-10-06',
+          url: 'https://github.com/google/adk-go/pull/1603',
         },
       ],
     },

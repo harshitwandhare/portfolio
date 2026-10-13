@@ -137,12 +137,20 @@ test.describe('/', () => {
     const section = page.locator('section[aria-labelledby="oss-heading"]')
     const articles = section.locator('article')
 
-    // Every repository shows at most four rows to start with. The disclosure
-    // exists so the section stays a readable length, and that only holds if
-    // nothing has quietly grown past the limit.
+    // A repository that folds shows four rows. One that does not fold may show
+    // five, because splitMerged deliberately leaves a fifth row in place rather
+    // than putting a disclosure in front of a single hidden item. Asserting a
+    // flat four made the suite fail the moment a repo reached exactly five,
+    // which is the one case the component is written to allow.
     for (const article of await articles.all()) {
       const shown = await article.locator('ul:not(details ul) > li').count()
-      expect(shown, 'a repository is showing more rows than the limit').toBeLessThanOrEqual(4)
+      const folds = (await article.locator('details').count()) > 0
+      expect(
+        shown,
+        folds
+          ? 'a folding repository is showing more rows than the limit'
+          : 'an unfolded repository has grown past the point where it should fold',
+      ).toBeLessThanOrEqual(folds ? 4 : 5)
     }
 
     // A link inside a closed <details> is still in the document, which is the
