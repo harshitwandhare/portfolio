@@ -48,9 +48,8 @@ export const identity = {
 export const summary =
   'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
-  'at Reliance Jio (top annual rating), then owned the full stack of an open-source platform at a ' +
-  '3-person company. 28 pull requests merged into Google, AWS, NVIDIA, Anthropic and Linux ' +
-  'Foundation repositories. ' +
+  'at Reliance Jio, then owned the full stack of an open-source platform at a 3-person ' +
+  'company. 28 pull requests merged into Google, AWS, NVIDIA and Anthropic repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
 export const hero = {
@@ -113,26 +112,28 @@ export const metrics: readonly Metric[] = [
     // Counted on `main` via /repos/.../commits?author=<email>, 2026-08-18:
     // harshit 1,394, harshvardhan 1,058, ankit 81. The ranking is checkable by
     // swapping the email in that URL, which is why the claim can still be made.
+    //
+    // 2026-10-13: GitHub banned the repository, so every link into it now 404s
+    // for everyone, signed in or not. The count and the ranking are still true
+    // and the founder's letter covers the scope, but nothing a reader can click
+    // backs them any more, so this drops from `confirmed` to `self` and loses
+    // its link. Restore both if the repo ever comes back.
     value: '1,394',
     label: 'commits, most on the project',
-    source: 'confirmed',
-    href: 'https://github.com/YosemiteCrew/Yosemite-Crew/commits/main?author=harshit%40yosemitecrew.com',
-    note: 'Every one of them, filtered by author email',
+    source: 'self',
   },
-  // The only star count anywhere on the site. Job Sentinel and ATLAS are young
-  // repos with none, and leading a panel with a zero would draw the eye
-  // straight to the weakest fact on the page.
+  // This slot used to hold the star count on Yosemite Crew. GitHub banned that
+  // repository on 2026-10-13, so the number cannot be checked by anyone any
+  // more and a stat nobody can verify is worse than no stat. The merge record
+  // replaces it, and it is the better fact anyway: it is current, it is his
+  // own work rather than a project's popularity, and every row is one click
+  // away in somebody else's repository.
   {
-    // A floor, not a reading. This was 2,045, then 2,034, and is 2,025 today:
-    // stars move both ways and a figure printed above the real one is the worst
-    // version of a true claim. The floor stays true without maintenance.
-    value: '2,000+',
-    label: 'stars on that project',
+    value: '28',
+    label: 'merged into Google, AWS, NVIDIA and Anthropic repos',
     source: 'confirmed',
-    // The repo home, not /stargazers: GitHub 404s the stargazers list for
-    // signed-out visitors, and the count is on the repo header anyway.
-    href: 'https://github.com/YosemiteCrew/Yosemite-Crew',
-    note: 'Check it on GitHub',
+    href: 'https://github.com/search?q=is%3Apr+author%3Aharshitwandhare+is%3Amerged&type=pullrequests',
+    note: 'Open the merged list',
   },
   { value: '100K+', label: 'monthly users', source: 'self' },
   { value: 'A*', label: 'top rating, Jio', source: 'document', evidence: '/docs/jio-rating.pdf' },
@@ -160,20 +161,14 @@ export const experience: readonly Role[] = [
     from: '2026-08',
     to: 'Present',
     points: [
+      // Two bullets, not four. The résumé sheet prints this array, and the
+      // first draft of this role pushed it to 1,083px against 980px of page.
       {
-        text: 'Identity and access management for university-wide systems on a Python and Django stack deployed on AWS.',
+        text: 'Identity and access management for university-wide systems in Python and Django on AWS: RBAC role hierarchies and primary-permission mappings, row-level permissions enforcing least privilege, and recurring audits for over-provisioned accounts.',
         source: 'self',
       },
       {
-        text: 'Designs and maintains RBAC role hierarchies and primary-permission mappings governing access across enterprise systems.',
-        source: 'self',
-      },
-      {
-        text: 'Implements row-level permissions and database-level access controls enforcing least privilege, and runs recurring audits for over-provisioned accounts and stale role assignments.',
-        source: 'self',
-      },
-      {
-        text: 'Builds reusable reference components for the internal Django platform to standardise provisioning workflows, and maintains the legacy Perl automation behind identity provisioning.',
+        text: 'Builds reusable reference components for the internal Django platform, and maintains the legacy Perl automation behind identity provisioning.',
         source: 'self',
       },
     ],
@@ -204,9 +199,8 @@ export const experience: readonly Role[] = [
         source: 'document',
         evidence: '/docs/lor-founder.pdf',
       },
-      { text: 'Designed HL7/FHIR-aligned clinical data models.', source: 'self' },
       {
-        text: 'Integrated IDEXX Laboratories diagnostics and Merck Veterinary Manual APIs.',
+        text: 'Designed HL7/FHIR-aligned clinical data models, and integrated IDEXX Laboratories diagnostics and Merck Veterinary Manual APIs behind one shared adapter.',
         source: 'self',
       },
       {
@@ -217,7 +211,7 @@ export const experience: readonly Role[] = [
         source: 'self',
       },
       {
-        text: 'Owned cloud infrastructure (Lambda, S3, CloudFront, Redis) and authored the GitHub Actions estate, from CodeQL and Gitleaks to SonarCloud gates and Playwright E2E, across three codebases in a Turborepo/pnpm monorepo.',
+        text: 'Owned cloud infrastructure (Lambda, S3, CloudFront, Redis) and authored 14 GitHub Actions workflows across three codebases in a Turborepo monorepo: CodeQL, Gitleaks, SonarCloud gates and Playwright E2E.',
         source: 'self',
       },
       {
@@ -242,22 +236,13 @@ export const experience: readonly Role[] = [
         evidence: '/docs/jio-rating.pdf',
       },
       {
-        text: 'Ran daily scrum for a 30-engineer program spanning 10+ modules; solo-owned two modules end to end.',
-        source: 'self',
-      },
-      {
-        text: 'Enterprise products served 100K+ monthly active users; the larger module served 75,000+ on its own.',
+        text: 'Ran daily scrum for a 30-engineer program spanning 10+ modules, and solo-owned two of them end to end across products serving 100K+ monthly active users, the larger module 75,000+ on its own.',
         source: 'self',
       },
       {
         text: 'Designed the SDK layer for secure WebView-to-native message passing between React Native shells and embedded Angular/Next.js apps, adopted as the standard integration layer across products.',
         source: 'document',
         evidence: '/docs/lor-jio.pdf',
-      },
-      {
-        text: 'Shipped four products to production: Selfie with Modi, Namo Trending New UI, Jio CMS Strapi, and Delhi Chali Modi Ke Saath.',
-        source: 'document',
-        evidence: '/docs/jio-rating.pdf',
       },
       {
         text: 'Built an internal CMS on Next.js and Strapi; cut average page load ~40% via an Angular 17 SSR migration deployed on EC2.',

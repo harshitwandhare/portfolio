@@ -33,10 +33,27 @@ import {
  * rather than the four pages the unabridged content produces.
  */
 const LIMITS = {
-  experience: [5, 3],
-  projectBullets: 2,
+  /**
+   * One entry per role, in the order `experience` lists them: the UT Dallas
+   * identity role, Yosemite Crew, then Jio. The array held two numbers while
+   * there were two roles, so adding UT Dallas silently pushed Jio onto the
+   * `?? 4` fallback and the sheet onto a second page.
+   */
+  experience: [2, 3, 2],
+  /**
+   * One bullet per project, down from two. The third role has to come from
+   * somewhere, and a project a reader can open and run says more than its
+   * second bullet does.
+   */
+  projectBullets: 1,
   /** A bullet on the first paper only, matching the LaTeX. */
-  researchBullets: [1, 0] as readonly number[],
+  /**
+   * Titles only. The detector's numbers used to get a bullet here, but the
+   * third role needed the room and the papers are linked: a reader who cares
+   * about the mAP can open the PDF, and one who does not was skipping the line
+   * anyway.
+   */
+  researchBullets: [0, 0] as readonly number[],
   /** dsa-mastery is on the site but not the résumé, the same call the LaTeX makes. */
   projects: 2,
 } as const

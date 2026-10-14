@@ -38,16 +38,14 @@ test.describe('/', () => {
     // CountUp animates from zero, so wait for it to settle on the real figure.
     await expect(strip.getByText('1,394')).toBeVisible()
 
-    // The figure is only worth leading with if a reader can check it, so the
-    // tile is a link. It has to be the commit list filtered by author *email*,
-    // never /graphs/contributors: the graph only lists people whose commits
-    // currently resolve to a GitHub account, and these do not. The email lives
-    // in the commit objects, so that filter holds whatever happens to the
-    // account attribution.
-    await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveAttribute(
-      'href',
-      /Yosemite-Crew\/commits\/main\?author=harshit%40yosemitecrew\.com/,
-    )
+    // This tile used to link to the commit list filtered by author email.
+    // GitHub banned the repository on 2026-10-13, so that link 404s for
+    // everyone now. The claim is still true and the founder's letter covers the
+    // scope, but nothing clickable backs it, and a tile that looks checkable
+    // and lands on a 404 is worse than one that does not pretend. So the tile
+    // must not be a link, and nothing on the page may point into that repo.
+    await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveCount(0)
+    await expect(page.locator('a[href*="YosemiteCrew/Yosemite-Crew"]')).toHaveCount(0)
   })
 
   test('never shows a zero in the proof strip', async ({ page }) => {
