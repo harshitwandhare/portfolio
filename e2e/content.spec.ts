@@ -38,16 +38,14 @@ test.describe('/', () => {
     // CountUp animates from zero, so wait for it to settle on the real figure.
     await expect(strip.getByText('1,394')).toBeVisible()
 
-    // The figure is only worth leading with if a reader can check it, so the
-    // tile is a link. It has to be the commit list filtered by author *email*,
-    // never /graphs/contributors: the graph only lists people whose commits
-    // currently resolve to a GitHub account, and these do not. The email lives
-    // in the commit objects, so that filter holds whatever happens to the
-    // account attribution.
-    await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveAttribute(
-      'href',
-      /Yosemite-Crew\/commits\/main\?author=harshit%40yosemitecrew\.com/,
-    )
+    // This tile used to link to the commit list filtered by author email.
+    // GitHub banned the repository on 2026-10-13, so that link 404s for
+    // everyone now. The claim is still true and the founder's letter covers the
+    // scope, but nothing clickable backs it, and a tile that looks checkable
+    // and lands on a 404 is worse than one that does not pretend. So the tile
+    // must not be a link, and nothing on the page may point into that repo.
+    await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveCount(0)
+    await expect(page.locator('a[href*="YosemiteCrew/Yosemite-Crew"]')).toHaveCount(0)
   })
 
   test('never shows a zero in the proof strip', async ({ page }) => {
@@ -137,12 +135,20 @@ test.describe('/', () => {
     const section = page.locator('section[aria-labelledby="oss-heading"]')
     const articles = section.locator('article')
 
-    // Every repository shows at most four rows to start with. The disclosure
-    // exists so the section stays a readable length, and that only holds if
-    // nothing has quietly grown past the limit.
+    // A repository that folds shows four rows. One that does not fold may show
+    // five, because splitMerged deliberately leaves a fifth row in place rather
+    // than putting a disclosure in front of a single hidden item. Asserting a
+    // flat four made the suite fail the moment a repo reached exactly five,
+    // which is the one case the component is written to allow.
     for (const article of await articles.all()) {
       const shown = await article.locator('ul:not(details ul) > li').count()
-      expect(shown, 'a repository is showing more rows than the limit').toBeLessThanOrEqual(4)
+      const folds = (await article.locator('details').count()) > 0
+      expect(
+        shown,
+        folds
+          ? 'a folding repository is showing more rows than the limit'
+          : 'an unfolded repository has grown past the point where it should fold',
+      ).toBeLessThanOrEqual(folds ? 4 : 5)
     }
 
     // A link inside a closed <details> is still in the document, which is the
