@@ -49,7 +49,8 @@ export const summary =
   'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio, then owned the full stack of an open-source platform at a 3-person ' +
-  'company. 28 pull requests merged into Google, AWS, NVIDIA and Anthropic repositories. ' +
+  'company. 34 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
+  'Foundation repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
 export const hero = {
@@ -129,8 +130,8 @@ export const metrics: readonly Metric[] = [
   // own work rather than a project's popularity, and every row is one click
   // away in somebody else's repository.
   {
-    value: '28',
-    label: 'merged into Google, AWS, NVIDIA and Anthropic repos',
+    value: '34',
+    label: 'merged into AWS, Google, Anthropic, NVIDIA and Linux Foundation repos',
     source: 'confirmed',
     href: 'https://github.com/search?q=is%3Apr+author%3Aharshitwandhare+is%3Amerged&type=pullrequests',
     note: 'Open the merged list',
@@ -290,9 +291,9 @@ export const projects: readonly Project[] = [
       },
       { text: 'Local-first by design: no user data leaves the machine.', source: 'self' },
       {
-        // 507 collected by pytest today. Written as a floor: the old "~450"
+        // 599 collected by pytest today. Written as a floor: the old "~450"
         // counted test functions and missed every parametrised case.
-        text: '500+ tests, strict static typing, reproducible pinned builds, and CI gates for CodeQL, OpenSSF Scorecard, gitleaks, pip-audit and license compliance.',
+        text: '590+ tests, strict static typing, reproducible pinned builds, and CI gates for CodeQL, OpenSSF Scorecard, gitleaks, pip-audit and license compliance.',
         source: 'confirmed',
       },
     ],
@@ -322,9 +323,9 @@ export const projects: readonly Project[] = [
         source: 'confirmed',
       },
       {
-        // A floor. The suite is at 64 today and only grows, so an exact count
+        // A floor. The suite is at 83 today and only grows, so an exact count
         // here is a number that goes stale every time a test is added.
-        text: 'Strict static typing, 60+ tests, and behavioural evals gating CI.',
+        text: 'Strict static typing, 80+ tests, and behavioural evals gating CI.',
         source: 'confirmed',
       },
     ],
@@ -398,7 +399,9 @@ export interface Contribution {
  * section.
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
- * Verified against `gh search prs --author harshitwandhare --merged` on 2026-10-13: 28 upstream merges, 23 of them in agent frameworks.
+ * Counted per repo with `gh pr list --repo <r> --author harshitwandhare --state merged`
+ * on 2026-10-20: 34 upstream merges across six repositories. `gh search prs` is not
+ * used for this, it truncates at --limit and has under-reported two repos before.
  */
 export const openSource = {
   since: 'August 2026',
@@ -517,39 +520,25 @@ export const openSource = {
           merged: '2026-10-13',
           url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/895',
         },
-      ],
-    },
-    {
-      repo: 'anthropics/buffa',
-      href: 'https://github.com/anthropics/buffa/pulls?q=is%3Apr+author%3Aharshitwandhare',
-      what: 'A protobuf implementation in Rust, with editions support and zero-copy views.',
-      language: 'Rust',
-      logo: { src: '/logos/gh-anthropics.png', alt: 'anthropics on GitHub' },
-      merged: [
         {
-          number: 375,
-          title: 'qualify the core::fmt path in the generated Deserialize impl',
-          merged: '2026-08-29',
-          url: 'https://github.com/anthropics/buffa/pull/375',
+          number: 951,
+          title: 'keep waiting for initial delivery through a transient poll failure',
+          merged: '2026-10-17',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/951',
         },
         {
-          number: 436,
-          title: 'pin bsr-quickstart to one buffa release and check it in CI',
-          merged: '2026-09-12',
-          url: 'https://github.com/anthropics/buffa/pull/436',
+          number: 957,
+          title: 'keep the real clock for logging in the delivery-timeout test',
+          merged: '2026-10-18',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/957',
+          tag: 'flaky test',
         },
         {
-          number: 438,
-          title: 'expose the pool ordinal of MessageIndex, EnumIndex and ExtensionIndex',
-          merged: '2026-09-20',
-          url: 'https://github.com/anthropics/buffa/pull/438',
-        },
-        {
-          number: 440,
-          title: 'resolve each stored field once in DynamicMessage::for_each_set',
-          merged: '2026-09-20',
-          url: 'https://github.com/anthropics/buffa/pull/440',
-          tag: 'performance',
+          number: 956,
+          title: 'treat the reduced-motion spinner as processing',
+          merged: '2026-10-19',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/956',
+          tag: 'accessibility',
         },
       ],
     },
@@ -596,6 +585,47 @@ export const openSource = {
           merged: '2026-10-06',
           url: 'https://github.com/google/adk-go/pull/1603',
         },
+        {
+          number: 1750,
+          title: "match isResumable's doc and test table to the errors it sees",
+          merged: '2026-10-15',
+          url: 'https://github.com/google/adk-go/pull/1750',
+          tag: 'tests',
+        },
+      ],
+    },
+    {
+      repo: 'anthropics/buffa',
+      href: 'https://github.com/anthropics/buffa/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'A protobuf implementation in Rust, with editions support and zero-copy views.',
+      language: 'Rust',
+      logo: { src: '/logos/gh-anthropics.png', alt: 'anthropics on GitHub' },
+      merged: [
+        {
+          number: 375,
+          title: 'qualify the core::fmt path in the generated Deserialize impl',
+          merged: '2026-08-29',
+          url: 'https://github.com/anthropics/buffa/pull/375',
+        },
+        {
+          number: 436,
+          title: 'pin bsr-quickstart to one buffa release and check it in CI',
+          merged: '2026-09-12',
+          url: 'https://github.com/anthropics/buffa/pull/436',
+        },
+        {
+          number: 438,
+          title: 'expose the pool ordinal of MessageIndex, EnumIndex and ExtensionIndex',
+          merged: '2026-09-20',
+          url: 'https://github.com/anthropics/buffa/pull/438',
+        },
+        {
+          number: 440,
+          title: 'resolve each stored field once in DynamicMessage::for_each_set',
+          merged: '2026-09-20',
+          url: 'https://github.com/anthropics/buffa/pull/440',
+          tag: 'performance',
+        },
       ],
     },
     {
@@ -617,6 +647,33 @@ export const openSource = {
           title: 'convert a v0.3 push notification body to a v1.0 StreamResponse',
           merged: '2026-09-24',
           url: 'https://github.com/a2aproject/a2a-js/pull/726',
+        },
+        {
+          number: 770,
+          title: 'skip stream events whose payload kind is not recognised',
+          merged: '2026-10-14',
+          url: 'https://github.com/a2aproject/a2a-js/pull/770',
+        },
+      ],
+    },
+    {
+      repo: 'NVIDIA-NeMo/Switchyard',
+      href: 'https://github.com/NVIDIA-NeMo/Switchyard/pulls?q=is%3Apr+author%3Aharshitwandhare',
+      what: 'A router that puts one API in front of many inference backends.',
+      language: 'Python',
+      // NVIDIA-NeMo publishes the same avatar as NVIDIA, pixel for pixel, so it
+      // shares the pair rather than carrying a second copy of the same bytes.
+      logo: {
+        src: '/logos/gh-nvidia-dark.png',
+        srcLight: '/logos/gh-nvidia-light.png',
+        alt: 'NVIDIA-NeMo on GitHub',
+      },
+      merged: [
+        {
+          number: 964,
+          title: "don't let an exit line inside a read file fail the read",
+          merged: '2026-10-19',
+          url: 'https://github.com/NVIDIA-NeMo/Switchyard/pull/964',
         },
       ],
     },
@@ -647,19 +704,9 @@ export const openSource = {
   /** In review. Kept apart from the merged list on purpose. */
   open: [
     {
-      repo: 'google/adk-go',
-      title: 'classify a dropped live connection by type, not error text',
-      url: 'https://github.com/google/adk-go/pull/1603',
-    },
-    {
       repo: 'NVIDIA-NeMo/Switchyard',
-      title: 'keep foreign reasoning controls out of Responses requests',
-      url: 'https://github.com/NVIDIA-NeMo/Switchyard/pull/792',
-    },
-    {
-      repo: 'awslabs/cli-agent-orchestrator',
-      title: "check the caller's allowlist in assign_elastic",
-      url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/811',
+      title: 'report a dropped thinking budget on the way to Responses',
+      url: 'https://github.com/NVIDIA-NeMo/Switchyard/pull/856',
     },
   ],
 } as const
