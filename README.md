@@ -17,8 +17,8 @@ Maharashtra. Lay a square lattice of equidistant dots, then join dot to dot with
 straight lines until the geometry closes into a motif. The dots are scaffolding:
 by the time it is finished they are under the design.
 
-An earlier version of this file was not exact about that. The southern *sikku
-kolam* draws one continuous curve that loops **around** the dots and never
+An earlier version of this file was not exact about that. The southern _sikku
+kolam_ draws one continuous curve that loops **around** the dots and never
 touches them, while the Maharashtrian line is straight and lands **on** them.
 This site implemented the first and called it the second.
 
