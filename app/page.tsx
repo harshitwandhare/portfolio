@@ -146,11 +146,29 @@ function MetricTile({ metric }: { metric: Metric }) {
 
   if (!metric.href) return <div className="px-2 py-10 md:px-7">{body}</div>
 
+  const tile = 'group block px-2 py-10 transition-colors hover:bg-bg md:px-7'
+
+  // A metric whose proof is further down this page, rather than on someone
+  // else's site. Opening the merged pull requests in a new tab sent the reader
+  // to a GitHub search that answers to its own filters; the rows below are the
+  // same claim, already broken out per repository.
+  if (metric.href.startsWith('#')) {
+    return (
+      <a
+        href={metric.href}
+        aria-label={`${metric.value} ${metric.label} - see them listed below`}
+        className={tile}
+      >
+        {body}
+      </a>
+    )
+  }
+
   return (
     <ExternalLink
       href={metric.href}
       aria-label={`${metric.value} ${metric.label} - verify on GitHub`}
-      className="group block px-2 py-10 transition-colors hover:bg-bg md:px-7"
+      className={tile}
     >
       {body}
     </ExternalLink>
@@ -375,7 +393,11 @@ export default function Home() {
 
             Laid out on the same 220px column as Experience so the page reads as
             one document rather than a stack of unrelated blocks. */}
-        <section aria-labelledby="oss-heading" className="border-b border-line">
+        <section
+          id="open-source"
+          aria-labelledby="oss-heading"
+          className="scroll-mt-14 border-b border-line"
+        >
           <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
             <p className="mono text-fg-faint">03 - Open source</p>
             <h2 id="oss-heading" className="sr-only">
@@ -451,7 +473,10 @@ export default function Home() {
             <h2 id="work-heading" className="sr-only">
               Selected work
             </h2>
-            <div className="mt-14 grid gap-px bg-line md:grid-cols-3">
+            {/* Two across, not three. With four projects a third column leaves
+                the last card alone beside two empty cells, and the wider card
+                suits a list of five bullets better than a narrow one. */}
+            <div className="mt-14 grid gap-px bg-line md:grid-cols-2">
               {projects.map((p, i) => (
                 <Reveal key={p.name} delay={i * 90} className="bg-bg">
                   <article className="flex h-full flex-col p-8">
