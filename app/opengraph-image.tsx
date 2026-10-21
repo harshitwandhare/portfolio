@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { generateRangoli } from '@/lib/rangoli'
+import { generateTipkyanchi } from '@/lib/tipkyanchi'
 
 /**
  * The card that appears when the link is pasted into Slack, LinkedIn or a DM.
@@ -19,16 +19,18 @@ const ACCENT = '#f2a25c'
 const DOT = '#35322f'
 
 export default function OpenGraphImage() {
-  const r = generateRangoli({ rows: 5, cols: 5, size: 84, seed: 23, pad: 50 })
+  const r = generateTipkyanchi({ n: 7, size: 76, pad: 50, seed: 6, strokes: 6 })
 
   // Satori does not run our CSS, so the figure is inlined as an SVG data URI.
   const svg = [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${r.width} ${r.height}" width="${r.width}" height="${r.height}">`,
-    r.dots.map((d) => `<circle cx="${d[0]}" cy="${d[1]}" r="3.4" fill="${DOT}"/>`).join(''),
-    `<path d="${r.path}" fill="none" stroke="${ACCENT}" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>`,
-    r.stroke[0]
-      ? `<circle cx="${r.stroke[0].from[0]}" cy="${r.stroke[0].from[1]}" r="7" fill="${ACCENT}"/>`
-      : '',
+    r.dots.map((d) => `<circle cx="${d.x}" cy="${d.y}" r="3.4" fill="${DOT}"/>`).join(''),
+    r.segments
+      .map(
+        (l) =>
+          `<line x1="${l.x1}" y1="${l.y1}" x2="${l.x2}" y2="${l.y2}" stroke="${ACCENT}" stroke-width="4.2" stroke-linecap="round"/>`,
+      )
+      .join(''),
     `</svg>`,
   ].join('')
 

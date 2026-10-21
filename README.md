@@ -12,37 +12,44 @@ twenty-second skim and an engineer's twenty-minute one.
 
 ## The idea
 
-A **tipkyanchi rangoli** is the dot-grid form drawn on doorsteps across Maharashtra:
-lay a lattice of equidistant dots, then draw a line that goes _around_ every dot,
-never through one, never crossing itself, closing where it began.
+A **tipkyanchi rangoli** is the dotted form drawn on doorsteps across
+Maharashtra. Lay a square lattice of equidistant dots, then join dot to dot with
+straight lines until the geometry closes into a motif. The dots are scaffolding:
+by the time it is finished they are under the design.
 
-That is not a decoration. It is a constraint, and it is solvable.
+An earlier version of this file was not exact about that. The southern *sikku
+kolam* draws one continuous curve that loops **around** the dots and never
+touches them, while the Maharashtrian line is straight and lands **on** them.
+This site implemented the first and called it the second.
 
-The figure on the site is the solution. It is computed at build time, shipped as
-static SVG, and drawn over the author's real GitHub contribution history, so the
-ornament and the data are the same object.
+Symmetry is what turns the strokes into a motif. A rangoli is drawn one wedge at
+a time and repeated around the centre, so the eighth drawn first decides the
+whole figure. That is the rule, and it is checkable:
 
 ```
-lay a lattice          ->  every cell gets one of two tiles, each a pair of
-                           quarter-arcs centred on opposite corners
+choose strokes         ->  only inside one eighth of the square, the wedge
+                           0 <= v <= u measured from the centre dot
 
-count the loops        ->  every arc endpoint lands on a shared edge midpoint, so
-                           every midpoint has degree two. The arcs can only form
-                           closed loops, never a dangling end and never a crossing
+repeat them round      ->  close that set under the eight symmetries of the
+                           square: four rotations and four reflections
 
-splice them            ->  flipping one tile rewires exactly the two arcs inside
-                           that cell. If they belonged to different loops, the flip
-                           joins those loops into one
+drop the loose ends    ->  remove every stroke with a free end, and repeat.
+                           A rangoli closes; a stroke ending in mid-air is an
+                           unfinished drawing
 
-repeat                 ->  until a single unbroken stroke is left
+grow until it is whole ->  keep feeding in strokes until what survives is a
+                           single connected figure
 ```
 
-The implementation is [`lib/rangoli.ts`](lib/rangoli.ts). It is deterministic, so
-the same seed gives the same figure, which is why the centrepiece can be rendered
-on the server and cost the browser nothing.
+The implementation is [`lib/tipkyanchi.ts`](lib/tipkyanchi.ts). It is
+deterministic, so the same seed gives the same figure, which is why the
+centrepiece is rendered on the server and costs the browser no JavaScript at
+all.
 
-`flips === loops - 1` on every input tested, which is the optimal number of
-splices. That property is asserted in the test suite rather than assumed.
+The symmetry is asserted rather than assumed: the suite applies each of the
+eight symmetries to the finished figure and compares the edge set to itself, and
+separately checks that no dot is left carrying a single stroke. Pruning cannot
+break the symmetry, because degree is constant across a symmetry orbit.
 
 ## Running it
 
@@ -68,17 +75,15 @@ app/
   resume/               the résumé, as a document that prints to PDF
   layout.tsx            fonts, theme bootstrap, skip link
   globals.css           design tokens for both themes, contrast-checked
-  rangoli-figure.tsx    server-rendered SVG figure
-  splice.tsx            the algorithm running, in the hero
+  tipkyanchi-figure.tsx server-rendered SVG figure, drawn by CSS
+  rangoli-player.tsx    replay and reseed, the only script the hero needs
   motion.tsx            reveal, count-up, scroll progress
   theme-toggle.tsx      stateless light-dark switch
 lib/
-  rangoli.ts            the curve generator, and its intermediate stages
-  rangoli.test.ts       24 tests asserting the constraint actually holds
+  tipkyanchi.ts         the figure generator
+  tipkyanchi.test.ts    68 tests asserting the symmetry actually holds
 content/
   profile.ts            every claim the site makes, with its provenance
-data/
-  contributions.json    real contribution calendar, fetched from the GitHub API
 e2e/                    accessibility and content guards
 scripts/
   check-bundle-budget.mjs   measures first-load JS in a real browser
@@ -86,18 +91,17 @@ scripts/
 
 ### The centrepiece is the working, not the answer
 
-The figure in the hero plays the splice on load rather than presenting the
-finished curve. The raw tiling starts as a dozen separate closed loops, the
-largest is drawn in the accent and the rest in grey, and the accent visibly
-spreads as loops are absorbed, down to one unbroken stroke. `replay` runs it
-again and `new figure` regenerates it from a fresh seed, live. It is not tied to
+The hero draws the rangoli in the order a hand would make it. The wedge the seed
+chose goes down first, then its seven repeats around the centre, so what you
+watch is one eighth of a decision becoming the whole figure. It is not tied to
 scroll, because a reader should not have to scroll past their own introduction
 to watch it resolve.
 
-That section is progressive. The server renders the finished figure, so with
-scripting off you get the answer; JavaScript only adds the ability to watch it
-being derived. Under `prefers-reduced-motion` it holds the finished figure
-rather than animating faster.
+The drawing is CSS, not script: each of the eight passes is one group with its
+own animation delay. The server renders the finished figure, so with scripting
+off you get the answer, and `draw it again` and `another rangoli` are the only
+things JavaScript adds. Under `prefers-reduced-motion` it holds the finished
+figure rather than animating faster.
 
 ### Content has provenance, not vibes
 

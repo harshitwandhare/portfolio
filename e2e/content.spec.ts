@@ -10,10 +10,9 @@ test.describe('/', () => {
     await page.goto('/')
   })
 
-  test('states the figure is a single closed stroke', async ({ page }) => {
-    // The whole claim rests on the hero figure being one line, not a pattern.
-    await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
-    await expect(page.getByText(/never through one, never crossing, closed/)).toBeVisible()
+  test('says what the figure is, and draws that', async ({ page }) => {
+    await expect(page.getByText(/one eighth is chosen/)).toBeVisible()
+    await expect(page.locator('[data-rangoli] svg line').first()).toBeAttached()
   })
 
   test('is indexable and describes itself for a search result', async ({ page }) => {
@@ -50,8 +49,7 @@ test.describe('/', () => {
 
   test('never shows a zero in the proof strip', async ({ page }) => {
     // Job Sentinel and ATLAS have no stars; a panel reading "0" would put the
-    // weakest fact on the page in the largest type. Scoped to the strip: the
-    // splice panel legitimately starts at zero flips applied.
+    // weakest fact on the page in the largest type.
     const strip = page.locator('section').nth(1)
     await expect(strip.getByText('commits, most on the project')).toBeVisible()
     for (const value of await strip.locator('.tabular').allTextContents()) {
@@ -237,46 +235,94 @@ test.describe('/', () => {
 })
 
 test.describe('the hero figure', () => {
-  test('plays the splice down to exactly one unbroken stroke', async ({ page }) => {
-    await page.goto('/')
-    const counter = page.locator('[data-loop-count]')
-    await expect(counter).toBeVisible()
+  /** Every stroke, as endpoint pairs in the SVG's own coordinates. */
+  const strokes = (page: import('@playwright/test').Page) =>
+    page.locator('[data-rangoli] svg line').evaluateAll((els) =>
+      els.map((el) => {
+        const n = (a: string) => Number.parseFloat(el.getAttribute(a) ?? 'NaN')
+        return [n('x1'), n('y1'), n('x2'), n('y2')] as [number, number, number, number]
+      }),
+    )
 
-    // It plays on its own. The claim the whole page rests on is that it ends
-    // on one, so wait for that rather than for a fixed duration.
-    await expect(counter).toHaveText('1', { timeout: 20_000 })
-    await expect(page.getByText('unbroken stroke')).toBeVisible()
+  test('joins the dots rather than looping around them', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('[data-rangoli] svg line').first()).toBeAttached()
+
+    // This is the whole correction. A Maharashtrian rangoli lands on the dots;
+    // the southern kolam curves around them and touches none. So every stroke
+    // must be a straight line whose ends sit exactly on lattice dots.
+    const dots = await page
+      .locator('[data-rangoli] svg circle')
+      .evaluateAll((els) => els.map((el) => `${el.getAttribute('cx')},${el.getAttribute('cy')}`))
+    expect(dots.length, 'the lattice must be drawn').toBeGreaterThan(0)
+
+    const lines = await strokes(page)
+    expect(lines.length).toBeGreaterThan(0)
+    for (const [x1, y1, x2, y2] of lines) {
+      expect(dots).toContain(`${x1},${y1}`)
+      expect(dots).toContain(`${x2},${y2}`)
+    }
+
+    // And no curves anywhere in the figure.
+    expect(await page.locator('[data-rangoli] svg path').count()).toBe(0)
   })
 
-  test('draws a closed path with no gap left by a short dash pattern', async ({ page }) => {
+  test('is unchanged by all eight symmetries of the square', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
+    await expect(page.locator('[data-rangoli] svg line').first()).toBeAttached()
 
-    const closed = await page
-      .locator('[data-splice] path')
-      .first()
-      .evaluate((el) => {
-        const path = el as unknown as SVGPathElement
-        const d = path.getAttribute('d') ?? ''
-        const style = getComputedStyle(el)
-        const dash = style.strokeDasharray
-        // Either no dash pattern at all, or one long enough to cover the path.
-        const covered =
-          dash === 'none' ||
-          dash === '' ||
-          Number.parseFloat(dash) >= path.getTotalLength() - 1 ||
-          // pathLength normalises the curve to 1 unit.
-          (path.hasAttribute('pathLength') && Number.parseFloat(dash) >= 1)
-        return { endsWithZ: d.trim().endsWith('Z'), covered }
-      })
+    const lines = await strokes(page)
+    const box = await page
+      .locator('[data-rangoli] svg')
+      .getAttribute('viewBox')
+      .then((v) => (v ?? '0 0 0 0').split(' ').map(Number))
+    const c = (box[2] ?? 0) / 2
 
-    expect(closed.endsWithZ, 'path data must close with Z').toBe(true)
-    expect(closed.covered, 'dash pattern must cover the whole path').toBe(true)
+    const round = (v: number) => Math.round(v * 100) / 100
+    const asKey = (a: [number, number], b: [number, number]) =>
+      [`${round(a[0])},${round(a[1])}`, `${round(b[0])},${round(b[1])}`].sort().join('|')
+
+    const maps: ((p: [number, number]) => [number, number])[] = [
+      ([u, v]) => [u, v],
+      ([u, v]) => [-v, u],
+      ([u, v]) => [-u, -v],
+      ([u, v]) => [v, -u],
+      ([u, v]) => [-u, v],
+      ([u, v]) => [u, -v],
+      ([u, v]) => [v, u],
+      ([u, v]) => [-v, -u],
+    ]
+
+    const centred = lines.map(
+      ([x1, y1, x2, y2]) =>
+        [
+          [x1 - c, y1 - c],
+          [x2 - c, y2 - c],
+        ] as [[number, number], [number, number]],
+    )
+    const original = new Set(centred.map(([a, b]) => asKey(a, b)))
+
+    for (const [i, f] of maps.entries()) {
+      const image = new Set(centred.map(([a, b]) => asKey(f(a), f(b))))
+      expect(image, `symmetry ${i} must map the figure onto itself`).toEqual(original)
+    }
   })
 
-  test('never resizes while it plays, replays or reseeds', async ({ page }) => {
+  test('leaves no stroke ending in mid-air', async ({ page }) => {
     await page.goto('/')
-    const svg = page.locator('[data-splice] svg')
+    await expect(page.locator('[data-rangoli] svg line').first()).toBeAttached()
+
+    const degree = new Map<string, number>()
+    for (const [x1, y1, x2, y2] of await strokes(page)) {
+      for (const k of [`${x1},${y1}`, `${x2},${y2}`]) degree.set(k, (degree.get(k) ?? 0) + 1)
+    }
+    expect(degree.size).toBeGreaterThan(0)
+    for (const [at, d] of degree) expect(d, `dot ${at} carries one stroke`).toBeGreaterThan(1)
+  })
+
+  test('never resizes while it draws, replays or reseeds', async ({ page }) => {
+    await page.goto('/')
+    const svg = page.locator('[data-rangoli] svg')
     await expect(svg).toBeVisible()
 
     const box = async () => {
@@ -285,23 +331,20 @@ test.describe('the hero figure', () => {
       return `${Math.round(b.width)}x${Math.round(b.height)}`
     }
 
-    // Sampled across the whole animation. The figure used to size to its own
-    // caption, so the label changing from "separate loops" to "unbroken
-    // stroke" resized the SVG by 12% part-way through.
     const first = await box()
     const seen = new Set([first])
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 10; i++) {
       await page.waitForTimeout(220)
       seen.add(await box())
     }
 
-    await page.getByRole('button', { name: 'replay' }).click()
+    await page.getByRole('button', { name: 'draw it again' }).click()
     for (let i = 0; i < 6; i++) {
       await page.waitForTimeout(220)
       seen.add(await box())
     }
 
-    await page.getByRole('button', { name: 'new figure' }).click()
+    await page.getByRole('button', { name: 'another rangoli' }).click()
     for (let i = 0; i < 6; i++) {
       await page.waitForTimeout(220)
       seen.add(await box())
@@ -310,21 +353,19 @@ test.describe('the hero figure', () => {
     expect([...seen], 'the figure must hold one size throughout').toEqual([first])
   })
 
-  test('regenerates a different figure on demand', async ({ page }) => {
+  test('draws a different rangoli on demand', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('[data-loop-count]')).toHaveText('1', { timeout: 20_000 })
+    await expect(page.locator('[data-rangoli] svg line').first()).toBeAttached()
 
-    // Compare the whole figure, not one loop: two different tilings can share
-    // their largest loop by coincidence.
-    const shape = () =>
-      page
-        .locator('[data-splice] path')
-        .evaluateAll((els) => els.map((e) => e.getAttribute('d')).join('|'))
-
+    const shape = async () =>
+      (await strokes(page))
+        .map((l) => l.join(','))
+        .sort()
+        .join('|')
     const before = await shape()
     expect(before.length).toBeGreaterThan(0)
 
-    await page.getByRole('button', { name: 'new figure' }).click()
+    await page.getByRole('button', { name: 'another rangoli' }).click()
     await expect.poll(shape, { timeout: 20_000 }).not.toBe(before)
   })
 })
