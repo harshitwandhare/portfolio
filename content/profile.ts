@@ -166,6 +166,11 @@ export const experience: readonly Role[] = [
     where: 'Richardson, TX',
     from: '2026-08',
     to: 'Present',
+    // The same mark the education section uses. It is an opaque white tile
+    // with the monogram on it, so it needs no light and dark pair.
+    logo: { src: '/logos/utd.png', alt: 'The University of Texas at Dallas' },
+    // The office he actually works in, rather than the university front page.
+    href: 'https://oit.utdallas.edu',
     points: [
       // Two bullets, not four. The résumé sheet prints this array, and the
       // first draft of this role pushed it to 1,083px against 980px of page.
