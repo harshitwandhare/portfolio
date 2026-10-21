@@ -133,8 +133,13 @@ export const metrics: readonly Metric[] = [
     value: '34',
     label: 'merged into AWS, Google, Anthropic, NVIDIA and Linux Foundation repos',
     source: 'confirmed',
-    href: 'https://github.com/search?q=is%3Apr+author%3Aharshitwandhare+is%3Amerged&type=pullrequests',
-    note: 'Open the merged list',
+    // Was a GitHub search URL. Signed out, that page answers to its own
+    // filters rather than to the number beside it, so it could show a reader
+    // something other than his merged work. The section below is the same
+    // claim broken out per repository, and every row there links to the pull
+    // request itself.
+    href: '#open-source',
+    note: 'See all 34, repo by repo',
   },
   { value: '100K+', label: 'monthly users', source: 'self' },
   { value: 'A*', label: 'top rating, Jio', source: 'document', evidence: '/docs/jio-rating.pdf' },
@@ -330,10 +335,42 @@ export const projects: readonly Project[] = [
       },
     ],
   },
-  // Kalki, an autonomous short-form video generator, used to sit here. It came
-  // out because its repository is private, so the card was the only one on a
-  // page built around checkable claims that a reader could not open. A card
-  // nobody can click is the weakest thing in a section called Selected work.
+  // Kalki came out of this list while its repository was private, because a
+  // card nobody can open is the weakest thing in a section called Selected
+  // work. It was open sourced on 2026-10-19, so it goes back in, and the
+  // repository, the running site and the releases are all public now.
+  {
+    name: 'Kalki',
+    blurb: 'AI short-video studio, idea to finished vertical video.',
+    stack: ['TypeScript', 'Next.js', 'LangGraph', 'Prisma', 'PostgreSQL'],
+    repo: 'https://github.com/harshitwandhare/kalki',
+    live: 'https://kalki-studio.vercel.app',
+    logo: { src: '/logos/kalki-dark.svg', srcLight: '/logos/kalki-light.svg', alt: '' },
+    points: [
+      {
+        text: 'A LangGraph state machine carries one prompt through script, images, animation, voiceover and post-production, streaming each phase to the browser as it lands.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Generation is split across the model best at each step: Gemini 2.5 Pro writes, Stability draws, Seedance and Kling animate, ElevenLabs speaks, and ffmpeg cuts.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Publishing presets for eight platforms carry each one’s caption and hashtag limits alongside where its AI disclosure has to be set.',
+        source: 'confirmed',
+      },
+      {
+        // The honest version of why this repository could be published at all.
+        // The removed features are named in the commit that removed them.
+        text: 'Open sourced only after the account-farming and detection-evasion code came out, and a policy test now fails the build if any of it returns.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Every API route is role-gated in code by a shared guard, never by the client.',
+        source: 'confirmed',
+      },
+    ],
+  },
   {
     name: 'dsa-mastery',
     blurb: 'Algorithms curriculum that runs in the browser.',

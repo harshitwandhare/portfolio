@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="kalki-eye-light">
+      <rect width="64" height="64" fill="#fff"/>
+      <path d="M32 5 C51.5 14.72 51.5 49.28 32 59 C12.5 49.28 12.5 14.72 32 5Z" fill="#000"/>
+    </mask>
+  </defs>
+  <g fill="#18181b" mask="url(#kalki-eye-light)">
+    <rect x="4" y="19.5" width="56" height="5" rx="2.5"/>
+    <rect x="4" y="29.5" width="56" height="5" rx="2.5"/>
+    <rect x="4" y="39.5" width="56" height="5" rx="2.5"/>
+  </g>
+  <path fill="#18181b" fill-rule="evenodd" d="M32 9 C47 17.28 47 46.72 32 55 C17 46.72 17 17.28 32 9Z M32 14 C42.5 20.48 42.5 43.52 32 50 C21.5 43.52 21.5 20.48 32 14Z"/>
+  <circle cx="32" cy="32" r="5.5" fill="#18181b"/>
+</svg>
