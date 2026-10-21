@@ -275,6 +275,34 @@ a {
   animation: draw 4.5s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 
+/* One of the eight passes of the rangoli. Each group carries its own delay,
+   so the wedge lands first and its repeats follow it around the centre. */
+.rangoli-pass line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw var(--rangoli-pace, 0.55s) cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: inherit;
+  animation-duration: inherit;
+}
+
+/* The dots recede under the design, the way the powder does, but they do not
+   leave. The lattice is what makes this a dotted rangoli rather than any other
+   kind, and --dot sits close to the page already, so anything under about 0.7
+   erases it outright. */
+.rangoli-dots {
+  animation: settle 2.8s ease-out forwards;
+}
+
+@keyframes settle {
+  0%,
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.72;
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -406,5 +434,12 @@ a {
   }
   .stroke-draw {
     stroke-dashoffset: 0;
+  }
+  /* Hold the finished figure rather than drawing it fast. */
+  .rangoli-pass line {
+    stroke-dashoffset: 0;
+  }
+  .rangoli-dots {
+    opacity: 0.72;
   }
 }

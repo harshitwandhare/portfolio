@@ -17,8 +17,8 @@ import { ExternalLink } from './external-link'
 import { Logo } from './logo'
 import { ContactForm } from './contact-form'
 import { CountUp, Reveal, ScrollProgress } from './motion'
-import { RangoliFigure } from './rangoli-figure'
-import { SpliceFigure } from './splice'
+import { RangoliPlayer } from './rangoli-player'
+import { TipkyanchiFigure } from './tipkyanchi-figure'
 
 /**
  * The hero figure: coarse enough that the eye can follow the line all the way
@@ -30,7 +30,10 @@ import { SpliceFigure } from './splice'
  * lobes; across eight it settles back into a filled square. `pad` has to clear
  * that same half cell, or the bulge is cut off.
  */
-const HERO = { rows: 8, cols: 8, size: 56, seed: 13, pad: 34 }
+// Nine dots a side, so the lattice has a centre to turn about. Seed 6 draws
+// an eight-pointed wreath, which is about as plainly a rangoli as the
+// generator gets.
+const HERO = { n: 9, size: 56, pad: 34, seed: 6, strokes: 7 }
 
 /**
  * Counted from the data rather than written into the sentence below, which is
@@ -216,10 +219,10 @@ export default function Home() {
           <figure className="w-full lg:ml-auto" style={{ maxWidth: 'min(100%, 520px, 44svh)' }}>
             <noscript>
               <div className="text-fg">
-                <RangoliFigure {...HERO} strokeWidth={3.4} duration={0} showOrigin />
+                <TipkyanchiFigure {...HERO} strokeWidth={3.4} still />
               </div>
             </noscript>
-            <SpliceFigure {...HERO} />
+            <RangoliPlayer {...HERO} />
           </figure>
         </section>
 
@@ -646,7 +649,9 @@ export default function Home() {
         <div className="mono mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-2 px-6 py-10 text-fg-faint lg:px-10">
           <span>{identity.name}</span>
           <span>Richardson, TX</span>
-          <span className="ml-auto">the figure is a tipkyanchi rangoli, solved in the browser</span>
+          <span className="ml-auto">
+            the figure is a tipkyanchi rangoli, drawn from its own rule
+          </span>
         </div>
       </footer>
     </>

@@ -119,11 +119,12 @@ test('honours prefers-reduced-motion by showing the finished figure', async ({ b
   const page = await context.newPage()
   await page.goto('/')
 
-  // The stroke must be fully drawn immediately rather than merely animating fast.
-  const offset = await page
-    .locator('.stroke-draw')
-    .first()
-    .evaluate((el) => getComputedStyle(el).strokeDashoffset)
-  expect(Number.parseFloat(offset)).toBe(0)
+  // Every stroke must be fully drawn immediately rather than merely animating
+  // fast, and the lattice must be settled rather than mid-fade.
+  const offsets = await page
+    .locator('[data-rangoli] svg line')
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).strokeDashoffset))
+  expect(offsets.length).toBeGreaterThan(0)
+  for (const offset of offsets) expect(Number.parseFloat(offset)).toBe(0)
   await context.close()
 })
