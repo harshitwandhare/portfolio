@@ -49,7 +49,7 @@ export const summary =
   'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio, then owned the full stack of an open-source platform at a 3-person ' +
-  'company. 34 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
+  'company. 36 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
   'Foundation repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
@@ -130,7 +130,7 @@ export const metrics: readonly Metric[] = [
   // own work rather than a project's popularity, and every row is one click
   // away in somebody else's repository.
   {
-    value: '34',
+    value: '36',
     label: 'merged into AWS, Google, Anthropic, NVIDIA and Linux Foundation repos',
     source: 'confirmed',
     // Was a GitHub search URL. Signed out, that page answers to its own
@@ -139,7 +139,7 @@ export const metrics: readonly Metric[] = [
     // claim broken out per repository, and every row there links to the pull
     // request itself.
     href: '#open-source',
-    note: 'See all 34, repo by repo',
+    note: 'See all 36, repo by repo',
   },
   { value: '100K+', label: 'monthly users', source: 'self' },
   { value: 'A*', label: 'top rating, Jio', source: 'document', evidence: '/docs/jio-rating.pdf' },
@@ -442,7 +442,7 @@ export interface Contribution {
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
  * Counted per repo with `gh pr list --repo <r> --author harshitwandhare --state merged`
- * on 2026-10-20: 34 upstream merges across six repositories. `gh search prs` is not
+ * on 2026-10-23: 36 upstream merges across six repositories, 30 of them in agent frameworks. `gh search prs` is not
  * used for this, it truncates at --limit and has under-reported two repos before.
  */
 export const openSource = {
@@ -581,6 +581,19 @@ export const openSource = {
           merged: '2026-10-19',
           url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/956',
           tag: 'accessibility',
+        },
+        {
+          number: 1037,
+          title: 'keep waiting through a transient status poll failure',
+          merged: '2026-10-22',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1037',
+        },
+        {
+          number: 1040,
+          title: "fake PyPI's answer in the unpublished-plugin test",
+          merged: '2026-10-22',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1040',
+          tag: 'tests',
         },
       ],
     },
