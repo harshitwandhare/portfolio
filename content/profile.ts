@@ -283,6 +283,37 @@ export interface Project {
 // inviting inspection is a stronger move than describing the work.
 export const projects: readonly Project[] = [
   {
+    // Public since 2026-10-21, v0.1.0 tagged on the 22nd. The status line is
+    // deliberate: the README says outright that nothing here is
+    // production-ready, and the site must not claim more than the README.
+    //
+    // Never link mohar.vercel.app. That domain belongs to someone else.
+    name: 'Mohar',
+    blurb: 'Trust layer for AI agents.',
+    stack: ['Rust', 'ed25519', 'Apache-2.0'],
+    repo: 'https://github.com/harshitwandhare/mohar',
+    live: 'https://mohar-liard.vercel.app',
+    docs: 'https://harshitwandhare.github.io/mohar/',
+    points: [
+      {
+        text: 'An agent earns what it is allowed to do from verified results, and loses it the moment it gets something wrong.',
+        source: 'self',
+      },
+      {
+        text: 'Trust is scoped per capability rather than one score per agent, because being reliable at editing docs says nothing about being safe with a database migration.',
+        source: 'self',
+      },
+      {
+        text: 'v0.1.0 ships a signed, hash-chained receipt log and a CLI for Linux, macOS and Windows, with format test vectors and an independent Python checker so another implementation can be validated against the spec.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Early. The trust engine, verifiers and host adapters are designed and on the roadmap, not built.',
+        source: 'self',
+      },
+    ],
+  },
+  {
     name: 'Job Sentinel',
     blurb: 'Local-first career platform.',
     stack: ['Python', 'FastAPI', 'Playwright', 'Next.js', 'SQLite'],
