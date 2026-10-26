@@ -283,10 +283,10 @@ export interface Project {
 // inviting inspection is a stronger move than describing the work.
 export const projects: readonly Project[] = [
   {
-    // Public since 2026-10-21, v0.1.0 tagged on the 22nd. Only the receipt
-    // log and CLI are in a release; the trust engine, daemon and hook are on
-    // main. The last bullet says so, because the site must not claim more
-    // than the README. Test count is a floor: 206 passed in CI on 10-26.
+    // Public since 2026-10-21. v0.1.0 (receipt log and CLI) was tagged on the
+    // 22nd and v0.2.0 (trust engine, gates, daemon, hook) on the 26th. The
+    // last bullet names what the release ships, because the site must not
+    // claim more than the README. Test count is a floor: 206 passed on 10-26.
     //
     // Never link mohar.vercel.app. That domain belongs to someone else.
     name: 'Mohar',
@@ -295,7 +295,8 @@ export const projects: readonly Project[] = [
     repo: 'https://github.com/harshitwandhare/mohar',
     live: 'https://mohar-liard.vercel.app',
     docs: 'https://harshitwandhare.github.io/mohar/',
-    logo: { src: '/logos/mohar-dark.svg', srcLight: '/logos/mohar-light.svg', alt: '' },
+    // Mohar keeps its gold seal, the one its own site and docs use, instead of a monochrome mark.
+    logo: { src: '/logos/mohar.png', alt: '' },
     points: [
       {
         text: 'Every action an agent takes becomes an Ed25519-signed receipt in a hash-chained local log that anyone can verify.',
@@ -310,7 +311,7 @@ export const projects: readonly Project[] = [
         source: 'confirmed',
       },
       {
-        text: 'Early. v0.1.0 ships the receipt log and CLI for Linux, macOS and Windows; the trust engine, daemon and hook are on main for the next release. 200+ tests run on all three systems.',
+        text: 'Early. v0.2.0 ships the receipt log, the trust engine with its hard gates, the daemon and the Claude Code hook for Linux, macOS and Windows. 200+ tests run on all three systems.',
         source: 'confirmed',
       },
     ],
