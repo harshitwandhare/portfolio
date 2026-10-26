@@ -283,33 +283,35 @@ export interface Project {
 // inviting inspection is a stronger move than describing the work.
 export const projects: readonly Project[] = [
   {
-    // Public since 2026-10-21, v0.1.0 tagged on the 22nd. The status line is
-    // deliberate: the README says outright that nothing here is
-    // production-ready, and the site must not claim more than the README.
+    // Public since 2026-10-21, v0.1.0 tagged on the 22nd. Only the receipt
+    // log and CLI are in a release; the trust engine, daemon and hook are on
+    // main. The last bullet says so, because the site must not claim more
+    // than the README. Test count is a floor: 206 passed in CI on 10-26.
     //
     // Never link mohar.vercel.app. That domain belongs to someone else.
     name: 'Mohar',
     blurb: 'Trust layer for AI agents.',
-    stack: ['Rust', 'ed25519', 'Apache-2.0'],
+    stack: ['Rust', 'Ed25519', 'Apache-2.0'],
     repo: 'https://github.com/harshitwandhare/mohar',
     live: 'https://mohar-liard.vercel.app',
     docs: 'https://harshitwandhare.github.io/mohar/',
+    logo: { src: '/logos/mohar-dark.svg', srcLight: '/logos/mohar-light.svg', alt: '' },
     points: [
       {
-        text: 'An agent earns what it is allowed to do from verified results, and loses it the moment it gets something wrong.',
-        source: 'self',
-      },
-      {
-        text: 'Trust is scoped per capability rather than one score per agent, because being reliable at editing docs says nothing about being safe with a database migration.',
-        source: 'self',
-      },
-      {
-        text: 'v0.1.0 ships a signed, hash-chained receipt log and a CLI for Linux, macOS and Windows, with format test vectors and an independent Python checker so another implementation can be validated against the spec.',
+        text: 'Every action an agent takes becomes an Ed25519-signed receipt in a hash-chained local log that anyone can verify.',
         source: 'confirmed',
       },
       {
-        text: 'Early. The trust engine, verifiers and host adapters are designed and on the roadmap, not built.',
-        source: 'self',
+        text: 'Trust is kept per capability and earned only from verified outcomes: passing tests, diffs and human review. Hard gates cannot be averaged away, and a failure costs trust in proportion to what it could have broken.',
+        source: 'confirmed',
+      },
+      {
+        text: 'A local daemon answers from that ledger, and a Claude Code hook asks it before every tool call and denies the call if the daemon cannot answer.',
+        source: 'confirmed',
+      },
+      {
+        text: 'Early. v0.1.0 ships the receipt log and CLI for Linux, macOS and Windows; the trust engine, daemon and hook are on main for the next release. 200+ tests run on all three systems.',
+        source: 'confirmed',
       },
     ],
   },
