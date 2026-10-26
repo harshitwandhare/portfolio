@@ -476,12 +476,17 @@ export default function Home() {
             <h2 id="work-heading" className="sr-only">
               Selected work
             </h2>
-            {/* Two across, not three. With four projects a third column leaves
-                the last card alone beside two empty cells, and the wider card
-                suits a list of five bullets better than a narrow one. */}
+            {/* Two across, not three: the wider card suits a list of bullets
+                better than a narrow one. With five projects the first one, the
+                current flagship, spans the full row so no card sits alone
+                beside an empty cell. */}
             <div className="mt-14 grid gap-px bg-line md:grid-cols-2">
               {projects.map((p, i) => (
-                <Reveal key={p.name} delay={i * 90} className="bg-bg">
+                <Reveal
+                  key={p.name}
+                  delay={i * 90}
+                  className={i === 0 && projects.length % 2 === 1 ? 'bg-bg md:col-span-2' : 'bg-bg'}
+                >
                   <article className="flex h-full flex-col p-8">
                     <div className="flex h-10 items-center gap-3">
                       {p.logo && (
@@ -495,7 +500,7 @@ export default function Home() {
                       <h3 className="text-2xl font-semibold tracking-[-0.015em]">{p.name}</h3>
                     </div>
                     <p className="mt-3 text-fg-muted">{p.blurb}</p>
-                    <ul className="mt-6 flex-1 space-y-3">
+                    <ul className="mt-6 max-w-4xl flex-1 space-y-3">
                       {p.points.map((pt) => (
                         <li key={pt.text} className="text-fg-muted">
                           {pt.text}
