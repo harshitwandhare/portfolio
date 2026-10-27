@@ -33,29 +33,42 @@ test.describe('/', () => {
 
   test('leads the proof strip with commits, not a star count', async ({ page }) => {
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits on the project, as one of two engineers')).toBeVisible()
+    await expect(strip.getByText('commits on the project')).toBeVisible()
     // CountUp animates from zero, so wait for it to settle on the real figure.
-    // A floor rather than the exact 1,394: see the comment on the tile in
-    // content/profile.ts. With the repository banned, nobody can check an
-    // exact count, and the ranking that used to sit in this label was the
-    // claim the resume had already dropped.
-    await expect(strip.getByText('1,300+')).toBeVisible()
+    await expect(strip.getByText('1,394')).toBeVisible()
 
-    // This tile used to link to the commit list filtered by author email.
-    // GitHub banned the repository on 2026-10-13, so that link 404s for
-    // everyone now. The claim is still true and the founder's letter covers the
-    // scope, but nothing clickable backs it, and a tile that looks checkable
-    // and lands on a 404 is worse than one that does not pretend. So the tile
-    // must not be a link, and nothing on the page may point into that repo.
-    await expect(strip.getByRole('link', { name: /commits on the project/ })).toHaveCount(0)
-    await expect(page.locator('a[href*="YosemiteCrew/Yosemite-Crew"]')).toHaveCount(0)
+    // The repository came back up on 2026-10-27, so this is a link again and
+    // the number is exact again. It must stay a link: an unlinked count is
+    // what the page fell back to while the repo was banned, and there is no
+    // reason to make a reader take it on trust now that they can check it.
+    const tile = strip.getByRole('link', { name: /commits on the project/ })
+    await expect(tile).toHaveAttribute('href', /author=harshit%40yosemitecrew\.com|author=harshit@yosemitecrew\.com/)
+
+    // The one link into that repo that must never appear. His commits are
+    // unattributed to any GitHub account, so /graphs/contributors does not
+    // list him at all: sending a reader there would show them a page his name
+    // is absent from, directly under a claim about his commits. The
+    // author-filtered commit list is filtered on the git author email, which
+    // lives in the commit objects, so it renders his name regardless of which
+    // account holds that address.
+    await expect(page.locator('a[href*="/graphs/contributors"]')).toHaveCount(0)
+  })
+
+  test('claims no commit ranking on Yosemite Crew', async ({ page }) => {
+    // He was the largest contributor while he worked there and is not any
+    // more: the founder has kept committing since his last commit in July
+    // 2026 and is now well ahead on `main`. Every page that links to the
+    // commit list is one click from that fact, so any superlative here would
+    // be contradicted by its own citation. The bare count does not rot.
+    const body = await page.locator('body').innerText()
+    expect(body).not.toMatch(/largest contributor|most on the project|more than any other|ahead of every other/i)
   })
 
   test('never shows a zero in the proof strip', async ({ page }) => {
     // Job Sentinel and ATLAS have no stars; a panel reading "0" would put the
     // weakest fact on the page in the largest type.
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits on the project, as one of two engineers')).toBeVisible()
+    await expect(strip.getByText('commits on the project')).toBeVisible()
     for (const value of await strip.locator('.tabular').allTextContents()) {
       expect(value.trim()).not.toBe('0')
     }
