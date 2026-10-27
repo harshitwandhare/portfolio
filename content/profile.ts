@@ -46,7 +46,7 @@ export const identity = {
  * already above the real number by the time it was printed.
  */
 export const summary =
-  'Software and product engineer with 3 years shipping production systems, now an M.S. Computer ' +
+  'Software and product engineer with nearly 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio, then owned the full stack of an open-source platform at a 3-person ' +
   'company. 36 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
@@ -476,7 +476,8 @@ export interface Contribution {
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
  * Counted per repo with `gh pr list --repo <r> --author harshitwandhare --state merged`
- * on 2026-10-23: 36 upstream merges across six repositories, 30 of them in agent frameworks. `gh search prs` is not
+ * on 2026-10-27: 36 upstream merges across six repositories, 30 of them in agent frameworks, and 3 open. Every
+ * number below was re-checked against the live merged list on that date, PR by PR, and matched. `gh search prs` is not
  * used for this, it truncates at --limit and has under-reported two repos before.
  */
 export const openSource = {
@@ -792,6 +793,16 @@ export const openSource = {
   ] as readonly Contribution[],
   /** In review. Kept apart from the merged list on purpose. */
   open: [
+    {
+      repo: 'awslabs/cli-agent-orchestrator',
+      title: 'honor the local memory switch in memory_store and memory_for',
+      url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1104',
+    },
+    {
+      repo: 'a2aproject/a2a-js',
+      title: 'include extensions activated while producing the first stream event',
+      url: 'https://github.com/a2aproject/a2a-js/pull/791',
+    },
     {
       repo: 'NVIDIA-NeMo/Switchyard',
       title: 'report a dropped thinking budget on the way to Responses',
