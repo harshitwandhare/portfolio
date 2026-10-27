@@ -42,7 +42,10 @@ test.describe('/', () => {
     // what the page fell back to while the repo was banned, and there is no
     // reason to make a reader take it on trust now that they can check it.
     const tile = strip.getByRole('link', { name: /commits on the project/ })
-    await expect(tile).toHaveAttribute('href', /author=harshit%40yosemitecrew\.com|author=harshit@yosemitecrew\.com/)
+    await expect(tile).toHaveAttribute(
+      'href',
+      /author=harshit%40yosemitecrew\.com|author=harshit@yosemitecrew\.com/,
+    )
 
     // The one link into that repo that must never appear. His commits are
     // unattributed to any GitHub account, so /graphs/contributors does not
@@ -61,7 +64,9 @@ test.describe('/', () => {
     // commit list is one click from that fact, so any superlative here would
     // be contradicted by its own citation. The bare count does not rot.
     const body = await page.locator('body').innerText()
-    expect(body).not.toMatch(/largest contributor|most on the project|more than any other|ahead of every other/i)
+    expect(body).not.toMatch(
+      /largest contributor|most on the project|more than any other|ahead of every other/i,
+    )
   })
 
   test('never shows a zero in the proof strip', async ({ page }) => {
@@ -241,11 +246,20 @@ test.describe('/', () => {
         throw new Error(`${href} did not respond: ${String(err).split('\n')[0]}`)
       }
 
-      // LinkedIn answers automation with 999 (bot block) and, once the same
-      // run has asked a few times, 429 (slow down). Neither says anything
-      // about the link: a real visitor gets the page in both cases. Everything
-      // else, on any host, must be a genuine success.
-      if ([999, 429].includes(status) && new URL(href).hostname.endsWith('linkedin.com')) continue
+      // 429 means "you asked too often", which is a statement about this
+      // runner's IP and never about the link. GitHub returns it to CI for the
+      // filtered commit-list URL even while the page serves fine to a real
+      // visitor, and LinkedIn returns it once a run has asked a few times.
+      // Treating it as a failure made this suite fail for a link that works.
+      if (status === 429) continue
+
+      // LinkedIn also answers automation with 999, its own bot block. Same
+      // reasoning, but it is specific to that host, so keep it scoped.
+      if (status === 999 && new URL(href).hostname.endsWith('linkedin.com')) continue
+
+      // Everything else, on any host, must be a genuine success. 404 and 410
+      // in particular have to keep failing: a dead link is exactly what this
+      // test exists to catch, and it caught the Yosemite repo going down.
       expect(status, `${href} returned ${status}`).toBeLessThan(400)
     }
   })
