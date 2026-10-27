@@ -33,9 +33,13 @@ test.describe('/', () => {
 
   test('leads the proof strip with commits, not a star count', async ({ page }) => {
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits, most on the project')).toBeVisible()
+    await expect(strip.getByText('commits on the project, as one of two engineers')).toBeVisible()
     // CountUp animates from zero, so wait for it to settle on the real figure.
-    await expect(strip.getByText('1,394')).toBeVisible()
+    // A floor rather than the exact 1,394: see the comment on the tile in
+    // content/profile.ts. With the repository banned, nobody can check an
+    // exact count, and the ranking that used to sit in this label was the
+    // claim the resume had already dropped.
+    await expect(strip.getByText('1,300+')).toBeVisible()
 
     // This tile used to link to the commit list filtered by author email.
     // GitHub banned the repository on 2026-10-13, so that link 404s for
@@ -43,7 +47,7 @@ test.describe('/', () => {
     // scope, but nothing clickable backs it, and a tile that looks checkable
     // and lands on a 404 is worse than one that does not pretend. So the tile
     // must not be a link, and nothing on the page may point into that repo.
-    await expect(strip.getByRole('link', { name: /commits, most on the project/ })).toHaveCount(0)
+    await expect(strip.getByRole('link', { name: /commits on the project/ })).toHaveCount(0)
     await expect(page.locator('a[href*="YosemiteCrew/Yosemite-Crew"]')).toHaveCount(0)
   })
 
@@ -51,7 +55,7 @@ test.describe('/', () => {
     // Job Sentinel and ATLAS have no stars; a panel reading "0" would put the
     // weakest fact on the page in the largest type.
     const strip = page.locator('section').nth(1)
-    await expect(strip.getByText('commits, most on the project')).toBeVisible()
+    await expect(strip.getByText('commits on the project, as one of two engineers')).toBeVisible()
     for (const value of await strip.locator('.tabular').allTextContents()) {
       expect(value.trim()).not.toBe('0')
     }

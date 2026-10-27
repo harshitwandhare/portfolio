@@ -119,8 +119,14 @@ export const metrics: readonly Metric[] = [
     // and the founder's letter covers the scope, but nothing a reader can click
     // backs them any more, so this drops from `confirmed` to `self` and loses
     // its link. Restore both if the repo ever comes back.
-    value: '1,394',
-    label: 'commits, most on the project',
+    //
+    // 2026-10-27: the exact 1,394 and the "most on the project" ranking go
+    // too, here and in the role bullet below. An exact figure nobody can
+    // check reads worse than a floor, and the ranking was the claim this
+    // profile had already decided not to make in its resume form. The floor
+    // is what survives the repository being unreachable.
+    value: '1,300+',
+    label: 'commits on the project, as one of two engineers',
     source: 'self',
   },
   // This slot used to hold the star count on Yosemite Crew. GitHub banned that
@@ -202,8 +208,18 @@ export const experience: readonly Role[] = [
         evidence: '/docs/lor-founder.pdf',
       },
       {
-        text: 'The largest contributor to the project by commits, ahead of every other engineer on it, with 1,394 against 1,058 for the next.',
-        source: 'confirmed',
+        // Was "the largest contributor by commits, ahead of every other
+        // engineer on it, with 1,394 against 1,058 for the next", at
+        // `confirmed`. Nothing has been confirmable since GitHub banned the
+        // repository on 2026-10-13: the author-filtered commit list that
+        // backed the ranking 404s for everyone. The stats tile above already
+        // dropped to `self` for exactly this reason, so a bullet asserting the
+        // same fact at `confirmed` was the file disagreeing with itself.
+        // The floor and the team size survive the repo being gone; the
+        // ranking does not. Do not restore the comparison unless the
+        // repository does.
+        text: 'Wrote over 1,300 commits as one of two engineers on the project, across the web platform, the mobile app, the services and the infrastructure.',
+        source: 'self',
       },
       {
         text: 'Owned the React Native app end to end including the release process: builds, store review, and shipping to both the App Store and Google Play.',
@@ -985,7 +1001,7 @@ export const story = [
     lat: 49.99,
     lon: 8.25,
     title: 'Three people, one engineer',
-    body: 'A German startup, three people, and I owned the whole stack. Architecture, the web platform, the React Native app on both stores, the FHIR data models, the sign-in, the CI, the cloud. I ran the customer interviews. I hired the second engineer and wrote the specs he built against. The project is open source and I am still its largest contributor by commits.',
+    body: 'A German startup, three people, and I owned the whole stack. Architecture, the web platform, the React Native app on both stores, the FHIR data models, the sign-in, the CI, the cloud. I ran the customer interviews. I hired the second engineer and wrote the specs he built against. The project is open source, and over 1,300 commits of it are mine.',
   },
   {
     year: '2026',
