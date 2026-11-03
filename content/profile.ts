@@ -49,7 +49,7 @@ export const summary =
   'Software and product engineer with nearly 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio, then owned the full stack of an open-source platform at a 3-person ' +
-  'company. 36 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
+  'company. 39 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
   'Foundation repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
@@ -69,7 +69,7 @@ export const hero = {
   // Names the surfaces rather than gesturing at them. A reader hiring for the
   // web, for mobile, for backend or for AI work should find their own words
   // here instead of deciding it is probably not for them.
-  sub: 'Three years shipping production software: React and Next.js on the web, React Native on both app stores, Node and Python services on AWS underneath, and AI agent systems on top. Enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas, still sending patches to other people’s repositories most weeks.',
+  sub: 'Nearly three years shipping production software: React and Next.js on the web, React Native on both app stores, Node and Python services on AWS underneath, and AI agent systems on top. Enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas, still sending patches to other people’s repositories most weeks.',
 } as const
 
 /** The four numbers under the hero. Each implies a different competency. */
@@ -149,7 +149,7 @@ export const metrics: readonly Metric[] = [
   // own work rather than a project's popularity, and every row is one click
   // away in somebody else's repository.
   {
-    value: '36',
+    value: '39',
     label: 'merged into AWS, Google, Anthropic, NVIDIA and Linux Foundation repos',
     source: 'confirmed',
     // Was a GitHub search URL. Signed out, that page answers to its own
@@ -158,7 +158,7 @@ export const metrics: readonly Metric[] = [
     // claim broken out per repository, and every row there links to the pull
     // request itself.
     href: '#open-source',
-    note: 'See all 36, repo by repo',
+    note: 'See all 39, repo by repo',
   },
   { value: '100K+', label: 'monthly users', source: 'self' },
   { value: 'A*', label: 'top rating, Jio', source: 'document', evidence: '/docs/jio-rating.pdf' },
@@ -505,7 +505,7 @@ export interface Contribution {
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
  * Counted per repo with `gh pr list --repo <r> --author harshitwandhare --state merged`
- * on 2026-10-27: 36 upstream merges across six repositories, 30 of them in agent frameworks, and 3 open. Every
+ * on 2026-11-03: 39 upstream merges across six repositories, 33 of them in agent frameworks, and 2 open. Every
  * number below was re-checked against the live merged list on that date, PR by PR, and matched. `gh search prs` is not
  * used for this, it truncates at --limit and has under-reported two repos before.
  */
@@ -654,10 +654,30 @@ export const openSource = {
         },
         {
           number: 1040,
-          title: "fake PyPI's answer in the unpublished-plugin test",
+          title: "fake PyPI's answer in the unpublished-version test",
           merged: '2026-10-22',
           url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1040',
           tag: 'tests',
+        },
+        {
+          number: 1104,
+          title:
+            'honor the local memory switch in memory_store and memory_forget with a remote owner',
+          merged: '2026-10-29',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1104',
+        },
+        {
+          number: 1151,
+          title: "cover a decider's own cancellation through the launch routes",
+          merged: '2026-10-29',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1151',
+          tag: 'tests',
+        },
+        {
+          number: 1175,
+          title: 'record the two get_status transitions in launch_status_events',
+          merged: '2026-11-03',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1175',
         },
       ],
     },
@@ -822,11 +842,6 @@ export const openSource = {
   ] as readonly Contribution[],
   /** In review. Kept apart from the merged list on purpose. */
   open: [
-    {
-      repo: 'awslabs/cli-agent-orchestrator',
-      title: 'honor the local memory switch in memory_store and memory_for',
-      url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1104',
-    },
     {
       repo: 'a2aproject/a2a-js',
       title: 'include extensions activated while producing the first stream event',
