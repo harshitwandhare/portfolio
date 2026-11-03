@@ -69,7 +69,7 @@ export const hero = {
   // Names the surfaces rather than gesturing at them. A reader hiring for the
   // web, for mobile, for backend or for AI work should find their own words
   // here instead of deciding it is probably not for them.
-  sub: 'Three years shipping production software: React and Next.js on the web, React Native on both app stores, Node and Python services on AWS underneath, and AI agent systems on top. Enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas, still sending patches to other people’s repositories most weeks.',
+  sub: 'Nearly three years shipping production software: React and Next.js on the web, React Native on both app stores, Node and Python services on AWS underneath, and AI agent systems on top. Enterprise platforms serving 100K+ users at Reliance Jio, then full-stack ownership of an open-source platform at a three-person startup in Germany. Now an MS Computer Science student at UT Dallas, still sending patches to other people’s repositories most weeks.',
 } as const
 
 /** The four numbers under the hero. Each implies a different competency. */
