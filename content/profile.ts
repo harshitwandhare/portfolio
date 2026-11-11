@@ -49,7 +49,7 @@ export const summary =
   'Software and product engineer with nearly 3 years shipping production systems, now an M.S. Computer ' +
   'Science student at UT Dallas. Solo-owned the busiest module of a 30-engineer program ' +
   'at Reliance Jio, then owned the full stack of an open-source platform at a 3-person ' +
-  'company. 39 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
+  'company. 41 pull requests merged into AWS, Google, Anthropic, NVIDIA and Linux ' +
   'Foundation repositories. ' +
   'Seeking a Summer 2027 software or AI/ML internship.'
 
@@ -149,7 +149,7 @@ export const metrics: readonly Metric[] = [
   // own work rather than a project's popularity, and every row is one click
   // away in somebody else's repository.
   {
-    value: '39',
+    value: '41',
     label: 'merged into AWS, Google, Anthropic, NVIDIA and Linux Foundation repos',
     source: 'confirmed',
     // Was a GitHub search URL. Signed out, that page answers to its own
@@ -158,7 +158,7 @@ export const metrics: readonly Metric[] = [
     // claim broken out per repository, and every row there links to the pull
     // request itself.
     href: '#open-source',
-    note: 'See all 39, repo by repo',
+    note: 'See all 41, repo by repo',
   },
   { value: '100K+', label: 'monthly users', source: 'self' },
   { value: 'A*', label: 'top rating, Jio', source: 'document', evidence: '/docs/jio-rating.pdf' },
@@ -498,14 +498,14 @@ export interface Contribution {
  * request in someone else's repository needs nothing. It is either there or it
  * is not, the maintainer's name is on the merge, and the diff is public.
  *
- * Ordered by how much was merged, not by how famous the owner is. The three
+ * Ordered by how much was merged, not by how famous the owner is. The ones
  * still in review are listed separately, because "open" and "merged" are
  * different claims and collapsing them would lose the whole point of the
  * section.
  *
  * Every URL here is checked by the link test in e2e/content.spec.ts.
  * Counted per repo with `gh pr list --repo <r> --author harshitwandhare --state merged`
- * on 2026-11-03: 39 upstream merges across six repositories, 33 of them in agent frameworks, and 2 open. Every
+ * on 2026-11-11: 41 upstream merges across six repositories, 35 of them in agent frameworks, and 4 open. Every
  * number below was re-checked against the live merged list on that date, PR by PR, and matched. `gh search prs` is not
  * used for this, it truncates at --limit and has under-reported two repos before.
  */
@@ -679,6 +679,13 @@ export const openSource = {
           merged: '2026-11-03',
           url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1175',
         },
+        {
+          number: 1258,
+          title: 'pin the waits and queue placement at the two get_status sites',
+          merged: '2026-11-10',
+          url: 'https://github.com/awslabs/cli-agent-orchestrator/pull/1258',
+          tag: 'tests',
+        },
       ],
     },
     {
@@ -730,6 +737,12 @@ export const openSource = {
           merged: '2026-10-15',
           url: 'https://github.com/google/adk-go/pull/1750',
           tag: 'tests',
+        },
+        {
+          number: 2244,
+          title: "keep the resumption handle out of the caller's LiveRunConfig",
+          merged: '2026-11-10',
+          url: 'https://github.com/google/adk-go/pull/2244',
         },
       ],
     },
@@ -846,6 +859,16 @@ export const openSource = {
       repo: 'a2aproject/a2a-js',
       title: 'include extensions activated while producing the first stream event',
       url: 'https://github.com/a2aproject/a2a-js/pull/791',
+    },
+    {
+      repo: 'a2aproject/a2a-js',
+      title: 'trim a copy of the task for non-blocking historyLength',
+      url: 'https://github.com/a2aproject/a2a-js/pull/806',
+    },
+    {
+      repo: 'a2aproject/a2a-js',
+      title: 'release the webhook response in DefaultPushNotificationSender',
+      url: 'https://github.com/a2aproject/a2a-js/pull/808',
     },
     {
       repo: 'NVIDIA-NeMo/Switchyard',
