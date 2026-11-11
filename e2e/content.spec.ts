@@ -253,9 +253,11 @@ test.describe('/', () => {
       // Treating it as a failure made this suite fail for a link that works.
       if (status === 429) continue
 
-      // LinkedIn also answers automation with 999, its own bot block. Same
-      // reasoning, but it is specific to that host, so keep it scoped.
-      if (status === 999 && new URL(href).hostname.endsWith('linkedin.com')) continue
+      // LinkedIn also answers automation with 999, its own bot block, and
+      // since November with a plain 403 to CI runners. Same reasoning, but it
+      // is specific to that host, so keep it scoped.
+      if ((status === 999 || status === 403) && new URL(href).hostname.endsWith('linkedin.com'))
+        continue
 
       // Everything else, on any host, must be a genuine success. 404 and 410
       // in particular have to keep failing: a dead link is exactly what this
